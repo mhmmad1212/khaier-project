@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', $association->name ?? 'الموقع الرسمي للجمعية')</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+        :root{
+            --primary:#127962;
+            --primary-dark:#0d5948;
+            --secondary:#d4af37;
+            --dark:#1f2937;
+            --text-muted:#6b7280;
+            --light-bg:#f6f8fb;
+            --white:#ffffff;
+            --shadow-sm:0 2px 6px rgba(0,0,0,.05);
+            --shadow-md:0 12px 30px rgba(15,23,42,.10);
+            --radius:16px;
+            --transition:all .3s ease;
+        }
+
+        body{
+            font-family:'Tajawal',sans-serif;
+            background:var(--light-bg);
+            color:var(--dark);
+            overflow-x:hidden;
+            margin:0;
+        }
+
+        a{ text-decoration:none; transition:var(--transition); }
+
+        .topbar{
+            background:var(--primary-dark);
+            color:#fff;
+            font-size:.92rem;
+            position:relative;
+            z-index:1040;
+        }
+
+        .topbar a{ color:rgba(255,255,255,.92); }
+        .topbar a:hover{ color:var(--secondary); }
+        .topbar .contact-info i{
+            color:var(--secondary);
+            margin-inline-end:6px;
+        }
+
+        .header-main{
+            background:rgba(255,255,255,.96);
+            box-shadow:var(--shadow-sm);
+            position:sticky;
+            top:0;
+            z-index:1030;
+            transition:var(--transition);
+            border-bottom:1px solid rgba(0,0,0,.04);
+        }
+
+        .home-header{
+            position:absolute;
+            top:44px;
+            right:0;
+            left:0;
+            background:rgba(255,255,255,.16);
+            backdrop-filter:blur(10px);
+            -webkit-backdrop-filter:blur(10px);
+            border-bottom:1px solid rgba(255,255,255,.18);
+            box-shadow:none;
+        }
+
+        .navbar{ padding:.55rem 0; }
+
+        .navbar-brand{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin:0;
+        }
+
+        .brand-logo-wrap{
+            width:58px;
+            height:58px;
+            border-radius:18px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:1px solid rgba(255,255,255,.18);
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:#fff;
+            font-size:25px;
+            font-weight:800;
+            flex:0 0 auto;
+            box-shadow:var(--shadow-md);
+        }
+
+        .brand-text h1{
+            font-size:1.22rem;
+            font-weight:800;
+            margin:0;
+            line-height:1.35;
+            color:var(--primary-dark);
+        }
+
+        .home-header .brand-text h1,
+        .home-header .brand-text p,
+        .home-header .navbar-nav .nav-link{
+            color:#fff;
+        }
+
+        .brand-text p{
+            font-size:.82rem;
+            color:var(--text-muted);
+            margin:0;
+        }
+
+        .navbar-nav .nav-link{
+            color:var(--dark);
+            font-weight:700;
+            font-size:1rem;
+            padding:1rem .95rem;
+            position:relative;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active{
+            color:var(--primary);
+        }
+
+        .home-header .navbar-nav .nav-link:hover,
+        .home-header .navbar-nav .nav-link.active{
+            color:#fff;
+            opacity:.9;
+        }
+
+        .navbar-nav .nav-link::after{
+            content:'';
+            position:absolute;
+            right:50%;
+            transform:translateX(50%);
+            bottom:6px;
+            width:0;
+            height:3px;
+            background:var(--secondary);
+            border-radius:999px;
+            transition:var(--transition);
+        }
+
+        .navbar-nav .nav-link:hover::after,
+        .navbar-nav .nav-link.active::after{
+            width:30px;
+        }
+
+        .dropdown-menu{
+            border:none;
+            box-shadow:var(--shadow-md);
+            border-radius:18px;
+            padding:14px 0;
+            min-width:240px;
+            border-top:4px solid var(--primary);
+        }
+
+        .dropdown-item{
+            padding:11px 20px;
+            font-weight:600;
+            font-size:.95rem;
+            color:var(--dark);
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .dropdown-item:hover{
+            background:#f2f8f6;
+            color:var(--primary);
+            padding-inline-start:26px;
+        }
+
+        .btn-head{
+            background:var(--primary);
+            color:#fff;
+            border:2px solid var(--primary);
+            border-radius:999px;
+            padding:10px 22px;
+            font-weight:700;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .btn-head:hover{
+            background:transparent;
+            color:var(--primary);
+        }
+
+        .home-header .btn-head{
+            background:#fff;
+            border-color:#fff;
+            color:var(--primary-dark);
+        }
+
+        .home-header .btn-head:hover{
+            background:transparent;
+            color:#fff;
+            border-color:#fff;
+        }
+
+        .content-wrapper{ min-height:60vh; }
+
+        .site-footer{
+            background:#111827;
+            color:#e5e7eb;
+            padding-top:60px;
+            margin-top:70px;
+        }
+
+        .footer-title{
+            color:#fff;
+            font-weight:700;
+            font-size:1.2rem;
+            margin-bottom:25px;
+            position:relative;
+            padding-bottom:10px;
+        }
+
+        .footer-title::after{
+            content:'';
+            position:absolute;
+            bottom:0;
+            right:0;
+            width:42px;
+            height:3px;
+            background:var(--secondary);
+        }
+
+        .footer-links{
+            list-style:none;
+            padding:0;
+            margin:0;
+        }
+
+        .footer-links li{ margin-bottom:15px; }
+
+        .footer-links a{
+            color:#9ca3af;
+            font-size:.95rem;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .footer-links a::before{
+            content:"\\F285";
+            font-family:"bootstrap-icons";
+            font-size:.8rem;
+            color:var(--secondary);
+        }
+
+        .footer-links a:hover{
+            color:var(--secondary);
+            transform:translateX(-5px);
+        }
+
+        .footer-bottom{
+            background:#030712;
+            padding:20px 0;
+            margin-top:40px;
+            font-size:.9rem;
+            color:#6b7280;
+        }
+
+        @media (max-width: 991.98px){
+            .home-header{
+                position:relative;
+                top:0;
+                background:rgba(255,255,255,.96);
+            }
+
+            .home-header .brand-text h1,
+            .home-header .brand-text p,
+            .home-header .navbar-nav .nav-link{
+                color:var(--dark);
+            }
+
+            .home-header .btn-head{
+                background:var(--primary);
+                color:#fff;
+                border-color:var(--primary);
+            }
+
+            .navbar-nav .nav-link{ padding:.8rem 0; }
+
+            .brand-text h1{ font-size:1.05rem; }
+        }
+    </style>
+
+    @stack('styles')
+</head>
+<body>
+@php
+    $settings = $settings ?? \App\Models\SiteSetting::query()->first();
+
+    if (!isset($mainMenuItems)) {
+        $mainMenu = \App\Models\Menu::query()->where('location', 'main')->first();
+        $mainMenuItems = $mainMenu
+            ? \App\Models\MenuItem::query()
+                ->where('menu_id', $mainMenu->id)
+                ->whereNull('parent_id')
+                ->with(['children' => fn ($query) => $query->orderBy('sort_order')])
+                ->orderBy('sort_order')
+                ->get()
+            : collect();
+    }
+
+    if (!isset($footerMenuItems)) {
+        $footerMenu = \App\Models\Menu::query()->where('location', 'footer')->first();
+        $footerMenuItems = $footerMenu
+            ? \App\Models\MenuItem::query()
+                ->where('menu_id', $footerMenu->id)
+                ->whereNull('parent_id')
+                ->orderBy('sort_order')
+                ->get()
+            : collect();
+    }
+
+    $isHome = request()->routeIs('website.home');
+@endphp
+
+<div class="topbar d-none d-lg-block">
+    <div class="container d-flex align-items-center justify-content-between">
+        <div class="contact-info d-flex gap-4 py-2">
+            @if(!empty($settings?->phone))
+                <span><i class="bi bi-telephone-fill"></i> {{ $settings->phone }}</span>
+            @endif
+            @if(!empty($settings?->email))
+                <span><i class="bi bi-envelope-fill"></i> {{ $settings->email }}</span>
+            @endif
+        </div>
+
+        <div class="d-flex gap-3 align-items-center py-2">
+            <a href="/admin"><i class="bi bi-box-arrow-in-left"></i> تسجيل الدخول</a>
+        </div>
+    </div>
+</div>
+
+<header class="header-main {{ $isHome ? 'home-header' : '' }}">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg">
+            <a class="navbar-brand" href="/">
+                <div class="brand-logo-wrap">
+                    {{ mb_substr($association->name ?? 'ج', 0, 1) }}
+                </div>
+
+                <div class="brand-text d-none d-sm-block">
+                    <h1>{{ $association->name ?? 'جمعية البر الأهلية' }}</h1>
+                    <p>مسجلة بالمركز الوطني برقم ({{ $settings->license_number ?? '1234' }})</p>
+                </div>
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                    @if($mainMenuItems->count())
+                        @foreach($mainMenuItems as $item)
+                            <li class="nav-item {{ $item->children->count() ? 'dropdown' : '' }}">
+                                <a class="nav-link {{ $item->children->count() ? 'dropdown-toggle' : '' }}"
+                                   href="{{ $item->children->count() ? '#' : ($item->url ?: '#') }}"
+                                   @if($item->children->count()) data-bs-toggle="dropdown" @endif>
+                                    @if(!empty($item->icon))
+                                        <i class="bi {{ $item->icon }}"></i>
+                                    @endif
+                                    <span>{{ $item->title }}</span>
+                                </a>
+
+                                @if($item->children->count())
+                                    <ul class="dropdown-menu">
+                                        @foreach($item->children as $child)
+                                            <li>
+                                                <a class="dropdown-item" href="{{ $child->url ?: '#' }}">
+                                                    @if(!empty($child->icon))
+                                                        <i class="bi {{ $child->icon }}"></i>
+                                                    @endif
+                                                    <span>{{ $child->title }}</span>
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </li>
+                        @endforeach
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">
+                                <i class="bi bi-house"></i>
+                                <span>الرئيسية</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/news">
+                                <i class="bi bi-newspaper"></i>
+                                <span>الأخبار</span>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+
+                <div class="d-flex gap-2 mt-3 mt-lg-0 ms-lg-4">
+                    <a href="/news" class="btn btn-head"><i class="bi bi-newspaper"></i> المركز الإعلامي</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>

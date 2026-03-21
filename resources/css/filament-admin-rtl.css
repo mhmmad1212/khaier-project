@@ -1,0 +1,58 @@
+html[dir="rtl"],
+body {
+    direction: rtl;
+    text-align: right;
+}
+
+.fi-sidebar {
+    right: 0;
+    left: auto;
+}
+
+.fi-main,
+.fi-topbar,
+.fi-header,
+.fi-section,
+.fi-card,
+.fi-ta,
+.fi-fo,
+.fi-modal,
+.fi-dropdown-panel,
+.fi-input,
+.fi-select-input,
+.fi-text-input,
+.fi-textarea {
+    direction: rtl;
+    text-align: right;
+}
+
+.fi-ta-header-cell,
+.fi-ta-cell,
+.fi-fo-field-wrp-label,
+.fi-fo-field-wrp-hint,
+.fi-breadcrumbs,
+.fi-tabs,
+.fi-dropdown-list-item-label,
+.fi-btn-label {
+    text-align: right;
+}
+
+.fi-sidebar-nav {
+    direction: rtl;
+}
+
+.fi-sidebar-item-button {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.fi-topbar nav,
+.fi-breadcrumbs ol {
+    direction: rtl;
+}
+
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-ta-header-heading {
+    text-align: right;
+}

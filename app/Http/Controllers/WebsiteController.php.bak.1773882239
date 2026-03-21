@@ -1,0 +1,218 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+
+class WebsiteController extends Controller
+{
+    public function home()
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $sliders = DB::connection('tenant')->table('sliders')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        $statistics = DB::connection('tenant')->table('statistics')
+            ->orderBy('sort_order')
+            ->get();
+
+        $news = DB::connection('tenant')->table('news')
+            ->where('is_active', true)
+            ->where('status', 'published')
+            ->orderByDesc('published_at')
+            ->limit(6)
+            ->get();
+
+        $partners = DB::connection('tenant')->table('partners')
+            ->orderBy('sort_order')
+            ->get();
+
+        $theme = $association->theme_key ?: 'default';
+
+        return view("themes.{$theme}.home", [
+            'association' => $association,
+            'sliders' => $sliders,
+            'statistics' => $statistics,
+            'news' => $news,
+            'partners' => $partners,
+        ]);
+    }
+
+    public function newsIndex()
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $news = DB::connection('tenant')->table('news')
+            ->where('is_active', true)
+            ->where('status', 'published')
+            ->orderByDesc('published_at')
+            ->paginate(10);
+
+        return view("themes.{$theme}.news.index", [
+            'association' => $association,
+            'news' => $news,
+        ]);
+    }
+
+    public function newsShow($slug)
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $news = DB::connection('tenant')->table('news')
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->where('status', 'published')
+            ->first();
+
+        abort_if(! $news, 404);
+
+        return view("themes.{$theme}.news.show", [
+            'association' => $association,
+            'news' => $news,
+        ]);
+    }
+
+    public function pageShow($slug)
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $page = DB::connection('tenant')->table('pages')
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->where('status', 'published')
+            ->first();
+
+        abort_if(! $page, 404);
+
+        return view("themes.{$theme}.page.show", [
+            'association' => $association,
+            'page' => $page,
+        ]);
+    }
+
+    public function boardMembers()
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $members = DB::connection('tenant')->table('board_members')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view("themes.{$theme}.system.board-members", [
+            'association' => $association,
+            'members' => $members,
+        ]);
+    }
+
+    public function generalAssemblyMembers()
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $members = DB::connection('tenant')->table('general_assembly_members')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view("themes.{$theme}.system.general-assembly-members", [
+            'association' => $association,
+            'members' => $members,
+        ]);
+    }
+
+    public function employeesPage()
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $employees = DB::connection('tenant')->table('employees')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view("themes.{$theme}.system.employees", [
+            'association' => $association,
+            'employees' => $employees,
+        ]);
+    }
+
+    public function committeesPage()
+    {
+        $association = App::bound('currentAssociation')
+            ? App::make('currentAssociation')
+            : null;
+
+        if (! $association) {
+            abort(404);
+        }
+
+        $theme = $association->theme_key ?: 'default';
+
+        $committees = DB::connection('tenant')->table('committees')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view("themes.{$theme}.system.committees", [
+            'association' => $association,
+            'committees' => $committees,
+        ]);
+    }
+}
