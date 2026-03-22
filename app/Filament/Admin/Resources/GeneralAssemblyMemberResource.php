@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\GeneralAssemblyMemberResource\Pages;
+use App\Forms\Components\MediaPicker;
 use App\Models\GeneralAssemblyMember;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -35,10 +36,18 @@ class GeneralAssemblyMemberResource extends Resource
             Forms\Components\DatePicker::make('join_date')
                 ->label('تاريخ الانضمام'),
 
-            Forms\Components\TextInput::make('photo')
+            Forms\Components\Hidden::make('photo_media_id')
+                ->dehydrated(false),
+
+            MediaPicker::make('photo_media_id')
                 ->label('الصورة')
-                ->maxLength(255)
-                ->helperText('يمكن استبداله لاحقًا برفع ملف.'),
+                ->columnSpanFull(),
+
+            Forms\Components\Placeholder::make('current_photo')
+                ->label('الصورة الحالية')
+                ->content(fn ($record) => $record && $record->photo ? $record->photo : 'لا توجد صورة حالية')
+                ->visible(fn ($record) => filled($record?->photo))
+                ->columnSpanFull(),
 
             Forms\Components\TextInput::make('sort_order')
                 ->label('الترتيب')
@@ -67,6 +76,11 @@ class GeneralAssemblyMemberResource extends Resource
                 Tables\Columns\TextColumn::make('join_date')
                     ->label('تاريخ الانضمام')
                     ->date(),
+
+                Tables\Columns\TextColumn::make('photo')
+                    ->label('الصورة')
+                    ->limit(30)
+                    ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')

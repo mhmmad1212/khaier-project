@@ -44,10 +44,6 @@ class StatisticResource extends Resource
                 ->label('الترتيب')
                 ->numeric()
                 ->default(0),
-
-            Forms\Components\Toggle::make('is_active')
-                ->label('نشط')
-                ->default(true),
         ])->columns(2);
     }
 
@@ -71,10 +67,6 @@ class StatisticResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')
                     ->sortable(),
-
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('نشط')
-                    ->boolean(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

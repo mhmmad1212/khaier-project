@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 
-class Statistic extends Model
+class Statistic extends TenantModel
 {
-    //
+    protected $fillable = [
+        'title',
+        'value',
+        'icon',
+        'sort_order',
+    ];
 }

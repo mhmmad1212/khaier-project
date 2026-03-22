@@ -1,67 +1,37 @@
 @extends('themes.default.layouts.app')
 
 @section('content')
-<div class="container py-5">
+<div class="container" style="padding:40px 20px;">
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:20px;">السياسات</h1>
 
-    <div class="mb-4">
-        <h2 class="fw-bold">السياسات</h2>
-        <p class="text-muted mb-0">استعراض وتحميل ملفات السياسات المعتمدة.</p>
+    <div style="margin-bottom:20px;padding:12px 16px;background:#f3f4f6;border-radius:12px;">
+        items_count = {{ isset($items) ? $items->count() : 'items_not_passed' }}
     </div>
 
-    <form method="GET" class="row g-3 mb-4">
-        <div class="col-md-5">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="بحث بالاسم">
-        </div>
-
-        <div class="col-md-5">
-            <input type="number" name="year" value="{{ request('year') }}" class="form-control" placeholder="السنة">
-        </div>
-
-        <div class="col-md-2 d-grid">
-            <button class="btn btn-primary">تصفية</button>
-        </div>
-    </form>
-
-    @if($items->count())
-        <div class="row g-4">
+    @if(isset($items) && $items->count())
+        <div style="display:grid;gap:16px;">
             @foreach($items as $item)
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="fw-bold mb-2">{{ $item->title }}</h5>
+                <div style="border:1px solid #e5e7eb;border-radius:14px;padding:16px;background:#fff;">
+                    <div style="font-size:18px;font-weight:700;">{{ $item->title }}</div>
 
-                            <div class="mb-2">
-                                <span class="badge bg-light text-dark border">
-                                    السنة:
-                                    {{ $item->year ?: '—' }}
-                                </span>
-                            </div>
+                    @if(!empty($item->description))
+                        <div style="margin-top:8px;color:#6b7280;">{{ $item->description }}</div>
+                    @endif
 
-                            @if($item->description)
-                                <p class="text-muted mb-3">{{ $item->description }}</p>
-                            @endif
-
-                            <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <small class="text-muted">
-                                    {{ optional($item->published_at)->format('Y-m-d') ?: '—' }}
-                                </small>
-
-                                @if($item->fileMedia && $item->fileMedia->file)
-                                    <a href="{{ asset('storage/' . $item->fileMedia->file) }}" target="_blank" class="btn btn-primary">
-                                        عرض / تحميل الملف
-                                    </a>
-                                @else
-                                    <span class="badge bg-secondary">لا يوجد ملف</span>
-                                @endif
-                            </div>
+                    @if(!empty($item->fileMedia) && !empty($item->fileMedia->file))
+                        <div style="margin-top:12px;">
+                            <a href="{{ asset('storage/' . $item->fileMedia->file) }}" target="_blank" style="background:#127962;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600;">
+                                عرض الملف
+                            </a>
                         </div>
-                    </div>
+                    @endif
                 </div>
             @endforeach
         </div>
     @else
-        <div class="alert alert-light border">لا توجد نتائج.</div>
+        <div style="padding:20px;border:1px solid #e5e7eb;border-radius:12px;color:#6b7280;">
+            لا توجد سياسات أو أن المتغير items لم يُمرر للقالب.
+        </div>
     @endif
-
 </div>
 @endsection

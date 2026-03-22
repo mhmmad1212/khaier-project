@@ -6,8 +6,10 @@ use App\Filament\Admin\Resources\PagesResource\Pages;
 use App\Forms\Components\CkEditorMediaPicker;
 use App\Forms\Components\MediaPicker;
 use App\Models\Page;
+use App\Support\PageTypeRegistry;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,6 +27,22 @@ class PagesResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            Forms\Components\Select::make('page_type')
+                ->label('نوع الصفحة')
+                ->options([
+                    'content' => 'صفحة عادية',
+                    'system' => 'صفحة نظامية',
+                ])
+                ->default('content')
+                ->live()
+                ->required(),
+
+            Forms\Components\Select::make('system_key')
+                ->label('نوع الصفحة النظامية')
+                ->options(PageTypeRegistry::systemPageTypes())
+                ->visible(fn (Get $get) => $get('page_type') === 'system')
+                ->required(fn (Get $get) => $get('page_type') === 'system')
+                ->searchable(),
 
             Forms\Components\TextInput::make('title')
                 ->label('عنوان الصفحة')
@@ -48,8 +66,9 @@ class PagesResource extends Resource
 
             CkEditorMediaPicker::make('content')
                 ->label('محتوى الصفحة')
-                ->required()
-                ->columnSpanFull(),
+                ->columnSpanFull()
+                ->visible(fn (Get $get) => $get('page_type') !== 'system')
+                ->required(fn (Get $get) => $get('page_type') !== 'system'),
 
             Forms\Components\Select::make('status')
                 ->label('الحالة')
@@ -63,7 +82,6 @@ class PagesResource extends Resource
             Forms\Components\Toggle::make('is_active')
                 ->label('نشط')
                 ->default(true),
-
         ])->columns(2);
     }
 
@@ -81,6 +99,14 @@ class PagesResource extends Resource
                     ->searchable()
                     ->limit(40),
 
+                Tables\Columns\TextColumn::make('page_type')
+                    ->label('نوع الصفحة')
+                    ->formatStateUsing(fn ($state) => $state === 'system' ? 'نظامية' : 'عادية'),
+
+                Tables\Columns\TextColumn::make('system_key')
+                    ->label('المفتاح النظامي')
+                    ->formatStateUsing(fn ($state) => $state ? PageTypeRegistry::label($state) : '-'),
+
                 Tables\Columns\TextColumn::make('slug')
                     ->label('الرابط المختصر')
                     ->searchable()
@@ -95,6 +121,12 @@ class PagesResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+
+                Tables\Actions\Action::make('preview')
+                    ->label('معاينة')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn ($record) => url('/page/' . $record->slug))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

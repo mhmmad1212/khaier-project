@@ -86,6 +86,12 @@ class SiteSettingResource extends Resource
                                 ->searchable()
                                 ->preload(),
 
+                            Forms\Components\Select::make('regulations_template_key')
+                                ->label('تصميم صفحة اللوائح')
+                                ->options(fn () => static::templateOptions('regulations'))
+                                ->searchable()
+                                ->preload(),
+
                             Forms\Components\Select::make('financial_reports_template_key')
                                 ->label('تصميم صفحة القوائم المالية')
                                 ->options(fn () => static::templateOptions('financial_reports'))
@@ -93,8 +99,14 @@ class SiteSettingResource extends Resource
                                 ->preload(),
 
                             Forms\Components\Select::make('news_index_template_key')
-                                ->label('تصميم صفحة الأخبار')
+                                ->label('تصميم قائمة الأخبار')
                                 ->options(fn () => static::templateOptions('news_index'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('news_show_template_key')
+                                ->label('تصميم تفاصيل الخبر')
+                                ->options(fn () => static::templateOptions('news_show'))
                                 ->searchable()
                                 ->preload(),
 
@@ -119,6 +131,24 @@ class SiteSettingResource extends Resource
                             Forms\Components\Select::make('employees_template_key')
                                 ->label('تصميم صفحة الموظفين')
                                 ->options(fn () => static::templateOptions('employees'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('program_projects_index_template_key')
+                                ->label('تصميم صفحة قائمة المشاريع')
+                                ->options(fn () => static::templateOptions('program_projects_index'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('program_projects_show_template_key')
+                                ->label('تصميم صفحة تفاصيل المشروع')
+                                ->options(fn () => static::templateOptions('program_projects_show'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('services_template_key')
+                                ->label('تصميم صفحة الخدمات')
+                                ->options(fn () => static::templateOptions('services'))
                                 ->searchable()
                                 ->preload(),
                         ])->columns(2),

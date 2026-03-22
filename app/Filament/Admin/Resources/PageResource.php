@@ -46,6 +46,7 @@ class PageResource extends Resource
                             'employees' => 'الموظفون',
                             'committees' => 'اللجان',
                             'news_index' => 'قائمة الأخبار',
+                            'program_projects_index' => 'قائمة المشاريع',
                         ])
                         ->visible(fn (Get $get) => $get('page_type') === 'system' && (\Illuminate\Support\Facades\App::bound('currentAssociation') ? (bool) \Illuminate\Support\Facades\App::make('currentAssociation')->can_edit_system_pages : false)),
                 ])->columns(3),

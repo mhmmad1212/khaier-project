@@ -6,10 +6,10 @@ use App\Models\Concerns\HasShortCode;
 
 use App\Models\Concerns\HasUniqueSlug;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class FinancialReport extends Model
+class FinancialReport extends TenantModel
 {
     use HasShortCode;
 

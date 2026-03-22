@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 
-class Committee extends Model
+class Committee extends TenantModel
 {
     protected $connection = 'tenant';
 

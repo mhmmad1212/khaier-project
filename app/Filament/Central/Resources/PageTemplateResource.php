@@ -5,6 +5,7 @@ namespace App\Filament\Central\Resources;
 use App\Filament\Central\Resources\PageTemplateResource\Pages;
 use App\Models\Association;
 use App\Models\PageTemplate;
+use App\Support\PageTypeRegistry;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -27,15 +28,7 @@ class PageTemplateResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('page_type')
                         ->label('نوع الصفحة')
-                        ->options([
-                            'home' => 'الصفحة الرئيسية',
-                            'policies' => 'السياسات',
-                            'regulations' => 'اللوائح',
-                            'financial_reports' => 'القوائم المالية',
-                            'news_index' => 'قائمة الأخبار',
-                            'news_show' => 'تفاصيل الخبر',
-                            'page' => 'الصفحات الداخلية',
-                        ])
+                        ->options(PageTypeRegistry::templateTypes())
                         ->required(),
 
                     Forms\Components\TextInput::make('name')
@@ -121,16 +114,7 @@ class PageTemplateResource extends Resource
 
                 Tables\Columns\TextColumn::make('page_type')
                     ->label('نوع الصفحة')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'home' => 'الصفحة الرئيسية',
-                        'policies' => 'السياسات',
-                        'regulations' => 'اللوائح',
-                        'financial_reports' => 'القوائم المالية',
-                        'news_index' => 'قائمة الأخبار',
-                        'news_show' => 'تفاصيل الخبر',
-                        'page' => 'الصفحات الداخلية',
-                        default => $state,
-                    }),
+                    ->formatStateUsing(fn (string $state): string => PageTypeRegistry::label($state)),
 
                 Tables\Columns\TextColumn::make('template_key')
                     ->label('المعرف الفني')

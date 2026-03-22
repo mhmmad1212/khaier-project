@@ -6,11 +6,11 @@ use App\Models\Concerns\HasShortCode;
 
 use App\Models\Concerns\HasUniqueSlug;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class News extends Model
+class News extends TenantModel
 {
     use HasShortCode;
 

@@ -1,15 +1,19 @@
 <?php
 
 use App\Http\Controllers\WebsiteController;
+use App\Http\Controllers\FrontendPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WebsiteController::class, 'home'])->name('website.home');
 
 Route::get('/news', [WebsiteController::class, 'newsIndex'])->name('news.index');
 
-Route::get('/news/{slug}', [WebsiteController::class, 'newsShow'])->name('news.show');
+Route::get('/page/{slug}/news/{newsSlug}', [FrontendPageController::class, 'pageNewsShow'])->name('page.news.show');
+Route::get('/news/{slug}', [FrontendPageController::class, 'newsShow'])->name('news.show');
 
-Route::get('/page/{slug}', [WebsiteController::class, 'pageShow'])->name('page.show');
+Route::get('/page/{slug}/project/{id}', [FrontendPageController::class, 'pageProgramProjectShow'])->name('page.project.show');
+Route::get('/page/{slug}', [FrontendPageController::class, 'pageShow'])->name('page.show');
+Route::get('/projects/{id}', [FrontendPageController::class, 'programProjectShow'])->name('program-projects.show');
 
 Route::get('/board-members', [WebsiteController::class, 'boardMembers'])->name('board-members.index');
 
@@ -275,7 +279,25 @@ Route::get('/policies', function () {
         ->orderBy('sort_order')
         ->get();
 
-    return view('themes.default.policies.index', compact('items'));
+    $siteSettings = \Illuminate\Support\Facades\DB::connection('tenant')
+        ->table('site_settings')
+        ->orderByDesc('id')
+        ->first();
+
+    $template = null;
+
+    if ($siteSettings && !empty($siteSettings->policies_template_key)) {
+        $template = \App\Models\PageTemplate::query()
+            ->where('template_key', $siteSettings->policies_template_key)
+            ->where('is_active', true)
+            ->first();
+    }
+
+    $viewPath = ($template && !empty($template->view_path))
+        ? $template->view_path
+        : 'themes.default.policies.index';
+
+    return view($viewPath, compact('items', 'template', 'siteSettings'));
 });
 
 Route::get('/regulations', function () {

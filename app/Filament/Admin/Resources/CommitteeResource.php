@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\CommitteeResource\Pages;
+use App\Forms\Components\MediaPicker;
 use App\Models\Committee;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -41,10 +42,18 @@ class CommitteeResource extends Resource
                 ->label('عدد الأعضاء')
                 ->numeric(),
 
-            Forms\Components\TextInput::make('attachment')
+            Forms\Components\Hidden::make('attachment_media_id')
+                ->dehydrated(false),
+
+            MediaPicker::make('attachment_media_id')
                 ->label('المرفق')
-                ->maxLength(255)
-                ->helperText('يمكن استبداله لاحقًا برفع ملف.'),
+                ->columnSpanFull(),
+
+            Forms\Components\Placeholder::make('current_attachment')
+                ->label('المرفق الحالي')
+                ->content(fn ($record) => $record && $record->attachment ? $record->attachment : 'لا يوجد مرفق حالي')
+                ->visible(fn ($record) => filled($record?->attachment))
+                ->columnSpanFull(),
 
             Forms\Components\TextInput::make('sort_order')
                 ->label('الترتيب')
@@ -73,6 +82,11 @@ class CommitteeResource extends Resource
                 Tables\Columns\TextColumn::make('members_count')
                     ->label('عدد الأعضاء')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('attachment')
+                    ->label('المرفق')
+                    ->limit(30)
+                    ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')

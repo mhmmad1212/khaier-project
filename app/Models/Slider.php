@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Slider extends Model
+class Slider extends TenantModel
 {
-    protected $connection = 'tenant';
-
     protected $fillable = [
         'title',
         'description',
@@ -19,6 +17,19 @@ class Slider extends Model
         'sort_order',
         'is_active',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Slider $slider) {
+            if ($slider->image_media_id) {
+                $media = MediaItem::query()->find($slider->image_media_id);
+
+                if ($media && ! empty($media->file)) {
+                    $slider->image = $media->file;
+                }
+            }
+        });
+    }
 
     public function imageMedia(): BelongsTo
     {

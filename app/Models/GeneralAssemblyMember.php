@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 
-class GeneralAssemblyMember extends Model
+class GeneralAssemblyMember extends TenantModel
 {
     protected $connection = 'tenant';
 

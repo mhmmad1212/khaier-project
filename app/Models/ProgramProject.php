@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Tenant\TenantModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class ProgramProject extends TenantModel
+{
+    protected $fillable = [
+        'title',
+        'description',
+        'cover_image',
+        'cover_image_media_id',
+        'start_date',
+        'end_date',
+        'project_amount',
+        'donation_amount',
+        'donation_url',
+        'report_file',
+        'report_media_id',
+        'sort_order',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'project_amount' => 'decimal:2',
+        'donation_amount' => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
+
+    public function coverMedia(): BelongsTo
+    {
+        return $this->belongsTo(MediaItem::class, 'cover_image_media_id');
+    }
+
+    public function reportMedia(): BelongsTo
+    {
+        return $this->belongsTo(MediaItem::class, 'report_media_id');
+    }
+
+    public function galleryImages(): HasMany
+    {
+        return $this->hasMany(ProgramProjectImage::class)->orderBy('sort_order');
+    }
+}

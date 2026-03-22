@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class NewsCategory extends Model
+class NewsCategory extends TenantModel
 {
     protected $connection = 'tenant';
 

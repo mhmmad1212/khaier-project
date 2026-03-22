@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenant\TenantModel;
 
-class MediaItem extends Model
+class MediaItem extends TenantModel
 {
     protected $connection = 'tenant';
 
