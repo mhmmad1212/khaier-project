@@ -10,6 +10,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        app()->setLocale('ar');
+        setlocale(LC_TIME, 'ar_SA.UTF-8', 'ar_SA', 'ar');
         View::composer('*', function ($view) {
             $request = request();
 
