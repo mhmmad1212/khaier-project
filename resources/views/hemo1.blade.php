@@ -496,7 +496,7 @@
             <div class="brand">
                 <div class="brand-logo">
                     @if($logo)
-                        <img src="{{ $logo }}" alt="{{ $siteName }}">
+                        <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $siteName }}">
                     @else
                         <div style="font-weight:700;color:#0f6f87;">{{ mb_substr($siteName, 0, 1) }}</div>
                     @endif
@@ -550,7 +550,7 @@
                 <div class="mini-card">
                     <div class="image-wrap">
                         @if($heroImage)
-                            <img src="{{ $heroImage }}" alt="{{ $associationName }}">
+                            <img loading="lazy" decoding="async" src="{{ $heroImage }}" alt="{{ $associationName }}">
                         @else
                             <div style="text-align:center;color:#0f6f87;font-weight:700;">
                                 صورة رئيسية للجمعية
@@ -584,7 +584,7 @@
             <div class="about-grid">
                 <div class="card about-image">
                     @if($heroImage)
-                        <img src="{{ $heroImage }}" alt="{{ $associationName }}">
+                        <img loading="lazy" decoding="async" src="{{ $heroImage }}" alt="{{ $associationName }}">
                     @else
                         <div style="min-height:420px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e9fbff,#f9fdff);color:#0f6f87;font-weight:700;">
                             صورة تعريفية
@@ -681,7 +681,7 @@
                     <article class="card news-card">
                         <div class="news-image">
                             @if(!empty($item->featured_image))
-                                <img src="{{ asset('storage/' . ltrim($item->featured_image, '/')) }}" alt="{{ $item->title ?? 'خبر' }}">
+                                <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($item->featured_image, '/')) }}" alt="{{ $item->title ?? 'خبر' }}">
                             @else
                                 <div style="height:100%;display:flex;align-items:center;justify-content:center;color:#0f6f87;font-weight:700;">
                                     صورة الخبر
@@ -718,7 +718,7 @@
                 @forelse(($partners ?? []) as $partner)
                     <div class="card partner">
                         @if(!empty($partner->logo))
-                            <img src="{{ asset('storage/' . ltrim($partner->logo, '/')) }}" alt="{{ $partner->name ?? 'شريك' }}">
+                            <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($partner->logo, '/')) }}" alt="{{ $partner->name ?? 'شريك' }}">
                         @else
                             <div style="color:#64748b;">{{ $partner->name ?? 'شريك' }}</div>
                         @endif

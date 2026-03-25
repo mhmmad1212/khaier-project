@@ -10,7 +10,7 @@ $record = $getRecord();
         الصورة الحالية
     </div>
 
-    <img
+    <img loading="lazy" decoding="async"
         src="{{ asset('storage/'.$record->image) }}"
         style="width:200px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px"
     >

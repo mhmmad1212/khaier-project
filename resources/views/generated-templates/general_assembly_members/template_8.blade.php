@@ -163,7 +163,7 @@
                 <div class="ga-card">
                     <div class="ga-avatar-wrap">
                         @if(!empty($photo))
-                            <img
+                            <img loading="lazy" decoding="async"
                                 src="{{ asset('storage/' . ltrim($photo, '/')) }}"
                                 alt="{{ $name }}"
                                 class="ga-avatar"

@@ -204,7 +204,7 @@
                 <div class="project-card">
                     <div class="project-image-wrap">
                         @if(!empty($image))
-                            <img
+                            <img loading="lazy" decoding="async"
                                 src="{{ asset('storage/' . ltrim($image, '/')) }}"
                                 alt="{{ $title }}"
                                 class="project-image"

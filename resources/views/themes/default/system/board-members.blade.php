@@ -124,7 +124,7 @@
                     <article class="board-card">
                         <div class="board-photo">
                             @if($photoUrl)
-                                <img src="{{ $photoUrl }}" alt="{{ $member->name }}">
+                                <img loading="lazy" decoding="async" src="{{ $photoUrl }}" alt="{{ $member->name }}">
                             @endif
                         </div>
 

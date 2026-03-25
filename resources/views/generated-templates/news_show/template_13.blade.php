@@ -167,7 +167,7 @@
         <div class="news-show-card">
             @if(!empty($image))
                 <div class="news-show-image-wrap">
-                    <img
+                    <img loading="lazy" decoding="async"
                         src="{{ asset('storage/' . ltrim($image, '/')) }}"
                         alt="{{ $title }}"
                         class="news-show-image"

@@ -36,7 +36,7 @@
                     {{-- الصورة --}}
                     <div style="margin-bottom: 15px;">
                         @if(!empty($member->imageMedia) && !empty($member->imageMedia->file))
-                            <img src="{{ asset('storage/' . $member->imageMedia->file) }}"
+                            <img loading="lazy" decoding="async" src="{{ asset('storage/' . $member->imageMedia->file) }}"
                                  style="
                                     width: 110px;
                                     height: 110px;

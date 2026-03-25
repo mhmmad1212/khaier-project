@@ -44,7 +44,7 @@
         @if($media)
             <div style="margin-top:14px;padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#fafafa;">
                 @if($media->is_image)
-                    <img
+                    <img loading="lazy" decoding="async"
                         src="{{ asset('storage/' . $media->file) }}"
                         style="width:130px;height:130px;object-fit:cover;border-radius:12px;border:1px solid #ddd;"
                         alt="{{ $media->alt_text ?: $media->title }}"

@@ -189,7 +189,7 @@
                 <div class="employee-card">
                     <div class="employee-image-wrap">
                         @if(!empty($photo))
-                            <img
+                            <img loading="lazy" decoding="async"
                                 src="{{ asset('storage/' . ltrim($photo, '/')) }}"
                                 alt="{{ $name }}"
                                 class="employee-image"

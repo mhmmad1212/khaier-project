@@ -214,7 +214,7 @@
 
                         @if($imageSrc)
                             {{-- استخدمنا onerror هنا حتى لو كان الرابط خطأ تتحول الصورة للأيقونة الرمزية --}}
-                            <img src="{{ $imageSrc }}" 
+                            <img loading="lazy" decoding="async" src="{{ $imageSrc }}" 
                                  class="member-avatar" 
                                  alt="{{ $member->name ?? 'صورة العضو' }}" 
                                  onerror="this.onerror=null; this.outerHTML='<div class=\'member-avatar fallback-avatar\'>👤</div>';">

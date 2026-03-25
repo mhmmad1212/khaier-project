@@ -28,6 +28,42 @@ class NewsResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+Forms\Components\Section::make('تحسين محركات البحث (SEO)')
+    ->schema([
+                    Forms\Components\Actions::make([
+                        Forms\Components\Actions\Action::make('generate_seo')
+                            ->label('توليد SEO تلقائي')
+                            ->icon('heroicon-o-sparkles')
+                            ->color('primary')
+                            ->action(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) {
+                                $title = trim((string) ($get('title') ?? ''));
+                                $content = trim(strip_tags((string) ($get('excerpt') ?? $get('summary') ?? $get('short_description') ?? $get('description') ?? $get('content') ?? '')));
+
+                                if ($title !== '' && trim((string) $get('meta_title')) === '') {
+                                    $set('meta_title', \Illuminate\Support\Str::limit($title, 60, ''));
+                                }
+
+                                if ($content === '' && $title !== '') {
+                                    $content = $title;
+                                }
+
+                                if ($content !== '' && trim((string) $get('meta_description')) === '') {
+                                    $set('meta_description', \Illuminate\Support\Str::limit($content, 160, ''));
+                                }
+                            }),
+                    ]),
+
+        Forms\Components\TextInput::make('meta_title')
+            ->label('عنوان SEO')
+            ->maxLength(60),
+
+        Forms\Components\Textarea::make('meta_description')
+            ->label('وصف SEO')
+            ->rows(3)
+            ->maxLength(160),
+    ])
+    ->collapsed(),
+
             Forms\Components\TextInput::make('title')
                 ->label('العنوان')
                 ->required()

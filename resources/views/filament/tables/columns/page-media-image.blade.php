@@ -4,7 +4,7 @@
 
 @if($media && $media->file)
     @if($media->is_image)
-        <img
+        <img loading="lazy" decoding="async"
             src="{{ asset('storage/' . $media->file) }}"
             alt="page-media-image"
             style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb;"

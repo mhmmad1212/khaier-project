@@ -10,6 +10,18 @@ class EditAssociation extends EditRecord
 {
     protected static string $resource = AssociationResource::class;
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (($data['domain_type'] ?? null) === 'subdomain') {
+            $label = trim((string) ($data['subdomain_label'] ?? ''));
+            $label = strtolower(preg_replace('/[^a-z0-9\-]/', '', str_replace(' ', '-', $label)));
+            $data['subdomain_label'] = $label;
+            $data['domain'] = $label . '.khaier.sa';
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

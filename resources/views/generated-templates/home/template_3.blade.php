@@ -268,7 +268,7 @@
             <div class="logo">
                 <a href="/">
                     @if($logo)
-                        <img src="{{ $logo }}" alt="{{ $associationName }}">
+                        <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $associationName }}">
                     @else
                         <h2>{{ $associationName }}</h2>
                     @endif
@@ -402,7 +402,7 @@
                 <div class="projects-col">
                     <h3 class="col-title">أبرز مشاريعنا</h3>
                     <div class="card project-card">
-                        <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=كفالة+يتيم" alt="كفالة يتيم">
+                        <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=كفالة+يتيم" alt="كفالة يتيم">
                         <div class="project-content">
                             <h3 class="news-title">مشروع كفالة يتيم</h3>
                             <p class="news-text">توفير الرعاية الشاملة للأيتام ودعمهم في مسيرتهم التعليمية والاجتماعية.</p>
@@ -410,7 +410,7 @@
                         </div>
                     </div>
                     <div class="card project-card">
-                        <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=سقيا+الماء" alt="سقيا الماء">
+                        <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=سقيا+الماء" alt="سقيا الماء">
                         <div class="project-content">
                             <h3 class="news-title">مشروع سقيا الماء</h3>
                             <p class="news-text">توفير مياه صالحة للشرب في الأماكن العامة والمناطق النائية.</p>
@@ -438,7 +438,7 @@
                                 $newsCount++;
                             @endphp
                             <div class="card news-card">
-                                <img src="{{ $newsImg }}" alt="{{ $newsTitle }}">
+                                <img loading="lazy" decoding="async" src="{{ $newsImg }}" alt="{{ $newsTitle }}">
                                 <div class="news-content">
                                     @if(!empty($newsDate))
                                         <span class="news-date"><i class="far fa-clock"></i> {{ $newsDate }}</span>
@@ -475,13 +475,13 @@
                             $partnerLogo = !empty($partner->logo) ? asset('storage/' . ltrim($partner->logo, '/')) : 'https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك';
                             $partnerName = $partner->name ?? 'شريك نجاح';
                         @endphp
-                        <img src="{{ $partnerLogo }}" alt="{{ $partnerName }}" class="partner-img">
+                        <img loading="lazy" decoding="async" src="{{ $partnerLogo }}" alt="{{ $partnerName }}" class="partner-img">
                     @endforeach
                 @else
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+1" alt="شريك 1" class="partner-img">
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+2" alt="شريك 2" class="partner-img">
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+3" alt="شريك 3" class="partner-img">
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+4" alt="شريك 4" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+1" alt="شريك 1" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+2" alt="شريك 2" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+3" alt="شريك 3" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+4" alt="شريك 4" class="partner-img">
                 @endif
             </div>
         </div>
@@ -503,7 +503,7 @@
         <div class="container footer-grid">
             <div class="footer-col">
                 @if($logo)
-                    <img src="{{ $logo }}" alt="{{ $associationName }}" style="max-height: 50px; margin-bottom: 20px; filter: brightness(0) invert(1);">
+                    <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $associationName }}" style="max-height: 50px; margin-bottom: 20px; filter: brightness(0) invert(1);">
                 @else
                     <h4>{{ $associationName }}</h4>
                 @endif

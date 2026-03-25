@@ -109,7 +109,7 @@ margin-top:4px;
 <div class="emp-photo">
 
 @if(!empty($emp->photo))
-<img src="{{ $emp->photo }}">
+<img loading="lazy" decoding="async" src="{{ $emp->photo }}">
 @else
 <i class="bi bi-person"></i>
 @endif

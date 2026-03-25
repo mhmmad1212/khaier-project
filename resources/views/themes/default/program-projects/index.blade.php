@@ -12,7 +12,7 @@
         @forelse($projects as $project)
             <div style="border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff;">
                 @if(!empty($project->cover_image))
-                    <img src="{{ asset('storage/' . ltrim($project->cover_image, '/')) }}" alt="{{ $project->title }}" style="width:100%;height:220px;object-fit:cover;">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($project->cover_image, '/')) }}" alt="{{ $project->title }}" style="width:100%;height:220px;object-fit:cover;">
                 @endif
                 <div style="padding:18px;">
                     <h3 style="margin:0 0 10px;">{{ $project->title }}</h3>

@@ -567,7 +567,7 @@
             <div class="logo">
                 <a href="/">
                     @if($logo)
-                        <img src="{{ $logo }}" alt="{{ $associationName }}">
+                        <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $associationName }}">
                     @else
                         <h2>{{ $associationName }}</h2>
                     @endif
@@ -685,7 +685,7 @@
             </div>
             <div class="cards-grid">
                 <div class="card">
-                    <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=مشروع+كفالة+يتيم" alt="مشروع كفالة" class="card-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=مشروع+كفالة+يتيم" alt="مشروع كفالة" class="card-img">
                     <div class="card-body">
                         <h3 class="card-title">مشروع كفالة يتيم</h3>
                         <p class="card-excerpt">توفير الرعاية الشاملة للأيتام ودعمهم في مسيرتهم التعليمية والاجتماعية لضمان حياة كريمة.</p>
@@ -693,7 +693,7 @@
                     </div>
                 </div>
                 <div class="card">
-                    <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=مشروع+السلة+الغذائية" alt="مشروع السلة" class="card-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=مشروع+السلة+الغذائية" alt="مشروع السلة" class="card-img">
                     <div class="card-body">
                         <h3 class="card-title">مشروع السلال الغذائية</h3>
                         <p class="card-excerpt">توزيع سلال غذائية متكاملة تلبي احتياجات الأسر المتعففة والمحتاجة بشكل دوري.</p>
@@ -701,7 +701,7 @@
                     </div>
                 </div>
                 <div class="card">
-                    <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=مشروع+سقيا+الماء" alt="مشروع سقيا" class="card-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=مشروع+سقيا+الماء" alt="مشروع سقيا" class="card-img">
                     <div class="card-body">
                         <h3 class="card-title">مشروع سقيا الماء</h3>
                         <p class="card-excerpt">توفير مياه صالحة للشرب في الأماكن العامة والمناطق النائية كصدقة جارية.</p>
@@ -722,9 +722,9 @@
                     @foreach($news->take(3) as $item)
                         <div class="card">
                             @if(!empty($item->featured_image))
-                            <img src="{{ asset('storage/' . ltrim($item->featured_image, '/')) }}" alt="{{ $item->title }}" class="card-img">
+                            <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($item->featured_image, '/')) }}" alt="{{ $item->title }}" class="card-img">
                         @else
-                            <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=خبر" alt="{{ $item->title }}" class="card-img">
+                            <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=خبر" alt="{{ $item->title }}" class="card-img">
                         @endif
                             <div class="card-body">
                                 @if(!empty($item->published_at))
@@ -779,13 +779,13 @@
             <div class="partners-grid">
                 @if(isset($partners) && $partners->count() > 0)
                     @foreach($partners as $partner)
-                        <img src="{{ asset('storage/' . ltrim($partner->logo, '/')) }}" alt="{{ $partner->name }}" class="partner-img">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($partner->logo, '/')) }}" alt="{{ $partner->name }}" class="partner-img">
                     @endforeach
                 @else
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+1" alt="شريك 1" class="partner-img">
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+2" alt="شريك 2" class="partner-img">
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+3" alt="شريك 3" class="partner-img">
-                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+4" alt="شريك 4" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+1" alt="شريك 1" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+2" alt="شريك 2" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+3" alt="شريك 3" class="partner-img">
+                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+4" alt="شريك 4" class="partner-img">
                 @endif
             </div>
         </div>
@@ -796,7 +796,7 @@
             <div class="footer-grid">
                 <div class="footer-col">
                     @if($logo)
-                        <img src="{{ $logo }}" alt="{{ $associationName }}" style="max-height: 60px; margin-bottom: 15px; filter: brightness(0) invert(1);">
+                        <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $associationName }}" style="max-height: 60px; margin-bottom: 15px; filter: brightness(0) invert(1);">
                     @else
                         <h4>{{ $associationName }}</h4>
                     @endif

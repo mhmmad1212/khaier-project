@@ -5,7 +5,7 @@
     <h1 style="margin-bottom:20px;">{{ $project->title }}</h1>
 
     @if(!empty($project->cover_image))
-        <img src="{{ asset('storage/' . ltrim($project->cover_image, '/')) }}" alt="{{ $project->title }}" style="width:100%;max-height:420px;object-fit:cover;border-radius:18px;margin-bottom:24px;">
+        <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($project->cover_image, '/')) }}" alt="{{ $project->title }}" style="width:100%;max-height:420px;object-fit:cover;border-radius:18px;margin-bottom:24px;">
     @endif
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
@@ -45,7 +45,7 @@
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:30px;">
             @foreach($project->galleryImages as $image)
                 @if($image->mediaItem && !empty($image->mediaItem->file))
-                    <img src="{{ asset('storage/' . ltrim($image->mediaItem->file, '/')) }}" alt="{{ $project->title }}" style="width:100%;height:220px;object-fit:cover;border-radius:14px;">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/' . ltrim($image->mediaItem->file, '/')) }}" alt="{{ $project->title }}" style="width:100%;height:220px;object-fit:cover;border-radius:14px;">
                 @endif
             @endforeach
         </div>

@@ -472,7 +472,7 @@
                         @foreach($sliders as $slide)
                             <div class="swiper-slide position-relative">
                                 @if(!empty($slide->image))
-                                    <img class="hero-slide-image" src="{{ asset('storage/' . $slide->image) }}" alt="{{ $slide->title ?? $association->name }}">
+                                    <img decoding="async" fetchpriority="high" class="hero-slide-image" src="{{ asset('storage/' . $slide->image) }}" alt="{{ $slide->title ?? $association->name }}">
                                 @else
                                     <div class="hero-slide-image"></div>
                                 @endif
@@ -626,7 +626,7 @@
                 <div class="col-lg-4">
                     <article class="news-card-home">
                         @if(!empty($item->image))
-                            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}">
+                            <img loading="lazy" decoding="async" src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}">
                         @else
                             <div style="height:235px;background:linear-gradient(135deg,#d8efe8,#edf7f4);"></div>
                         @endif
@@ -710,7 +710,7 @@
                             : null;
                     @endphp
                     @if($sliderMedia && !empty($sliderMedia->file))
-                        <img src="{{ asset('storage/' . $sliderMedia->file) }}" class="card-img-top">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/' . $sliderMedia->file) }}" class="card-img-top">
                     @endif
 
                     <div class="card-body text-center">

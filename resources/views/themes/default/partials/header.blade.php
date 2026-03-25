@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', $association->name ?? 'الموقع الرسمي للجمعية')</title>
+    @php
+    $associationName = $association->name ?? 'الموقع الرسمي للجمعية';
+
+    if (isset($resolvedTitle)) {
+        if (!str_contains($resolvedTitle, $associationName)) {
+            $resolvedTitle .= ' | ' . $associationName;
+        }
+    }
+@endphp
+
+@include('themes.default.partials.seo-meta')
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -737,7 +747,7 @@
             <a class="navbar-brand" href="/">
                 <div class="brand-logo-wrap">
                     @if($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="{{ $association->name ?? 'الشعار' }}">
+                        <img decoding="async" src="{{ $logoUrl }}" alt="{{ $association->name ?? 'الشعار' }}">
                     @else
                         {{ mb_substr($association->name ?? 'ج', 0, 1) }}
                     @endif

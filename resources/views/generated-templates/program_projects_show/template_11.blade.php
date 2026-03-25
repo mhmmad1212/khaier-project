@@ -273,7 +273,7 @@
         <div class="project-show-card">
             <div class="project-show-image-wrap">
                 @if(!empty($coverImage))
-                    <img
+                    <img loading="lazy" decoding="async"
                         src="{{ asset('storage/' . ltrim($coverImage, '/')) }}"
                         alt="{{ $title }}"
                         class="project-show-image"
@@ -348,7 +348,7 @@
 
                         @if(!empty($galleryFile))
                             <div class="project-gallery-item">
-                                <img
+                                <img loading="lazy" decoding="async"
                                     src="{{ asset('storage/' . ltrim($galleryFile, '/')) }}"
                                     alt="{{ $title }}"
                                     class="project-gallery-image"

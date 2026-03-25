@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\FrontendPageController;
+use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
 
 Route::get('/', [WebsiteController::class, 'home'])->name('website.home');
 
@@ -89,7 +93,7 @@ Route::middleware(['web'])->post('/admin/media-library/upload', function (\Illum
     $baseName = now()->format('Ymd_His') . '_' . uniqid();
 
     if ($isImage) {
-        $extension = 'jpg';
+        $extension = 'webp';
     }
 
     $relativePath = 'tenants/' . config('database.connections.tenant.database') . '/media/' . $baseName . '.' . $extension;
@@ -110,9 +114,9 @@ Route::middleware(['web'])->post('/admin/media-library/upload', function (\Illum
             $image->scaleDown(width: 1920);
         }
 
-        $encoded = $image->toJpeg(85);
+        $encoded = $image->toWebp(82);
         file_put_contents($absolutePath, (string) $encoded);
-        $mimeType = 'image/jpeg';
+        $mimeType = 'image/webp';
         $size = filesize($absolutePath);
     } else {
         $uploadedFile->move(dirname($absolutePath), basename($absolutePath));

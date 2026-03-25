@@ -5,7 +5,7 @@
 
 @if($file)
     @if($isImage)
-        <img
+        <img loading="lazy" decoding="async"
             src="{{ asset('storage/' . $file) }}"
             alt="media-preview"
             style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb;"

@@ -23,33 +23,130 @@ class AssociationResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            Forms\Components\Section::make('بيانات الجمعية')
+                ->schema([
+                    Forms\Components\Toggle::make('can_edit_system_pages')
+                        ->label('السماح للجمعية بتعديل الصفحات النظامية')
+                        ->helperText('إذا كان مغلقًا فلن تتمكن الجمعية من تعديل صفحات النظام مثل مجلس الإدارة والأخبار')
+                        ->default(false),
 
-            Forms\Components\Toggle::make('can_edit_system_pages')
-                ->label('السماح للجمعية بتعديل الصفحات النظامية')
-                ->helperText('إذا كان مغلقًا فلن تتمكن الجمعية من تعديل صفحات النظام مثل مجلس الإدارة والأخبار')
-                ->default(false),
+                    Forms\Components\TextInput::make('name')
+                        ->label('اسم الجمعية')
+                        ->required()
+                        ->maxLength(255),
 
-            Forms\Components\TextInput::make('name')
-                ->label('اسم الجمعية')
-                ->required()
-                ->maxLength(255),
+                    Forms\Components\TextInput::make('slug')
+                        ->label('المعرف المختصر')
+                        ->required()
+                        ->maxLength(255)
+                        ->unique(ignoreRecord: true)
+                        ->helperText('مثال: abar-hail'),
 
-            Forms\Components\TextInput::make('slug')
-                ->label('المعرف المختصر')
-                ->required()
-                ->maxLength(255)
-                ->unique(ignoreRecord: true)
-                ->helperText('مثال: abar-hail'),
+                    Forms\Components\Select::make('domain_type')
+                        ->label('نوع الدومين')
+                        ->options([
+                            'subdomain' => 'رابط داخلي مؤقت',
+                            'custom_domain' => 'دومين خاص',
+                        ])
+                        ->default('custom_domain')
+                        ->live()
+                        ->required(),
 
-            Forms\Components\TextInput::make('domain')
-                ->label('الدومين')
-                ->maxLength(255)
-                ->unique(ignoreRecord: true)
-                ->helperText('مثال: abar-hail.org.sa'),
+                    Forms\Components\TextInput::make('subdomain_label')
+                        ->label('اسم الرابط الداخلي')
+                        ->helperText('مثال: riyadh-demo وسيصبح riyadh-demo.khaier.sa')
+                        ->maxLength(255)
+                        ->visible(fn (Forms\Get $get) => $get('domain_type') === 'subdomain')
+                        ->required(fn (Forms\Get $get) => $get('domain_type') === 'subdomain')
+                        ->dehydrated(fn (Forms\Get $get) => $get('domain_type') === 'subdomain'),
 
-            Forms\Components\Toggle::make('is_active')
-                ->label('نشطة')
-                ->default(true),
+                    Forms\Components\TextInput::make('domain')
+                        ->label('الدومين')
+                        ->maxLength(255)
+                        ->unique(ignoreRecord: true)
+                        ->helperText('مثال: abar-hail.org.sa')
+                        ->visible(fn (Forms\Get $get) => $get('domain_type') === 'custom_domain')
+                        ->required(fn (Forms\Get $get) => $get('domain_type') === 'custom_domain')
+                        ->dehydrated(fn (Forms\Get $get) => $get('domain_type') === 'custom_domain'),
+
+                    Forms\Components\TextInput::make('official_phone')
+                        ->label('رقم جوال المسؤول على الموقع')
+                        ->tel()
+                        ->maxLength(255),
+
+                    Forms\Components\TextInput::make('official_email')
+                        ->label('الإيميل الرسمي للجمعية')
+                        ->email()
+                        ->maxLength(255),
+
+                    Forms\Components\Select::make('is_subscribed')
+                        ->label('هل الجمعية مشتركة في نظام خيّر؟')
+                        ->options([
+                            1 => 'نعم',
+                            0 => 'لا',
+                        ])
+                        ->default(1)
+                        ->required(),
+
+                    Forms\Components\Select::make('site_status')
+                        ->label('حالة الموقع')
+                        ->options([
+                            'active' => 'نشطة',
+                            'closed' => 'مغلقة',
+                            'suspended' => 'موقوفة',
+                        ])
+                        ->default('active')
+                        ->required(),
+
+                    Forms\Components\Toggle::make('is_active')
+                        ->label('مفعلة في النظام')
+                        ->default(true),
+                ])
+                ->columns(2),
+
+            Forms\Components\Section::make('الاشتراك')
+                ->schema([
+                    Forms\Components\Select::make('subscription_status')
+                        ->label('حالة الاشتراك')
+                        ->options([
+                            'active' => 'نشط',
+                            'expired' => 'منتهي',
+                            'suspended' => 'معلق',
+                        ])
+                        ->default('active')
+                        ->required(),
+
+                    Forms\Components\DatePicker::make('subscription_start_date')
+                        ->label('تاريخ البداية')
+                        ->native(false),
+
+                    Forms\Components\DatePicker::make('subscription_end_date')
+                        ->label('تاريخ النهاية')
+                        ->native(false),
+                ])
+                ->columns(3),
+
+            Forms\Components\Section::make('طريقة الإنشاء')
+                ->schema([
+                    Forms\Components\Select::make('creation_mode')
+                        ->label('نوع الإنشاء')
+                        ->options([
+                            'empty' => 'جمعية فارغة',
+                            'clone' => 'استنساخ من جمعية موجودة',
+                        ])
+                        ->default('empty')
+                        ->live()
+                        ->required(),
+
+                    Forms\Components\Select::make('cloned_from_association_id')
+                        ->label('الجمعية المصدر')
+                        ->options(fn () => Association::query()->where('is_active', true)->pluck('name', 'id'))
+                        ->searchable()
+                        ->preload()
+                        ->visible(fn (Forms\Get $get) => $get('creation_mode') === 'clone')
+                        ->required(fn (Forms\Get $get) => $get('creation_mode') === 'clone'),
+                ])
+                ->columns(2),
         ]);
     }
 
@@ -66,19 +163,54 @@ class AssociationResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('slug')
-                    ->label('المعرف')
-                    ->searchable()
-                    ->copyable(),
-
                 Tables\Columns\TextColumn::make('domain')
                     ->label('الدومين')
                     ->searchable()
                     ->copyable()
                     ->placeholder('-'),
 
+                Tables\Columns\TextColumn::make('domain_type')
+                    ->label('نوع الدومين')
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
+                        'subdomain' => 'رابط داخلي مؤقت',
+                        'custom_domain' => 'دومين خاص',
+                        default => '-',
+                    }),
+
+                Tables\Columns\TextColumn::make('site_status')
+                    ->label('حالة الموقع')
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
+                        'active' => 'نشطة',
+                        'closed' => 'مغلقة',
+                        'suspended' => 'موقوفة',
+                        default => '-',
+                    }),
+
+                Tables\Columns\TextColumn::make('subscription_status')
+                    ->label('الاشتراك')
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
+                        'active' => 'نشط',
+                        'expired' => 'منتهي',
+                        'suspended' => 'معلق',
+                        default => '-',
+                    }),
+
+                Tables\Columns\TextColumn::make('subscription_end_date')
+                    ->label('ينتهي في')
+                    ->date('Y-m-d')
+                    ->placeholder('-')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('official_phone')
+                    ->label('جوال المسؤول')
+                    ->placeholder('-'),
+
+                Tables\Columns\TextColumn::make('official_email')
+                    ->label('الإيميل الرسمي')
+                    ->placeholder('-'),
+
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('نشطة')
+                    ->label('مفعلة')
                     ->boolean(),
 
                 Tables\Columns\TextColumn::make('created_at')

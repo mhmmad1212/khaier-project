@@ -28,7 +28,7 @@
                         : 'border:1px solid #e5e7eb; background:#fff;'"
                     style="border-radius:12px;padding:8px;text-align:right;cursor:pointer;"
                 >
-                    <img
+                    <img loading="lazy" decoding="async"
                         src="{{ asset('storage/' . $item->file) }}"
                         alt="{{ $item->title }}"
                         style="width:100%;height:90px;object-fit:cover;border-radius:8px;border:1px solid #eee;display:block;margin-bottom:8px;"

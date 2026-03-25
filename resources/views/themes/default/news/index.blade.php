@@ -34,7 +34,7 @@
                     <article class="card h-100 border-0 shadow-sm overflow-hidden news-card">
                         <div class="news-card-image-wrap">
                             @if($imageUrl)
-                                <img src="{{ $imageUrl }}" alt="{{ $item->title }}" class="news-card-image">
+                                <img loading="lazy" decoding="async" src="{{ $imageUrl }}" alt="{{ $item->title }}" class="news-card-image">
                             @else
                                 <div class="news-card-placeholder d-flex align-items-center justify-content-center">
                                     <i class="bi bi-newspaper fs-1 text-success"></i>

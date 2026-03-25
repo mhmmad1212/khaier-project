@@ -121,7 +121,7 @@
 
         <article class="page-card">
             @if($featuredMedia && !empty($featuredMedia->file) && $featuredMedia->is_image)
-                <img
+                <img loading="lazy" decoding="async"
                     class="page-featured-image"
                     src="{{ asset('storage/' . $featuredMedia->file) }}"
                     alt="{{ $featuredMedia->alt_text ?: $page->title }}"

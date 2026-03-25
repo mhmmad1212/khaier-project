@@ -254,7 +254,7 @@
                 <div class="khaier-login-brand">
                     <div class="khaier-login-logo">
                         @if($logo)
-                            <img src="{{ $logo }}" alt="شعار خير">
+                            <img loading="lazy" decoding="async" src="{{ $logo }}" alt="شعار خير">
                         @else
                             <div class="khaier-login-logo-fallback">خير</div>
                         @endif

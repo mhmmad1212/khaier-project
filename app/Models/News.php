@@ -19,6 +19,8 @@ class News extends TenantModel
     protected $connection = 'tenant';
 
     protected $fillable = [
+        'meta_title',
+        'meta_description',
         'title',
         'slug',
         'short_code',

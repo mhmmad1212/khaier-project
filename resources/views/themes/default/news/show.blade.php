@@ -27,7 +27,7 @@
 
                 @if($imageUrl)
                     <div class="news-single-image-wrap">
-                        <img src="{{ $imageUrl }}" alt="{{ $news->title }}" class="news-single-image">
+                        <img loading="lazy" decoding="async" src="{{ $imageUrl }}" alt="{{ $news->title }}" class="news-single-image">
                     </div>
                 @endif
 
