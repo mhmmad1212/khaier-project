@@ -220,13 +220,6 @@ class AssociationResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->actions([
-                Tables\Actions\Action::make('preview')
-                    ->label('معاينة الموقع')
-                    ->icon('heroicon-o-eye')
-                    ->color('success')
-                    ->url(fn (Association $record): ?string => $record->getPreviewUrl())
-                    ->openUrlInNewTab()
-                    ->visible(fn (Association $record): bool => filled($record->getPreviewUrl())),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

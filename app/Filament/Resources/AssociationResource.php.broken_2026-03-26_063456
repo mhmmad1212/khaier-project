@@ -54,7 +54,7 @@ class AssociationResource extends Resource
 
                     Forms\Components\TextInput::make('subdomain_label')
                         ->label('اسم الرابط الداخلي')
-                        ->helperText('مثال: riyadh-demo وسيصبح riyadh-demo.khaier.org')
+                        ->helperText('مثال: riyadh-demo وسيصبح riyadh-demo.' . env('TENANT_BASE_DOMAIN', 'khaier.org'))')
                         ->maxLength(255)
                         ->visible(fn (Forms\Get $get) => $get('domain_type') === 'subdomain')
                         ->required(fn (Forms\Get $get) => $get('domain_type') === 'subdomain')
@@ -224,9 +224,9 @@ class AssociationResource extends Resource
                     ->label('معاينة الموقع')
                     ->icon('heroicon-o-eye')
                     ->color('success')
+                    ->button()
                     ->url(fn (Association $record): ?string => $record->getPreviewUrl())
-                    ->openUrlInNewTab()
-                    ->visible(fn (Association $record): bool => filled($record->getPreviewUrl())),
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

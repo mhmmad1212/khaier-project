@@ -18,7 +18,7 @@ class CreateAssociation extends CreateRecord
             $label = trim((string) ($data['subdomain_label'] ?? ''));
             $label = strtolower(preg_replace('/[^a-z0-9\\-]/', '', str_replace(' ', '-', $label)));
             $data['subdomain_label'] = $label;
-            $data['domain'] = $label . '.' . env('TENANT_BASE_DOMAIN', 'khaier.org');
+            $data['domain'] = $label . '.' . env('TENANT_BASE_DOMAIN', 'ramm.sa');
         }
 
         return $data;
