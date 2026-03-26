@@ -3,8 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AssociationResource\Pages;
-use App\Filament\Resources\AssociationResource\Pages\AssociationActivities;
-use App\Filament\Resources\AssociationResource\RelationManagers\ActivitiesRelationManager;
 use App\Models\Association;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -222,147 +220,18 @@ class AssociationResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('preview')
-                        ->label('معاينة الموقع')
-                        ->icon('heroicon-o-eye')
-                        ->url(fn (Association $record): ?string => $record->getPreviewUrl())
-                        ->openUrlInNewTab()
-                        ->visible(fn (Association $record): bool => filled($record->getPreviewUrl())),
-
-                    Tables\Actions\Action::make('resetTenantPassword')
-                        ->label('إعادة تعيين كلمة المرور')
-                        ->icon('heroicon-o-key')
-                        ->color('warning')
-                        ->modalHeading('إعادة تعيين كلمة مرور مستخدم الجمعية')
-                        ->modalDescription('سيتم تغيير كلمة المرور مباشرة داخل قاعدة بيانات الجمعية.')
-                        ->form([
-                            Forms\Components\Select::make('user_id')
-                                ->label('المستخدم')
-                                ->options(function (Association $record): array {
-                                    $connectionName = 'tenant_reset_' . $record->id;
-
-                                    config([
-                                        'database.connections.' . $connectionName => [
-                                            'driver' => 'mysql',
-                                            'host' => $record->database_host ?: '127.0.0.1',
-                                            'port' => $record->database_port ?: 3306,
-                                            'database' => $record->database_name,
-                                            'username' => $record->database_username,
-                                            'password' => $record->database_password,
-                                            'charset' => 'utf8mb4',
-                                            'collation' => 'utf8mb4_unicode_ci',
-                                            'prefix' => '',
-                                            'prefix_indexes' => true,
-                                            'strict' => true,
-                                            'engine' => null,
-                                        ],
-                                    ]);
-
-                                    \Illuminate\Support\Facades\DB::purge($connectionName);
-
-                                    return \Illuminate\Support\Facades\DB::connection($connectionName)
-                                        ->table('users')
-                                        ->orderBy('name')
-                                        ->get()
-                                        ->mapWithKeys(fn ($user) => [
-                                            $user->id => trim(($user->name ?? '') . ' - ' . ($user->email ?? ''))
-                                        ])
-                                        ->toArray();
-                                })
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->native(false),
-
-                            Forms\Components\TextInput::make('password')
-                                ->label('كلمة المرور الجديدة')
-                                ->password()
-                                ->revealable()
-                                ->required()
-                                ->minLength(8),
-
-                            Forms\Components\TextInput::make('password_confirmation')
-                                ->label('تأكيد كلمة المرور')
-                                ->password()
-                                ->revealable()
-                                ->required()
-                                ->same('password'),
-                        ])
-                        ->action(function (Association $record, array $data): void {
-                            $connectionName = 'tenant_reset_' . $record->id;
-
-                            config([
-                                'database.connections.' . $connectionName => [
-                                    'driver' => 'mysql',
-                                    'host' => $record->database_host ?: '127.0.0.1',
-                                    'port' => $record->database_port ?: 3306,
-                                    'database' => $record->database_name,
-                                    'username' => $record->database_username,
-                                    'password' => $record->database_password,
-                                    'charset' => 'utf8mb4',
-                                    'collation' => 'utf8mb4_unicode_ci',
-                                    'prefix' => '',
-                                    'prefix_indexes' => true,
-                                    'strict' => true,
-                                    'engine' => null,
-                                ],
-                            ]);
-
-                            \Illuminate\Support\Facades\DB::purge($connectionName);
-
-                            $user = \Illuminate\Support\Facades\DB::connection($connectionName)
-                                ->table('users')
-                                ->where('id', $data['user_id'])
-                                ->first();
-
-                            if (! $user) {
-                                \Filament\Notifications\Notification::make()
-                                    ->title('تعذر العثور على المستخدم')
-                                    ->body('لم يتم العثور على المستخدم المحدد داخل قاعدة الجمعية.')
-                                    ->danger()
-                                    ->send();
-
-                                return;
-                            }
-
-                            \Illuminate\Support\Facades\DB::connection($connectionName)
-                                ->table('users')
-                                ->where('id', $user->id)
-                                ->update([
-                                    'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
-                                    'updated_at' => now(),
-                                ]);
-
-                            \Filament\Notifications\Notification::make()
-                                ->title('تم تحديث كلمة المرور')
-                                ->body('تم تغيير كلمة المرور للمستخدم: ' . ($user->email ?? ('#' . $user->id)))
-                                ->success()
-                                ->send();
-                        }),
-
-                    Tables\Actions\Action::make('activities')
-                        ->label('سجل الحركات')
-                        ->icon('heroicon-o-clipboard-document-list')
-                        ->url(fn (Association $record): string => AssociationResource::getUrl('activities', ['record' => $record]))
-                        ->openUrlInNewTab(false),
-
-                    Tables\Actions\EditAction::make(),
-                ])
-                ->label('الإجراءات')
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->button(),
+                Tables\Actions\Action::make('preview')
+                    ->label('معاينة الموقع')
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->url(fn (Association $record): ?string => $record->getPreviewUrl())
+                    ->openUrlInNewTab()
+                    ->visible(fn (Association $record): bool => filled($record->getPreviewUrl())),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            ActivitiesRelationManager::class,
-        ];
     }
 
     public static function getPages(): array
@@ -371,7 +240,6 @@ class AssociationResource extends Resource
             'index' => Pages\ListAssociations::route('/'),
             'create' => Pages\CreateAssociation::route('/create'),
             'edit' => Pages\EditAssociation::route('/{record}/edit'),
-            'activities' => AssociationActivities::route('/{record}/activities'),
         ];
     }
 }

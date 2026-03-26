@@ -86,4 +86,11 @@ class Association extends Model
         return null;
     }
 
+
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(AssociationActivity::class);
+    }
+
 }

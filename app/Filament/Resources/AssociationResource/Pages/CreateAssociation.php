@@ -4,6 +4,7 @@ namespace App\Filament\Resources\AssociationResource\Pages;
 
 use App\Filament\Resources\AssociationResource;
 use App\Services\AssociationProvisioningService;
+use App\Services\AssociationActivityLogger;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Throwable;
@@ -39,6 +40,15 @@ class CreateAssociation extends CreateRecord
                 ->success()
                 ->persistent()
                 ->send();
+
+            AssociationActivityLogger::log(
+                $this->record,
+                1,
+                'created',
+                'تم إنشاء الجمعية',
+                "تم إنشاء الجمعية على الدومين: {$this->record->domain}\n" .
+                "بريد المدير: {$credentials['email']}"
+            );
         } catch (Throwable $e) {
             Notification::make()
                 ->title('فشل إنشاء الجمعية')

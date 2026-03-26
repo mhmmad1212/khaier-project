@@ -344,7 +344,7 @@ class AssociationResource extends Resource
                     Tables\Actions\Action::make('activities')
                         ->label('سجل الحركات')
                         ->icon('heroicon-o-clipboard-document-list')
-                        ->url(fn (Association $record): string => AssociationResource::getUrl('activities', ['record' => $record]))
+                        ->url(fn (Association $record): string => static::getUrl('activities', ['record' => $record]))
                         ->openUrlInNewTab(false),
 
                     Tables\Actions\EditAction::make(),
