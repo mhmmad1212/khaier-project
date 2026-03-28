@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Filament\Support;
+
+use App\Models\MediaItem;
+use App\Support\UnifiedMediaPicker;
+
+trait AppliesSelectedMedia
+{
+    protected function applySelectedMedia(array $data, array $map): array
+    {
+        $payload = UnifiedMediaPicker::selectedPayload(request());
+
+        foreach ($map as $mediaIdField => $pathField) {
+            if ($payload['clear_media']) {
+                $data[$mediaIdField] = null;
+                $data[$pathField] = null;
+                continue;
+            }
+
+            if (! empty($payload['selected_media_id'])) {
+                $data[$mediaIdField] = $payload['selected_media_id'];
+            }
+
+            if (! empty($payload['selected_media_file'])) {
+                $data[$pathField] = $payload['selected_media_file'];
+            }
+
+            if (empty($data[$pathField]) && ! empty($data[$mediaIdField])) {
+                $media = MediaItem::query()->find($data[$mediaIdField]);
+
+                if ($media && ! empty($media->file)) {
+                    $data[$pathField] = $media->file;
+                }
+            }
+        }
+
+        return $data;
+    }
+}

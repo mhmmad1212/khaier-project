@@ -16,5 +16,13 @@ class Committee extends TenantModel
         'attachment',
         'sort_order',
         'is_active',
+        'attachment_media_id',
     ];
+
+
+    public function attachmentMedia(): BelongsTo
+    {
+        return $this->belongsTo(MediaItem::class, 'attachment_media_id');
+    }
+
 }

@@ -3,17 +3,19 @@
 namespace App\Filament\Admin\Resources\EmployeeResource\Pages;
 
 use App\Filament\Admin\Resources\EmployeeResource;
-use Filament\Actions;
+use App\Filament\Support\AppliesSelectedMedia;
 use Filament\Resources\Pages\EditRecord;
 
 class EditEmployee extends EditRecord
 {
+    use AppliesSelectedMedia;
+
     protected static string $resource = EmployeeResource::class;
 
-    protected function getHeaderActions(): array
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        return $this->applySelectedMedia($data, [
+            'photo_media_id' => 'photo',
+        ]);
     }
 }

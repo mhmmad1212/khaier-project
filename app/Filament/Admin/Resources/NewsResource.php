@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\NewsResource\Pages;
 use App\Forms\Components\MediaPicker;
 use App\Models\News;
+use App\Models\MediaItem;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -13,6 +14,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\ImageColumn;
 use Illuminate\Support\Str;
 
 class NewsResource extends Resource
@@ -28,6 +30,7 @@ class NewsResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+
 Forms\Components\Section::make('تحسين محركات البحث (SEO)')
     ->schema([
                     Forms\Components\Actions::make([
@@ -111,9 +114,14 @@ Forms\Components\Section::make('تحسين محركات البحث (SEO)')
                 ->label('المحتوى')
                 ->columnSpanFull(),
 
-            MediaPicker::make('featured_image')
+
+            MediaPicker::make('image_media_id')
                 ->label('الصورة البارزة')
+                ->default(fn () => request('selected_media_id'))
                 ->columnSpanFull(),
+
+            Forms\Components\Hidden::make('image')
+                ->default(fn () => request('selected_media_file')),
 
             Forms\Components\DateTimePicker::make('published_at')
                 ->label('تاريخ النشر'),
@@ -129,6 +137,10 @@ Forms\Components\Section::make('تحسين محركات البحث (SEO)')
         return $table
             ->defaultSort('published_at', 'desc')
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('الصورة')
+                    ->disk('public'),
+
                 Tables\Columns\TextColumn::make('title')
                     ->label('العنوان')
                     ->searchable(),

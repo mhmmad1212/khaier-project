@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Filament\Admin\Resources\PartnerResource\Pages;
+
+use App\Filament\Admin\Resources\PartnerResource;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreatePartner extends CreateRecord
+{
+    protected static string $resource = PartnerResource::class;
+
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (empty($data['logo']) && request()->filled('selected_media_file')) {
+            $data['logo'] = request('selected_media_file');
+        }
+
+        if (empty($data['logo']) && ! empty($data['logo_media_id'])) {
+            $media = \App\Models\MediaItem::find($data['logo_media_id']);
+            if ($media) {
+                $data['logo'] = $media->file;
+            }
+        }
+
+        return $data;
+    }
+
+}

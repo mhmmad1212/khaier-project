@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Filament\Admin\Resources\ProgramProjectResource\RelationManagers;
+
+use App\Forms\Components\MediaPicker;
+use App\Models\Attachment;
+use App\Models\MediaItem;
+use App\Support\UnifiedMediaPicker;
+use Filament\Forms;
+use Filament\Forms\Get;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Illuminate\Support\HtmlString;
+
+class AttachmentsRelationManager extends RelationManager
+{
+    protected static string $relationship = 'attachments';
+
+    protected static ?string $title = 'مرفقات المشروع';
+
+    public function form(Forms\Form $form): Forms\Form
+    {
+        $payload = UnifiedMediaPicker::selectedPayload(request());
+
+        return $form->schema([
+            MediaPicker::make('media_item_id')
+                ->label('الملف')
+                ->default(fn () => $payload['selected_media_id'] ?? null)
+                ->required()
+                ->columnSpanFull(),
+
+            Forms\Components\Placeholder::make('media_preview')
+                ->label('معاينة')
+                ->content(function (Get $get) {
+                    $mediaId = $get('media_item_id');
+
+                    if (! $mediaId) {
+                        return new HtmlString('<span style="color:#6b7280;">لا يوجد ملف مختار</span>');
+                    }
+
+                    $media = MediaItem::query()->find($mediaId);
+
+                    if (! $media) {
+                        return new HtmlString('<span style="color:#b91c1c;">تعذر تحميل الملف</span>');
+                    }
+
+                    $title = e($media->title ?: basename((string) $media->file));
+
+                    if ($media->is_image) {
+                        $src = asset('storage/' . $media->file);
+
+                        return new HtmlString(
+                            '<div style="display:flex;align-items:center;gap:12px;">' .
+                                '<img src="' . e($src) . '" alt="' . $title . '" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid #e5e7eb;background:#fafafa;">' .
+                                '<div style="font-weight:700;color:#111827;">' . $title . '</div>' .
+                            '</div>'
+                        );
+                    }
+
+                    return new HtmlString(
+                        '<div style="display:flex;align-items:center;gap:12px;">' .
+                            '<div style="width:72px;height:72px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid #e5e7eb;background:#fafafa;color:#dc2626;font-weight:800;">FILE</div>' .
+                            '<div style="font-weight:700;color:#111827;">' . $title . '</div>' .
+                        '</div>'
+                    );
+                })
+                ->columnSpanFull(),
+
+            Forms\Components\Select::make('collection')
+                ->label('نوع المرفق')
+                ->options([
+                    'gallery' => 'صور المشروع',
+                    'report' => 'تقرير',
+                    'document' => 'ملف',
+                ])
+                ->default('gallery')
+                ->required(),
+
+            Forms\Components\TextInput::make('title')
+                ->label('عنوان (اختياري)')
+                ->maxLength(255),
+
+            Forms\Components\TextInput::make('sort_order')
+                ->label('الترتيب')
+                ->numeric()
+                ->default(0),
+
+            Forms\Components\Toggle::make('is_active')
+                ->label('نشط')
+                ->default(true),
+        ])->columns(2);
+    }
+
+    public function table(Tables\Table $table): Tables\Table
+    {
+        return $table
+            ->defaultSort('sort_order')
+            ->columns([
+                Tables\Columns\TextColumn::make('collection')
+                    ->label('النوع')
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'gallery' => 'صور المشروع',
+                        'report' => 'تقرير',
+                        'document' => 'ملف',
+                        default => $state ?: '-',
+                    }),
+
+                Tables\Columns\TextColumn::make('title')
+                    ->label('العنوان')
+                    ->placeholder('-')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('media.title')
+                    ->label('الملف')
+                    ->placeholder('-'),
+
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->label('الترتيب')
+                    ->sortable(),
+
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('نشط')
+                    ->boolean(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $payload = UnifiedMediaPicker::selectedPayload(request());
+
+                        if (! empty($payload['selected_media_id'])) {
+                            $data['media_item_id'] = $payload['selected_media_id'];
+                        }
+
+                        $data['section_code'] = Attachment::SECTION_PROGRAM_PROJECTS;
+
+                        return $data;
+                    }),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make()
+                    ->mutateRecordDataUsing(function (array $data): array {
+                        $payload = UnifiedMediaPicker::selectedPayload(request());
+
+                        if (! empty($payload['selected_media_id'])) {
+                            $data['media_item_id'] = $payload['selected_media_id'];
+                        }
+
+                        return $data;
+                    }),
+                Tables\Actions\DeleteAction::make(),
+            ]);
+    }
+}

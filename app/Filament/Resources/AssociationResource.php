@@ -3,9 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AssociationResource\Pages;
-use App\Filament\Resources\AssociationResource\Pages\AssociationActivities;
 use App\Filament\Resources\AssociationResource\RelationManagers\ActivitiesRelationManager;
 use App\Models\Association;
+use App\Services\AssociationActivityLogger;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -334,6 +334,14 @@ class AssociationResource extends Resource
                                     'updated_at' => now(),
                                 ]);
 
+                            AssociationActivityLogger::log(
+                                $record,
+                                4,
+                                'password_reset',
+                                'تم تغيير كلمة المرور',
+                                'تم تغيير كلمة المرور للمستخدم: ' . (($user->name ?? '') !== '' ? ($user->name . ' - ') : '') . ($user->email ?? ('#' . $user->id))
+                            );
+
                             \Filament\Notifications\Notification::make()
                                 ->title('تم تحديث كلمة المرور')
                                 ->body('تم تغيير كلمة المرور للمستخدم: ' . ($user->email ?? ('#' . $user->id)))
@@ -344,8 +352,80 @@ class AssociationResource extends Resource
                     Tables\Actions\Action::make('activities')
                         ->label('سجل الحركات')
                         ->icon('heroicon-o-clipboard-document-list')
-                        ->url(fn (Association $record): string => AssociationResource::getUrl('activities', ['record' => $record]))
+                        ->url(fn (Association $record): string => url('/khaier/association-activities?association=' . $record->id))
                         ->openUrlInNewTab(false),
+
+                    Tables\Actions\Action::make('renewSubscription')
+                        ->label('تجديد الاشتراك')
+                        ->icon('heroicon-o-calendar-days')
+                        ->color('primary')
+                        ->modalHeading('تجديد اشتراك الجمعية')
+                        ->modalDescription('اختر مدة التجديد أو استخدم تاريخًا مخصصًا لتحديث تاريخ انتهاء الاشتراك.')
+                        ->form([
+                            Forms\Components\Select::make('renewal_type')
+                                ->label('نوع التجديد')
+                                ->options([
+                                    '1_month' => 'شهر',
+                                    '6_months' => '6 أشهر',
+                                    '1_year' => 'سنة',
+                                    '2_years' => 'سنتان',
+                                    '3_years' => '3 سنوات',
+                                    'custom_date' => 'تاريخ مخصص',
+                                ])
+                                ->default('1_year')
+                                ->live()
+                                ->required(),
+
+                            Forms\Components\DatePicker::make('custom_date')
+                                ->label('تاريخ الانتهاء الجديد')
+                                ->native(false)
+                                ->visible(fn (Forms\Get $get) => $get('renewal_type') === 'custom_date')
+                                ->required(fn (Forms\Get $get) => $get('renewal_type') === 'custom_date'),
+
+                            Forms\Components\Placeholder::make('current_end_date')
+                                ->label('تاريخ الانتهاء الحالي')
+                                ->content(fn (Association $record): string => $record->subscription_end_date
+                                    ? \Illuminate\Support\Carbon::parse($record->subscription_end_date)->format('Y-m-d')
+                                    : 'غير محدد'),
+                        ])
+                        ->action(function (Association $record, array $data): void {
+                            $baseDate = $record->subscription_end_date
+                                ? \Illuminate\Support\Carbon::parse($record->subscription_end_date)
+                                : now();
+
+                            if ($baseDate->isPast()) {
+                                $baseDate = now();
+                            }
+
+                            $newEndDate = match ($data['renewal_type']) {
+                                '1_month' => $baseDate->copy()->addMonth(),
+                                '6_months' => $baseDate->copy()->addMonths(6),
+                                '1_year' => $baseDate->copy()->addYear(),
+                                '2_years' => $baseDate->copy()->addYears(2),
+                                '3_years' => $baseDate->copy()->addYears(3),
+                                'custom_date' => \Illuminate\Support\Carbon::parse($data['custom_date']),
+                                default => $baseDate->copy()->addYear(),
+                            };
+
+                            $record->update([
+                                'subscription_status' => 'active',
+                                'subscription_end_date' => $newEndDate->toDateString(),
+                            ]);
+
+                            AssociationActivityLogger::log(
+                                $record,
+                                2,
+                                'renewed',
+                                'تم تجديد الاشتراك',
+                                'تم التجديد بنوع: ' . $data['renewal_type'] . ' | تاريخ الانتهاء الجديد: ' . $newEndDate->format('Y-m-d')
+                            );
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('تم تجديد الاشتراك')
+                                ->body('تاريخ الانتهاء الجديد: ' . $newEndDate->format('Y-m-d'))
+                                ->success()
+                                ->send();
+                        }),
 
                     Tables\Actions\EditAction::make(),
                 ])
@@ -371,7 +451,6 @@ class AssociationResource extends Resource
             'index' => Pages\ListAssociations::route('/'),
             'create' => Pages\CreateAssociation::route('/create'),
             'edit' => Pages\EditAssociation::route('/{record}/edit'),
-            'activities' => AssociationActivities::route('/{record}/activities'),
         ];
     }
 }

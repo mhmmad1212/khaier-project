@@ -1,0 +1,328 @@
+@php
+    $statePath = $getStatePath();
+    $media = null;
+
+    if ($getState()) {
+        $media = \App\Models\MediaItem::query()->find($getState());
+    }
+@endphp
+
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :field="$field"
+>
+    <div
+        x-data="{
+            tab: 'library',
+            loading: false,
+            uploading: false,
+            items: [],
+            selected: @entangle($statePath),
+            selectedItem: @js($media ? [
+                'id' => $media->id,
+                'title' => $media->title ?: basename((string) $media->file),
+                'url' => asset('storage/' . $media->file),
+                'is_image' => (bool) $media->is_image,
+                'extension' => $media->extension,
+                'alt_text' => $media->alt_text,
+            ] : null),
+            search: '',
+            uploadTitle: '',
+            uploadAlt: '',
+            uploadFile: null,
+            uploadError: '',
+            getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+                return '';
+            },
+            async loadItems() {
+                this.loading = true;
+                try {
+                    const response = await fetch('/admin/media-library/picker-json', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) throw new Error('تعذر تحميل المكتبة');
+                    this.items = await response.json();
+                } catch (e) {
+                    this.items = [];
+                    this.uploadError = e.message || 'تعذر تحميل المكتبة';
+                } finally {
+                    this.loading = false;
+                }
+            },
+            async openPicker() {
+                this.uploadError = '';
+                this.tab = 'library';
+                this.$refs.dialog.showModal();
+                await this.loadItems();
+            },
+            closePicker() {
+                this.$refs.dialog.close();
+            },
+            chooseItem(item) {
+                this.selected = item.id;
+                this.selectedItem = item;
+                this.closePicker();
+            },
+            removeSelection() {
+                this.selected = null;
+                this.selectedItem = null;
+            },
+            filteredItems() {
+                const q = this.search.trim().toLowerCase();
+                if (!q) return this.items;
+                return this.items.filter(item =>
+                    String(item.title || '').toLowerCase().includes(q) ||
+                    String(item.id).includes(q) ||
+                    String(item.extension || '').toLowerCase().includes(q)
+                );
+            },
+            async uploadNow() {
+                this.uploadError = '';
+
+                if (!this.uploadFile) {
+                    this.uploadError = 'اختر ملفًا أولًا';
+                    return;
+                }
+
+                this.uploading = true;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', this.uploadFile);
+                    formData.append('title', this.uploadTitle || '');
+                    formData.append('alt_text', this.uploadAlt || '');
+
+                    const csrfMeta = document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content') || '';
+                    const xsrfCookie = this.getCookie('XSRF-TOKEN');
+
+                    const response = await fetch('/admin/media-library/upload', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfMeta,
+                            'X-XSRF-TOKEN': xsrfCookie,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        body: formData,
+                        credentials: 'same-origin',
+                    });
+
+                    const raw = await response.text();
+                    let data = {};
+                    try {
+                        data = JSON.parse(raw);
+                    } catch (e) {
+                        data = { message: raw };
+                    }
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'تعذر رفع الملف');
+                    }
+
+                    this.items.unshift(data.item);
+                    this.selected = data.item.id;
+                    this.selectedItem = data.item;
+                    this.uploadTitle = '';
+                    this.uploadAlt = '';
+                    this.uploadFile = null;
+                    this.closePicker();
+                } catch (e) {
+                    this.uploadError = e.message || 'تعذر رفع الملف';
+                } finally {
+                    this.uploading = false;
+                }
+            }
+        }"
+        class="space-y-3"
+    >
+        <input type="hidden" wire:model.defer="{{ $statePath }}">
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button
+                type="button"
+                x-on:click="openPicker()"
+                style="background:#127962;color:#fff;border:none;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:700;"
+            >
+                اختيار / رفع وسائط
+            </button>
+
+            <button
+                type="button"
+                x-show="selected"
+                x-on:click="removeSelection()"
+                style="background:#eef2f7;color:#111827;border:none;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:700;"
+            >
+                إزالة الاختيار
+            </button>
+        </div>
+
+        <template x-if="selectedItem">
+            <div style="margin-top:14px;padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#fafafa;">
+                <template x-if="selectedItem.is_image">
+                    <img :src="selectedItem.url" :alt="selectedItem.alt_text || selectedItem.title" style="width:130px;height:130px;object-fit:cover;border-radius:12px;border:1px solid #ddd;">
+                </template>
+
+                <template x-if="!selectedItem.is_image">
+                    <div style="width:130px;height:130px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid #ddd;background:#fff;color:#dc2626;font-weight:800;font-size:28px;">
+                        PDF
+                    </div>
+                </template>
+
+                <div style="margin-top:10px;font-weight:700;" x-text="selectedItem.title"></div>
+                <div style="margin-top:4px;font-size:13px;color:#6b7280;">
+                    #<span x-text="selectedItem.id"></span> —
+                    <span x-text="(selectedItem.extension || 'FILE').toUpperCase()"></span>
+                </div>
+            </div>
+        </template>
+
+        <dialog
+            x-ref="dialog"
+            style="padding:0;border:none;border-radius:24px;max-width:min(1100px,96vw);width:96vw;box-shadow:0 25px 60px rgba(0,0,0,.25);"
+        >
+            <div style="display:flex;flex-direction:column;background:#fff;max-height:88vh;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #e5e7eb;gap:10px;flex-wrap:wrap;">
+                    <div style="font-size:22px;font-weight:800;">مكتبة الوسائط</div>
+
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button
+                            type="button"
+                            x-on:click="tab = 'library'"
+                            :style="tab === 'library'
+                                ? 'background:#127962;color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;'
+                                : 'background:#eef2f7;color:#111827;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;'"
+                        >
+                            المكتبة
+                        </button>
+
+                        <button
+                            type="button"
+                            x-on:click="tab = 'upload'"
+                            :style="tab === 'upload'
+                                ? 'background:#127962;color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;'
+                                : 'background:#eef2f7;color:#111827;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;'"
+                        >
+                            رفع جديد
+                        </button>
+
+                        <button
+                            type="button"
+                            x-on:click="closePicker()"
+                            style="background:#111827;color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;"
+                        >
+                            إغلاق
+                        </button>
+                    </div>
+                </div>
+
+                <div style="padding:18px;overflow:auto;max-height:calc(88vh - 84px);">
+                    <template x-if="tab === 'library'">
+                        <div>
+                            <input
+                                type="text"
+                                x-model="search"
+                                placeholder="ابحث بالعنوان أو الرقم..."
+                                style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:12px 14px;margin-bottom:16px;"
+                            >
+
+                            <template x-if="uploadError && !loading">
+                                <div style="margin-bottom:16px;background:#fef2f2;color:#b91c1c;padding:12px 14px;border-radius:12px;font-weight:600;" x-text="uploadError"></div>
+                            </template>
+
+                            <template x-if="loading">
+                                <div style="padding:30px;border:1px dashed #d1d5db;border-radius:14px;text-align:center;color:#6b7280;">
+                                    جاري تحميل المكتبة...
+                                </div>
+                            </template>
+
+                            <template x-if="!loading && filteredItems().length === 0">
+                                <div style="padding:30px;border:1px dashed #d1d5db;border-radius:14px;text-align:center;color:#6b7280;">
+                                    لا توجد ملفات
+                                </div>
+                            </template>
+
+                            <div x-show="!loading && filteredItems().length > 0" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;">
+                                <template x-for="item in filteredItems()" :key="item.id">
+                                    <button
+                                        type="button"
+                                        x-on:click="chooseItem(item)"
+                                        style="cursor:pointer;border:1px solid #e5e7eb;border-radius:14px;padding:10px;background:#fff;text-align:right;"
+                                    >
+                                        <template x-if="item.is_image">
+                                            <img :src="item.url" style="width:100%;height:100px;object-fit:cover;border-radius:10px;border:1px solid #eee;margin-bottom:8px;">
+                                        </template>
+
+                                        <template x-if="!item.is_image">
+                                            <div style="height:100px;border-radius:10px;border:1px solid #eee;margin-bottom:8px;display:flex;align-items:center;justify-content:center;background:#f8fafc;font-weight:800;color:#dc2626;">
+                                                PDF
+                                            </div>
+                                        </template>
+
+                                        <div style="font-size:12px;font-weight:700;">#<span x-text="item.id"></span></div>
+                                        <div style="font-size:11px;color:#6b7280;line-height:1.5;word-break:break-word;" x-text="item.title"></div>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template x-if="tab === 'upload'">
+                        <div style="max-width:700px;margin:0 auto;display:grid;gap:14px;">
+                            <div>
+                                <label style="display:block;margin-bottom:6px;font-weight:700;">عنوان الملف</label>
+                                <input type="text" x-model="uploadTitle" style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:12px 14px;">
+                            </div>
+
+                            <div>
+                                <label style="display:block;margin-bottom:6px;font-weight:700;">النص البديل</label>
+                                <input type="text" x-model="uploadAlt" style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:12px 14px;">
+                            </div>
+
+                            <div>
+                                <label style="display:block;margin-bottom:6px;font-weight:700;">الملف</label>
+                                <input
+                                    type="file"
+                                    x-on:change="uploadFile = $event.target.files[0] || null"
+                                    accept=".jpg,.jpeg,.png,.webp,.gif,.pdf"
+                                    style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:12px 14px;background:#fff;"
+                                >
+                            </div>
+
+                            <template x-if="uploadError">
+                                <div style="background:#fef2f2;color:#b91c1c;padding:12px 14px;border-radius:12px;font-weight:600;" x-text="uploadError"></div>
+                            </template>
+
+                            <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
+                                <button
+                                    type="button"
+                                    x-on:click="tab = 'library'"
+                                    style="background:#eef2f7;color:#111827;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;"
+                                >
+                                    رجوع للمكتبة
+                                </button>
+
+                                <button
+                                    type="button"
+                                    x-on:click="uploadNow()"
+                                    :disabled="uploading"
+                                    style="background:#127962;color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;"
+                                >
+                                    <span x-show="!uploading">رفع الملف</span>
+                                    <span x-show="uploading">جاري الرفع...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </dialog>
+    </div>
+</x-dynamic-component>

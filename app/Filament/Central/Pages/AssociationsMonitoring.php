@@ -3,6 +3,7 @@
 namespace App\Filament\Central\Pages;
 
 use App\Models\Association;
+use App\Services\AssociationActivityLogger;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -22,6 +23,10 @@ class AssociationsMonitoring extends Page
     public string $statusFilter = '';
     public string $daysFilter = '';
     public string $subscriptionFilter = '';
+
+    public ?int $renewAssociationId = null;
+    public string $renewalType = '1_year';
+    public ?string $customRenewalDate = null;
 
     public function getAssociationsProperty()
     {
@@ -67,9 +72,18 @@ class AssociationsMonitoring extends Page
     public function stopAssociation(int $id): void
     {
         $association = Association::findOrFail($id);
+
         $association->update([
             'site_status' => 'suspended',
         ]);
+
+        AssociationActivityLogger::log(
+            $association,
+            3,
+            'suspended',
+            'تم إيقاف الجمعية',
+            'تم تغيير حالة الموقع إلى موقوفة.'
+        );
 
         Notification::make()
             ->title('تم إيقاف الجمعية')
@@ -80,12 +94,85 @@ class AssociationsMonitoring extends Page
     public function activateAssociation(int $id): void
     {
         $association = Association::findOrFail($id);
+
         $association->update([
             'site_status' => 'active',
         ]);
 
+        AssociationActivityLogger::log(
+            $association,
+            5,
+            'activated',
+            'تم تفعيل الجمعية',
+            'تم تغيير حالة الموقع إلى نشطة.'
+        );
+
         Notification::make()
             ->title('تم تفعيل الجمعية')
+            ->success()
+            ->send();
+    }
+
+    public function openRenewModal(int $id): void
+    {
+        $this->renewAssociationId = $id;
+        $this->renewalType = '1_year';
+        $this->customRenewalDate = null;
+
+        $this->dispatch('open-renew-modal');
+    }
+
+    public function closeRenewModal(): void
+    {
+        $this->renewAssociationId = null;
+        $this->renewalType = '1_year';
+        $this->customRenewalDate = null;
+
+        $this->dispatch('close-renew-modal');
+    }
+
+    public function renewAssociation(): void
+    {
+        abort_unless($this->renewAssociationId, 404);
+
+        $association = Association::findOrFail($this->renewAssociationId);
+
+        $baseDate = $association->subscription_end_date
+            ? Carbon::parse($association->subscription_end_date)
+            : now();
+
+        if ($baseDate->isPast()) {
+            $baseDate = now();
+        }
+
+        $newEndDate = match ($this->renewalType) {
+            '1_month' => $baseDate->copy()->addMonth(),
+            '6_months' => $baseDate->copy()->addMonths(6),
+            '1_year' => $baseDate->copy()->addYear(),
+            '2_years' => $baseDate->copy()->addYears(2),
+            '3_years' => $baseDate->copy()->addYears(3),
+            'custom_date' => Carbon::parse($this->customRenewalDate),
+            default => $baseDate->copy()->addYear(),
+        };
+
+        $association->update([
+            'subscription_status' => 'active',
+            'subscription_end_date' => $newEndDate->toDateString(),
+        ]);
+
+        AssociationActivityLogger::log(
+            $association,
+            2,
+            'renewed',
+            'تم تجديد الاشتراك',
+            'تم التجديد بنوع: ' . $this->renewalType . ' | تاريخ الانتهاء الجديد: ' . $newEndDate->format('Y-m-d')
+        );
+
+        $this->closeRenewModal();
+
+        Notification::make()
+            ->title('تم تجديد الاشتراك')
+            ->body('تاريخ الانتهاء الجديد: ' . $newEndDate->format('Y-m-d'))
             ->success()
             ->send();
     }

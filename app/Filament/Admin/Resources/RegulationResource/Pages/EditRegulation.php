@@ -3,17 +3,19 @@
 namespace App\Filament\Admin\Resources\RegulationResource\Pages;
 
 use App\Filament\Admin\Resources\RegulationResource;
-use Filament\Actions;
+use App\Filament\Support\AppliesSelectedMedia;
 use Filament\Resources\Pages\EditRecord;
 
 class EditRegulation extends EditRecord
 {
+    use AppliesSelectedMedia;
+
     protected static string $resource = RegulationResource::class;
 
-    protected function getHeaderActions(): array
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        return $this->applySelectedMedia($data, [
+            'file_media_id' => 'file',
+        ]);
     }
 }

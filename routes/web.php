@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\MediaLibraryController;
+use App\Http\Controllers\Admin\MediaPickerPageController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\FrontendPageController;
@@ -43,3 +46,18 @@ Route::get('/page/{slug}/project/{id}', [FrontendPageController::class, 'pagePro
 Route::get('/projects/{id}', [FrontendPageController::class, 'programProjectShow']);
 Route::get('/board-members', [WebsiteController::class, 'boardMembers'])->name('board-members');
 Route::get('/general-assembly', [WebsiteController::class, 'generalAssembly'])->name('general-assembly.index');
+
+
+
+Route::middleware(['web', 'auth'])->prefix('admin/media-library')->group(function () {
+    Route::get('/picker-json', [MediaLibraryController::class, 'pickerJson']);
+    Route::get('/usage/{itemId}', [MediaLibraryController::class, 'usage'])->whereNumber('itemId');
+    Route::post('/upload', [MediaLibraryController::class, 'upload']);
+});
+
+
+Route::get('/admin/media-picker', [\App\Http\Controllers\Admin\MediaPickerPageController::class, 'index']);
+
+
+Route::get('/admin/media-picker', [MediaPickerPageController::class, 'index']);
+Route::post('/admin/media-picker/upload', [MediaPickerPageController::class, 'store']);

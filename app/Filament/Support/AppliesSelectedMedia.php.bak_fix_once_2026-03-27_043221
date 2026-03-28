@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Filament\Support;
+
+use App\Models\MediaItem;
+
+trait AppliesSelectedMedia
+{
+    protected function applySelectedMedia(array $data, array $map): array
+    {
+        foreach ($map as $mediaIdField => $pathField) {
+            if (request()->boolean('clear_media')) {
+                $data[$mediaIdField] = null;
+                $data[$pathField] = null;
+                continue;
+            }
+
+            if (request()->filled('selected_media_id')) {
+                $data[$mediaIdField] = request('selected_media_id');
+            }
+
+            if (empty($data[$pathField]) && request()->filled('selected_media_file')) {
+                $data[$pathField] = request('selected_media_file');
+            }
+
+            if (empty($data[$pathField]) && ! empty($data[$mediaIdField])) {
+                $media = MediaItem::query()->find($data[$mediaIdField]);
+
+                if ($media && ! empty($media->file)) {
+                    $data[$pathField] = $media->file;
+                }
+            }
+        }
+
+        return $data;
+    }
+}

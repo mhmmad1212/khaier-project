@@ -1,0 +1,59 @@
+@php
+    $statePath = $getStatePath();
+    $media = null;
+
+    $selectedFromRequest = request()->get('selected_media_id');
+    if (! $getState() && $selectedFromRequest) {
+        $media = \App\Models\MediaItem::query()->find($selectedFromRequest);
+    } elseif ($getState()) {
+        $media = \App\Models\MediaItem::query()->find($getState());
+    }
+
+    $pickerUrl = url('/admin/media-picker?field=' . urlencode($statePath) . '&return=' . urlencode(url()->full()));
+@endphp
+
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :field="$field"
+>
+    <div class="space-y-3">
+        <input type="hidden" wire:model.defer="{{ $statePath }}">
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <a
+                href="{{ $pickerUrl }}"
+                style="display:inline-block;background:#127962;color:#fff;text-decoration:none;padding:10px 16px;border-radius:12px;font-weight:700;"
+            >
+                اختيار صورة من مكتبة الوسائط
+            </a>
+        </div>
+
+        @if($media)
+            <div style="margin-top:14px;padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#fafafa;">
+                @if($media->is_image)
+                    <img
+                        src="{{ asset('storage/' . $media->file) }}"
+                        alt="{{ $media->alt_text ?: $media->title }}"
+                        style="width:130px;height:130px;object-fit:cover;border-radius:12px;border:1px solid #ddd;"
+                    >
+                @else
+                    <div style="width:130px;height:130px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid #ddd;background:#fff;color:#dc2626;font-weight:800;font-size:28px;">
+                        PDF
+                    </div>
+                @endif
+
+                <div style="margin-top:10px;font-weight:700;">
+                    {{ $media->title ?: basename((string) $media->file) }}
+                </div>
+
+                <div style="margin-top:4px;font-size:13px;color:#6b7280;">
+                    #{{ $media->id }} — {{ strtoupper($media->extension ?: 'FILE') }}
+                </div>
+            </div>
+        @endif
+
+        <div style="padding:12px 14px;border:1px dashed #d1d5db;border-radius:12px;background:#fafafa;color:#6b7280;font-weight:600;">
+            سيتم الرجوع تلقائيًا لصفحة الخبر بعد اختيار الملف.
+        </div>
+    </div>
+</x-dynamic-component>

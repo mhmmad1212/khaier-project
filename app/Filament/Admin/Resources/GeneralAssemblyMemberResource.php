@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\GeneralAssemblyMemberResource\Pages;
+use App\Filament\Admin\Resources\GeneralAssemblyMemberResource\RelationManagers\AttachmentsRelationManager;
 use App\Forms\Components\MediaPicker;
 use App\Models\GeneralAssemblyMember;
 use Filament\Forms;
@@ -96,6 +97,13 @@ class GeneralAssemblyMemberResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            AttachmentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -1,5 +1,10 @@
 <x-filament-panels::page>
-    <div style="display:grid;gap:16px;">
+    <div
+        x-data="{ renewOpen: false }"
+        x-on:open-renew-modal.window="renewOpen = true"
+        x-on:close-renew-modal.window="renewOpen = false"
+        style="display:grid;gap:16px;"
+    >
         <div style="background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:16px;">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
                 <div>
@@ -45,16 +50,16 @@
         </div>
 
         <div style="background:#fff;border:1px solid #e5e7eb;border-radius:18px;overflow:auto;">
-            <table style="width:100%;border-collapse:collapse;min-width:1100px;">
+            <table style="width:100%;border-collapse:collapse;min-width:1180px;">
                 <thead style="background:#f9fafb;">
                     <tr>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">الجمعية</th>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">الدومين</th>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">حالة الموقع</th>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">الاشتراك</th>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">تاريخ الانتهاء</th>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">المتبقي</th>
-                        <th style="padding:12px;border-bottom:1px solid #e5e7eb;text-align:right;">الإجراءات</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">الجمعية</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">الدومين</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">حالة الموقع</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">الاشتراك</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">تاريخ الانتهاء</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">المتبقي</th>
+                        <th style="padding:14px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -78,61 +83,125 @@
                                 'suspended' => 'معلق',
                                 default => '-',
                             };
+
+                            $siteStatusStyle = match($association->site_status) {
+                                'active' => 'background:#ecfdf5;color:#166534;border:1px solid #bbf7d0;',
+                                'closed' => 'background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;',
+                                'suspended' => 'background:#fef2f2;color:#991b1b;border:1px solid #fecaca;',
+                                default => 'background:#f9fafb;color:#374151;border:1px solid #e5e7eb;',
+                            };
+
+                            $subscriptionStyle = match($association->subscription_status) {
+                                'active' => 'background:#ecfdf5;color:#166534;border:1px solid #bbf7d0;',
+                                'expired' => 'background:#fef2f2;color:#991b1b;border:1px solid #fecaca;',
+                                'suspended' => 'background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;',
+                                default => 'background:#f9fafb;color:#374151;border:1px solid #e5e7eb;',
+                            };
+
+                            if (is_null($daysLeft)) {
+                                $daysLeftText = '-';
+                                $daysLeftStyle = 'background:#f9fafb;color:#374151;border:1px solid #e5e7eb;';
+                            } elseif ($daysLeft < 0) {
+                                $daysLeftText = 'منتهي منذ ' . abs($daysLeft) . ' يوم';
+                                $daysLeftStyle = 'background:#fef2f2;color:#991b1b;border:1px solid #fecaca;font-weight:700;';
+                            } elseif ($daysLeft <= 30) {
+                                $daysLeftText = 'باقي ' . $daysLeft . ' يوم';
+                                $daysLeftStyle = 'background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;';
+                            } elseif ($daysLeft <= 90) {
+                                $daysLeftText = 'باقي ' . $daysLeft . ' يوم';
+                                $daysLeftStyle = 'background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;font-weight:700;';
+                            } else {
+                                $daysLeftText = 'باقي ' . $daysLeft . ' يوم';
+                                $daysLeftStyle = 'background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-weight:700;';
+                            }
                         @endphp
 
-                        <tr>
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">
-                                <div style="font-weight:700;">{{ $association->name }}</div>
-                                <div style="color:#6b7280;font-size:12px;">{{ $association->slug }}</div>
+                        <tr style="transition:background .2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                <div style="font-weight:700;color:#111827;">{{ $association->name }}</div>
+                                <div style="color:#6b7280;font-size:12px;margin-top:4px;">{{ $association->slug }}</div>
                             </td>
 
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">{{ $association->domain ?: '-' }}</td>
-
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">{{ $siteStatusLabel }}</td>
-
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">{{ $subscriptionLabel }}</td>
-
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">
-                                {{ $association->subscription_end_date ? \Illuminate\Support\Carbon::parse($association->subscription_end_date)->format('Y-m-d') : '-' }}
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                <div style="max-width:240px;word-break:break-word;color:#374151;">{{ $association->domain ?: '-' }}</div>
                             </td>
 
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">
-                                @if(is_null($daysLeft))
-                                    -
-                                @elseif($daysLeft < 0)
-                                    منتهي منذ {{ abs($daysLeft) }} يوم
-                                @elseif($daysLeft === 0)
-                                    ينتهي اليوم
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;{{ $siteStatusStyle }}">
+                                    {{ $siteStatusLabel }}
+                                </span>
+                            </td>
+
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;{{ $subscriptionStyle }}">
+                                    {{ $subscriptionLabel }}
+                                </span>
+                            </td>
+
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                @if($association->subscription_end_date)
+                                    <div style="display:flex;flex-direction:column;gap:4px;">
+                                        <span style="font-weight:700;color:#111827;">
+                                            {{ \Illuminate\Support\Carbon::parse($association->subscription_end_date)->format('Y-m-d') }}
+                                        </span>
+                                    </div>
                                 @else
-                                    باقي {{ $daysLeft }} يوم
+                                    -
                                 @endif
                             </td>
 
-                            <td style="padding:12px;border-bottom:1px solid #f3f4f6;">
-                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                    <a
-                                        href="{{ \App\Filament\Resources\AssociationResource::getUrl('edit', ['record' => $association]) }}"
-                                        style="padding:8px 12px;border-radius:10px;background:#f3f4f6;color:#111827;text-decoration:none;"
-                                    >
-                                        تعديل
-                                    </a>
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;{{ $daysLeftStyle }}">
+                                    {{ $daysLeftText }}
+                                </span>
+                            </td>
 
-                                    @if($association->site_status === 'active')
+                            <td style="padding:14px 12px;border-bottom:1px solid #f3f4f6;">
+                                <details style="position:relative;display:inline-block;">
+                                    <summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:#fff;border:1px solid #d1d5db;color:#111827;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.04);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#6b7280;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 6a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 6a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" />
+                                        </svg>
+                                        <span>الإجراءات</span>
+                                    </summary>
+
+                                    <div style="position:absolute;left:0;margin-top:8px;min-width:210px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.10);padding:8px;z-index:30;">
                                         <button
-                                            wire:click="stopAssociation({{ $association->id }})"
-                                            style="padding:8px 12px;border-radius:10px;background:#fee2e2;color:#991b1b;border:none;cursor:pointer;"
+                                            wire:click="openRenewModal({{ $association->id }})"
+                                            style="width:100%;display:flex;align-items:center;gap:10px;text-align:right;padding:10px 12px;border:none;background:transparent;cursor:pointer;border-radius:10px;color:#111827;font-weight:500;"
+                                            onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'"
                                         >
-                                            إيقاف
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#2563eb;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V8.25A2.25 2.25 0 0 1 5.25 6h13.5A2.25 2.25 0 0 1 21 8.25v10.5A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75ZM3 10.5h18" />
+                                            </svg>
+                                            <span>تجديد الاشتراك</span>
                                         </button>
-                                    @else
-                                        <button
-                                            wire:click="activateAssociation({{ $association->id }})"
-                                            style="padding:8px 12px;border-radius:10px;background:#dcfce7;color:#166534;border:none;cursor:pointer;"
-                                        >
-                                            تفعيل
-                                        </button>
-                                    @endif
-                                </div>
+
+                                        @if($association->site_status === 'active')
+                                            <button
+                                                wire:click="stopAssociation({{ $association->id }})"
+                                                style="width:100%;display:flex;align-items:center;gap:10px;text-align:right;padding:10px 12px;border:none;background:transparent;cursor:pointer;border-radius:10px;color:#991b1b;font-weight:500;"
+                                                onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#dc2626;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5.25 7.5h13.5m-10.5 0V6a1.5 1.5 0 0 1 1.5-1.5h4.5A1.5 1.5 0 0 1 15.75 6v1.5m-9 0v9.75A1.5 1.5 0 0 0 8.25 18.75h7.5a1.5 1.5 0 0 0 1.5-1.5V7.5" />
+                                                </svg>
+                                                <span>إيقاف</span>
+                                            </button>
+                                        @else
+                                            <button
+                                                wire:click="activateAssociation({{ $association->id }})"
+                                                style="width:100%;display:flex;align-items:center;gap:10px;text-align:right;padding:10px 12px;border:none;background:transparent;cursor:pointer;border-radius:10px;color:#166534;font-weight:500;"
+                                                onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='transparent'"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#16a34a;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12.75 11.25 15 15 9.75m6 2.25a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                                <span>تفعيل</span>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </details>
                             </td>
                         </tr>
                     @empty
@@ -142,6 +211,63 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div
+            x-show="renewOpen"
+            x-cloak
+            x-transition.opacity
+            style="position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.45); padding:24px;"
+        >
+            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                <div
+                    x-transition
+                    @click.outside="$wire.closeRenewModal()"
+                    style="width:min(560px, 100%); max-height:90vh; overflow:auto; background:#fff; border-radius:20px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,.18); border:1px solid #e5e7eb;"
+                >
+                <div style="font-size:18px;font-weight:700;margin-bottom:6px;">تجديد الاشتراك</div>
+                <div style="color:#6b7280;font-size:14px;margin-bottom:16px;">اختر مدة التجديد أو أدخل تاريخًا مخصصًا.</div>
+
+                <div style="display:grid;gap:14px;">
+                    <div>
+                        <label style="display:block;margin-bottom:6px;font-weight:700;">نوع التجديد</label>
+                        <select wire:model="renewalType" style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:10px 12px;">
+                            <option value="1_month">شهر</option>
+                            <option value="6_months">6 أشهر</option>
+                            <option value="1_year">سنة</option>
+                            <option value="2_years">سنتان</option>
+                            <option value="3_years">3 سنوات</option>
+                            <option value="custom_date">تاريخ مخصص</option>
+                        </select>
+                    </div>
+
+                    @if($renewalType === 'custom_date')
+                        <div>
+                            <label style="display:block;margin-bottom:6px;font-weight:700;">تاريخ الانتهاء الجديد</label>
+                            <input type="date" wire:model="customRenewalDate" style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:10px 12px;">
+                        </div>
+                    @endif
+                </div>
+
+                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px;">
+                    <button
+                        type="button"
+                        wire:click="closeRenewModal"
+                        style="padding:10px 14px;border:none;background:#f3f4f6;border-radius:10px;cursor:pointer;"
+                    >
+                        إلغاء
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="renewAssociation"
+                        style="padding:10px 14px;border:none;background:#111827;color:#fff;border-radius:10px;cursor:pointer;"
+                    >
+                        حفظ التجديد
+                    </button>
+                </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-filament-panels::page>

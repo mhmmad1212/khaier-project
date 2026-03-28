@@ -1,0 +1,8 @@
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :field="$field"
+>
+    <div style="padding:12px 14px;border:1px dashed #d1d5db;border-radius:12px;background:#fafafa;color:#6b7280;font-weight:600;">
+        تم تعطيل مكتبة الوسائط المنبثقة مؤقتًا لضمان استقرار النظام.
+    </div>
+</x-dynamic-component>

@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\SliderResource\Pages;
 use App\Forms\Components\MediaPicker;
+use App\Models\MediaItem;
 use App\Models\Slider;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -38,14 +39,20 @@ class SliderResource extends Resource
                     ->label('نص الزر')
                     ->maxLength(255),
 
-                Forms\Components\TextInput::make('button_url')
+                MediaPicker::make('image_media_id')
+                ->label('صورة السلايدر')
+                ->default(fn () => request('selected_media_id'))
+                ->columnSpanFull(),
+
+            Forms\Components\Hidden::make('image')
+                ->default(fn () => request('selected_media_file')),
+
+            Forms\Components\TextInput::make('button_url')
                     ->label('رابط الزر')
                     ->url()
                     ->maxLength(255),
 
-                MediaPicker::make('image_media_id')
-                    ->label('الصورة')
-                    ->columnSpanFull(),
+
 
                 Forms\Components\TextInput::make('sort_order')
                     ->label('الترتيب')

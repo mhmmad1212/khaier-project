@@ -3,17 +3,19 @@
 namespace App\Filament\Admin\Resources\PartnerResource\Pages;
 
 use App\Filament\Admin\Resources\PartnerResource;
-use Filament\Actions;
+use App\Filament\Support\AppliesSelectedMedia;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPartner extends EditRecord
 {
+    use AppliesSelectedMedia;
+
     protected static string $resource = PartnerResource::class;
 
-    protected function getHeaderActions(): array
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        return $this->applySelectedMedia($data, [
+            'logo_media_id' => 'logo',
+        ]);
     }
 }

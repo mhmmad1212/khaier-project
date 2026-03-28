@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Filament\Support;
+
+use App\Models\MediaItem;
+
+trait AppliesSelectedMedia
+{
+    protected function selectedMediaPayload(): array
+    {
+        $payload = [
+            'selected_media_id' => request('selected_media_id'),
+            'selected_media_file' => request('selected_media_file'),
+            'clear_media' => request()->boolean('clear_media'),
+        ];
+
+        $referer = request()->headers->get('referer');
+
+        if ($referer) {
+            $query = parse_url($referer, PHP_URL_QUERY);
+
+            if ($query) {
+                parse_str($query, $params);
+
+                $payload['selected_media_id'] = $payload['selected_media_id'] ?: ($params['selected_media_id'] ?? null);
+                $payload['selected_media_file'] = $payload['selected_media_file'] ?: ($params['selected_media_file'] ?? null);
+
+                if (! $payload['clear_media'] && isset($params['clear_media'])) {
+                    $payload['clear_media'] = (bool) $params['clear_media'];
+                }
+            }
+        }
+
+        return $payload;
+    }
+
+    protected function applySelectedMedia(array $data, array $map): array
+    {
+        $payload = $this->selectedMediaPayload();
+
+        foreach ($map as $mediaIdField => $pathField) {
+            if ($payload['clear_media']) {
+                $data[$mediaIdField] = null;
+                $data[$pathField] = null;
+                continue;
+            }
+
+            if (! empty($payload['selected_media_id'])) {
+                $data[$mediaIdField] = $payload['selected_media_id'];
+            }
+
+            if (! empty($payload['selected_media_file'])) {
+                $data[$pathField] = $payload['selected_media_file'];
+            }
+
+            if (empty($data[$pathField]) && ! empty($data[$mediaIdField])) {
+                $media = MediaItem::query()->find($data[$mediaIdField]);
+
+                if ($media && ! empty($media->file)) {
+                    $data[$pathField] = $media->file;
+                }
+            }
+        }
+
+        return $data;
+    }
+}

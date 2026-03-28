@@ -34,7 +34,11 @@ class EmployeeResource extends Resource
 
             MediaPicker::make('photo_media_id')
                 ->label('صورة الموظف')
+                ->default(fn () => request('selected_media_id'))
                 ->columnSpanFull(),
+
+            Forms\Components\Hidden::make('photo')
+                ->default(fn () => request('selected_media_file')),
         ];
 
         if (Schema::connection('tenant')->hasColumn('employees', 'department')) {

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\MediaItem;
+
 use App\Models\Tenant\TenantModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -16,6 +18,9 @@ class Slider extends TenantModel
         'image_media_id',
         'sort_order',
         'is_active',
+    
+    
+    
     ];
 
     protected static function booted(): void

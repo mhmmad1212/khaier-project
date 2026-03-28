@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Filament\Admin\Resources\SliderResource\Pages;
+
+use App\Filament\Admin\Resources\SliderResource;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreateSlider extends CreateRecord
+{
+    protected static string $resource = SliderResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (empty($data['image']) && ! empty($data['image_media_id'])) {
+            $media = \App\Models\MediaItem::query()->find($data['image_media_id']);
+            if ($media) {
+                $data['image'] = $media->file;
+            }
+        }
+
+        if (empty($data['image']) && request()->filled('selected_media_file')) {
+            $data['image'] = request('selected_media_file');
+        }
+
+        return $data;
+    }
+
+}

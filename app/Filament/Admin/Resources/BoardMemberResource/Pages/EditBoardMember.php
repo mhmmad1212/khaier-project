@@ -3,17 +3,19 @@
 namespace App\Filament\Admin\Resources\BoardMemberResource\Pages;
 
 use App\Filament\Admin\Resources\BoardMemberResource;
-use Filament\Actions;
+use App\Filament\Support\AppliesSelectedMedia;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBoardMember extends EditRecord
 {
+    use AppliesSelectedMedia;
+
     protected static string $resource = BoardMemberResource::class;
 
-    protected function getHeaderActions(): array
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        return $this->applySelectedMedia($data, [
+            'photo_media_id' => 'photo',
+        ]);
     }
 }

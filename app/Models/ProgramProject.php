@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\SyncsMediaFields;
 use App\Models\Tenant\TenantModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\HasAttachments;
 
 class ProgramProject extends TenantModel
 {
+    use HasAttachments;
+
+    use SyncsMediaFields;
+
+    protected array $mediaSyncMap = [
+        'cover_image_media_id' => 'cover_image',
+        'report_media_id' => 'report_file',
+    ];
+
     protected $fillable = [
         'title',
         'description',

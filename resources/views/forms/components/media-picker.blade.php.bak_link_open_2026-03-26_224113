@@ -1,0 +1,104 @@
+@php
+    $statePath = $getStatePath();
+    $media = null;
+
+    if ($getState()) {
+        $media = \App\Models\MediaItem::query()->find($getState());
+    }
+@endphp
+
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :field="$field"
+>
+    <div
+        x-data="{
+            selected: @entangle($statePath),
+            selectedItem: @js($media ? [
+                'id' => $media->id,
+                'title' => $media->title ?: basename((string) $media->file),
+                'url' => asset('storage/' . $media->file),
+                'file' => $media->file,
+                'is_image' => (bool) $media->is_image,
+                'extension' => $media->extension,
+                'alt_text' => $media->alt_text,
+            ] : null),
+            openLibrary() {
+                window.open('/admin/media-picker?field={{ urlencode($statePath) }}', '_blank', 'width=1200,height=850');
+            },
+            clearSelection() {
+                this.selected = null;
+                this.selectedItem = null;
+                this.syncRelatedFields();
+            },
+            syncRelatedFields() {
+                const root = this.$root.closest('[wire\\:id]');
+
+                if (!root) return;
+
+                const imageInput = root.querySelector('input[type=hidden][wire\\:model\\.defer$=\".image\"], input[type=hidden][wire\\:model$=\".image\"]');
+                if (imageInput) {
+                    imageInput.value = this.selectedItem?.file ?? '';
+                    imageInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    imageInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        }"
+        x-init="
+            window.addEventListener('message', (event) => {
+                if (event.data?.type !== 'tenant-media-selected') return;
+                if (event.data?.field !== '{{ $statePath }}') return;
+
+                selected = event.data.item.id;
+                selectedItem = event.data.item;
+                syncRelatedFields();
+            });
+        "
+        class="space-y-3"
+    >
+        <input type="hidden" wire:model.defer="{{ $statePath }}">
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button
+                type="button"
+                x-on:click="openLibrary()"
+                style="background:#127962;color:#fff;border:none;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:700;"
+            >
+                اختيار صورة من مكتبة الوسائط
+            </button>
+
+            <button
+                type="button"
+                x-show="selected"
+                x-on:click="clearSelection()"
+                style="background:#eef2f7;color:#111827;border:none;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:700;"
+            >
+                إزالة الاختيار
+            </button>
+        </div>
+
+        <template x-if="selectedItem">
+            <div style="margin-top:14px;padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#fafafa;">
+                <template x-if="selectedItem.is_image">
+                    <img :src="selectedItem.url" :alt="selectedItem.alt_text || selectedItem.title" style="width:130px;height:130px;object-fit:cover;border-radius:12px;border:1px solid #ddd;">
+                </template>
+
+                <template x-if="!selectedItem.is_image">
+                    <div style="width:130px;height:130px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid #ddd;background:#fff;color:#dc2626;font-weight:800;font-size:28px;">
+                        PDF
+                    </div>
+                </template>
+
+                <div style="margin-top:10px;font-weight:700;" x-text="selectedItem.title"></div>
+                <div style="margin-top:4px;font-size:13px;color:#6b7280;">
+                    #<span x-text="selectedItem.id"></span> —
+                    <span x-text="(selectedItem.extension || 'FILE').toUpperCase()"></span>
+                </div>
+            </div>
+        </template>
+
+        <div style="padding:12px 14px;border:1px dashed #d1d5db;border-radius:12px;background:#fafafa;color:#6b7280;font-weight:600;">
+            يمكنك رفع ملفات جديدة من صفحة مكتبة الوسائط ثم اختيارها هنا.
+        </div>
+    </div>
+</x-dynamic-component>

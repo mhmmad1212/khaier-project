@@ -1,0 +1,131 @@
+@php
+    $statePath = $getStatePath();
+
+    $selectedId = $getState() ?: request('selected_media_id');
+    $media = null;
+
+    if ($selectedId) {
+        $media = \App\Models\MediaItem::query()->find($selectedId);
+    }
+
+    $currentUrl = url()->full();
+    $previousUrl = url()->previous();
+    $referer = request()->headers->get('referer');
+
+    // الأصل: ارجع لنفس الصفحة الحالية (create / edit)
+    $returnUrl = $currentUrl;
+
+    // فقط إذا كانت الصفحة الحالية livewire/update نبحث عن بديل
+    if (str_contains($returnUrl, '/livewire/update')) {
+        if ($referer && ! str_contains($referer, '/livewire/update')) {
+            $returnUrl = $referer;
+        } elseif ($previousUrl && ! str_contains($previousUrl, '/livewire/update')) {
+            $returnUrl = $previousUrl;
+        }
+    }
+
+    // تنظيف أي بارامترات قديمة من الرابط
+    $returnUrl = preg_replace('/([&?])(selected_media_id|selected_media_file)=[^&]*/', '$1', $returnUrl);
+    $returnUrl = rtrim(str_replace(['?&', '&&'], ['?', '&'], $returnUrl), '?&');
+
+    $pickerUrl = url('/admin/media-picker') . '?' . http_build_query([
+        'field' => $statePath,
+        'return' => $returnUrl,
+    ]);
+@endphp
+
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :field="$field"
+>
+    <div class="space-y-4">
+        <input type="hidden" wire:model.defer="{{ $statePath }}">
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <a
+                href="{{ $pickerUrl }}"
+                style="display:inline-flex;align-items:center;gap:8px;background:#127962;color:#fff;text-decoration:none;padding:10px 16px;border-radius:12px;font-weight:700;"
+            >
+                <span>اختيار صورة من مكتبة الوسائط</span>
+            </a>
+
+            @if($media)
+                <span style="display:inline-flex;align-items:center;background:#eef2f7;color:#111827;padding:10px 14px;border-radius:12px;font-weight:700;">
+                    تم اختيار ملف
+                </span>
+            @endif
+        </div>
+
+        @if($media)
+            <div style="border:1px solid #e5e7eb;border-radius:16px;background:#fff;overflow:hidden;">
+                <div style="padding:16px;display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:start;">
+                    <div>
+                        @if($media->is_image)
+                            <img
+                                src="{{ asset('storage/' . $media->file) }}"
+                                alt="{{ $media->alt_text ?: $media->title }}"
+                                style="width:140px;height:140px;object-fit:cover;border-radius:14px;border:1px solid #e5e7eb;background:#fafafa;"
+                            >
+                        @else
+                            <div style="width:140px;height:140px;display:flex;align-items:center;justify-content:center;border-radius:14px;border:1px solid #e5e7eb;background:#fafafa;color:#dc2626;font-weight:800;font-size:28px;">
+                                PDF
+                            </div>
+                        @endif
+                    </div>
+
+                    <div style="display:grid;gap:10px;">
+                        <div>
+                            <div style="font-size:13px;color:#6b7280;margin-bottom:4px;">الملف المختار</div>
+                            <div style="font-size:18px;font-weight:800;color:#111827;">
+                                {{ $media->title ?: basename((string) $media->file) }}
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <span style="background:#f3f4f6;color:#111827;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;">
+                                #{{ $media->id }}
+                            </span>
+
+                            <span style="background:#f3f4f6;color:#111827;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;">
+                                {{ strtoupper($media->extension ?: 'FILE') }}
+                            </span>
+
+                            @if($media->size)
+                                <span style="background:#f3f4f6;color:#111827;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;">
+                                    @if($media->size < 1024)
+                                        {{ $media->size }} B
+                                    @elseif($media->size < 1024 * 1024)
+                                        {{ round($media->size / 1024, 1) }} KB
+                                    @else
+                                        {{ round($media->size / (1024 * 1024), 1) }} MB
+                                    @endif
+                                </span>
+                            @endif
+                        </div>
+
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <a
+                                href="{{ $pickerUrl }}"
+                                style="display:inline-flex;align-items:center;gap:8px;background:#111827;color:#fff;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:700;"
+                            >
+                                تغيير الصورة
+                            </a>
+
+                            <a
+                                href="{{ asset('storage/' . $media->file) }}"
+                                target="_blank"
+                                style="display:inline-flex;align-items:center;gap:8px;background:#eef2f7;color:#111827;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:700;"
+                            >
+                                فتح الملف
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div style="padding:14px 16px;border:1px dashed #d1d5db;border-radius:14px;background:#fafafa;color:#6b7280;font-weight:600;">
+                لم يتم اختيار صورة بعد. اضغط على زر <strong>اختيار صورة من مكتبة الوسائط</strong>.
+            </div>
+        @endif
+    </div>
+</x-dynamic-component>

@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Tenant\TenantModel;
+
+class GeneralAssemblyMember extends TenantModel
+{
+    protected $connection = 'tenant';
+
+    protected $fillable = [
+        'name',
+        'position',
+        'join_date',
+        'photo',
+        'sort_order',
+        'is_active',
+        'photo_media_id',
+    ];
+
+
+    public function photoMedia(): BelongsTo
+    {
+        return $this->belongsTo(MediaItem::class, 'photo_media_id');
+    }
+
+}
