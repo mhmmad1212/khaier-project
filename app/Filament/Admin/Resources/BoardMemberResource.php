@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Schema;
 
 class BoardMemberResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المجالس واللجان';
+    protected static ?int $navigationSort = 2;
     protected static ?string $model = BoardMember::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'مجلس الإدارة';
     protected static ?string $modelLabel = 'عضو';
     protected static ?string $pluralModelLabel = 'أعضاء مجلس الإدارة';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -102,6 +104,7 @@ class BoardMemberResource extends Resource
             ->columns($columns)
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

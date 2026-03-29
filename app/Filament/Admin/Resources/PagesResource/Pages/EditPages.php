@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPages extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = PagesResource::class;
 
     protected function getRedirectUrl(): string

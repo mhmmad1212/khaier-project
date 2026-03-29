@@ -13,14 +13,16 @@ use Filament\Tables\Table;
 
 class ServiceResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المشاريع والبرامج';
+    protected static ?int $navigationSort = 2;
     protected static ?string $model = Service::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'الخدمات';
     protected static ?string $modelLabel = 'خدمة';
     protected static ?string $pluralModelLabel = 'الخدمات';
-    protected static ?string $navigationGroup = 'الموقع';
-    protected static ?int $navigationSort = 36;
+    
+    
 
     public static function form(Form $form): Form
     {
@@ -89,6 +91,7 @@ class ServiceResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class EditNews extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = NewsResource::class;
 
     protected function mutateFormDataBeforeSave(array $data): array

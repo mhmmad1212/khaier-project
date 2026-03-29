@@ -14,12 +14,16 @@ use Illuminate\Support\Facades\Schema;
 
 class MenuBuilder extends Page implements Forms\Contracts\HasForms
 {
+    protected static ?string $navigationGroup = 'إدارة الموقع';
+    protected static ?int $navigationSort = 5;
+    
+    
     use Forms\Concerns\InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';
     protected static ?string $navigationLabel = 'بناء القوائم';
     protected static ?string $title = 'بناء القوائم';
-    protected static ?string $navigationGroup = 'الموقع';
+    
     protected static string $view = 'filament.admin.pages.menu-builder';
 
     public ?int $selectedMenuId = null;
@@ -288,5 +292,10 @@ class MenuBuilder extends Page implements Forms\Contracts\HasForms
         };
 
         return $make(0);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
     }
 }

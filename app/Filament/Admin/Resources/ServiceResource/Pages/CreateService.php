@@ -7,6 +7,8 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateService extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = ServiceResource::class;
 
     protected function getRedirectUrl(): string

@@ -8,6 +8,8 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateEmployee extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     use AppliesSelectedMedia;
 
     protected static string $resource = EmployeeResource::class;

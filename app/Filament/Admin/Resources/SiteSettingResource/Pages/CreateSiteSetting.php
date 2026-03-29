@@ -7,6 +7,8 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateSiteSetting extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = SiteSettingResource::class;
 
     public function mount(): void

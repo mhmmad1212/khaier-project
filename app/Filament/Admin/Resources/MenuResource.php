@@ -12,13 +12,17 @@ use Filament\Tables\Table;
 
 class MenuResource extends Resource
 {
+    protected static ?string $navigationGroup = 'إدارة الموقع';
+    protected static ?int $navigationSort = 3;
+    
+    
     protected static ?string $model = Menu::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3-bottom-right';
     protected static ?string $navigationLabel = 'القوائم';
     protected static ?string $modelLabel = 'قائمة';
     protected static ?string $pluralModelLabel = 'القوائم';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -57,6 +61,7 @@ class MenuResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

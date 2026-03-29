@@ -14,13 +14,15 @@ use Filament\Tables\Table;
 
 class ProgramProjectResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المشاريع والبرامج';
+    protected static ?int $navigationSort = 1;
     protected static ?string $model = ProgramProject::class;
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationLabel = 'البرامج والمشاريع';
     protected static ?string $modelLabel = 'برنامج / مشروع';
     protected static ?string $pluralModelLabel = 'البرامج والمشاريع';
-    protected static ?string $navigationGroup = 'الموقع';
-    protected static ?int $navigationSort = 35;
+    
+    
 
     public static function form(Form $form): Form
     {
@@ -120,6 +122,7 @@ class ProgramProjectResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPage extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = PageResource::class;
 
     protected function getHeaderActions(): array

@@ -8,16 +8,7 @@ class Committee extends TenantModel
 {
     protected $connection = 'tenant';
 
-    protected $fillable = [
-        'name',
-        'description',
-        'chairman',
-        'members_count',
-        'attachment',
-        'sort_order',
-        'is_active',
-        'attachment_media_id',
-    ];
+    protected $guarded = [];
 
 
     public function attachmentMedia(): BelongsTo

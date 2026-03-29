@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\GeneralAssemblyMemberResource\Pages;
-use App\Filament\Admin\Resources\GeneralAssemblyMemberResource\RelationManagers\AttachmentsRelationManager;
 use App\Forms\Components\MediaPicker;
 use App\Models\GeneralAssemblyMember;
 use Filament\Forms;
@@ -14,13 +13,15 @@ use Filament\Tables\Table;
 
 class GeneralAssemblyMemberResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المجالس واللجان';
+    protected static ?int $navigationSort = 1;
     protected static ?string $model = GeneralAssemblyMember::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'الجمعية العمومية';
     protected static ?string $modelLabel = 'عضو جمعية عمومية';
     protected static ?string $pluralModelLabel = 'الجمعية العمومية';
-    protected static ?string $navigationGroup = 'الهيكل الإداري';
+    
 
     public static function form(Form $form): Form
     {
@@ -66,6 +67,8 @@ class GeneralAssemblyMemberResource extends Resource
         return $table
             ->defaultSort('sort_order')
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('photo')->label('الصورة')->circular(),
+                
                 Tables\Columns\TextColumn::make('name')
                     ->label('الاسم')
                     ->searchable(),
@@ -78,10 +81,7 @@ class GeneralAssemblyMemberResource extends Resource
                     ->label('تاريخ الانضمام')
                     ->date(),
 
-                Tables\Columns\TextColumn::make('photo')
-                    ->label('الصورة')
-                    ->limit(30)
-                    ->placeholder('-'),
+                
 
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')
@@ -93,6 +93,7 @@ class GeneralAssemblyMemberResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -102,7 +103,6 @@ class GeneralAssemblyMemberResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AttachmentsRelationManager::class,
         ];
     }
 

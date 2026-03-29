@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditNewsCategory extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = NewsCategoryResource::class;
 
     protected function getHeaderActions(): array

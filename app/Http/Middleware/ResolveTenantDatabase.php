@@ -62,6 +62,7 @@ class ResolveTenantDatabase
         Config::set('database.connections.tenant.username', $association->database_username);
         Config::set('database.connections.tenant.password', $association->database_password);
 
+        \Illuminate\Support\Facades\Config::set('database.connections.tenant.timezone', '+03:00');
         DB::purge('tenant');
         DB::reconnect('tenant');
 

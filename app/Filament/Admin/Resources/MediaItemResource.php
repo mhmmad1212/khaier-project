@@ -12,12 +12,14 @@ use Filament\Tables\Table;
 
 class MediaItemResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المحتوى والإعلام';
+    protected static ?int $navigationSort = 5;
     protected static ?string $model = MediaItem::class;
     protected static ?string $navigationIcon = 'heroicon-o-photo';
     protected static ?string $navigationLabel = 'مكتبة الوسائط';
     protected static ?string $modelLabel = 'وسيط';
     protected static ?string $pluralModelLabel = 'مكتبة الوسائط';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {

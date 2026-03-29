@@ -13,14 +13,16 @@ use Filament\Tables\Table;
 
 class PartnerResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المحتوى والإعلام';
+    protected static ?int $navigationSort = 4;
     protected static ?string $model = Partner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     protected static ?string $navigationLabel = 'الشركاء';
     protected static ?string $modelLabel = 'شريك';
     protected static ?string $pluralModelLabel = 'الشركاء';
-    protected static ?string $navigationGroup = 'الموقع';
-    protected static ?int $navigationSort = 30;
+    
+    
 
     public static function form(Form $form): Form
     {
@@ -84,6 +86,7 @@ class PartnerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

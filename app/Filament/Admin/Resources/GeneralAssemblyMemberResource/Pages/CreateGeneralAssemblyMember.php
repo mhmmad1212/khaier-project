@@ -1,29 +1,18 @@
 <?php
-
 namespace App\Filament\Admin\Resources\GeneralAssemblyMemberResource\Pages;
-
 use App\Filament\Admin\Resources\GeneralAssemblyMemberResource;
-use App\Models\MediaItem;
 use Filament\Resources\Pages\CreateRecord;
+class CreateGeneralAssemblyMember extends CreateRecord {
+    use \App\Filament\Traits\HasBackButton;
 
-class CreateGeneralAssemblyMember extends CreateRecord
-{
     protected static string $resource = GeneralAssemblyMemberResource::class;
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $mediaId = $this->data['photo_media_id'] ?? null;
-
-        if ($mediaId) {
-            $media = MediaItem::query()->find($mediaId);
-
-            if ($media && ! empty($media->file)) {
-                $data['photo'] = $media->file;
-            }
-        }
-
-        unset($data['photo_media_id']);
-
-        return $data;
+    public function updated($property) { session()->put('assembly_form', $this->data); }
+    public function mount(): void {
+        parent::mount();
+        if (request()->filled('selected_media_id')) {
+            if (session()->has('assembly_form')) { $this->data = array_merge($this->data, session()->get('assembly_form')); }
+            $this->data['photo_media_id'] = request('selected_media_id');
+            $this->data['photo'] = request('selected_media_file');
+        } else { session()->forget('assembly_form'); }
     }
 }

@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPolicy extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     use AppliesSelectedMedia;
 
     protected static string $resource = PolicyResource::class;

@@ -7,6 +7,8 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateMediaLibrary extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = MediaLibraryResource::class;
 
     protected function getRedirectUrl(): string

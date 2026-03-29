@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPartner extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     use AppliesSelectedMedia;
 
     protected static string $resource = PartnerResource::class;

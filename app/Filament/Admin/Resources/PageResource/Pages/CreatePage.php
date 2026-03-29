@@ -8,5 +8,7 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreatePage extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = PageResource::class;
 }

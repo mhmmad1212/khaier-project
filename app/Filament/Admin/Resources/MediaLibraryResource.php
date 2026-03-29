@@ -13,14 +13,16 @@ use Illuminate\Support\Str;
 
 class MediaLibraryResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المحتوى والإعلام';
+    protected static ?int $navigationSort = 6;
     protected static ?string $model = MediaItem::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
     protected static ?string $navigationLabel = 'مكتبة الوسائط';
     protected static ?string $modelLabel = 'ملف';
     protected static ?string $pluralModelLabel = 'مكتبة الوسائط';
-    protected static ?string $navigationGroup = 'الموقع';
-    protected static ?int $navigationSort = 1;
+    
+    
 
     public static function form(Form $form): Form
     {

@@ -6,19 +6,10 @@ use App\Models\Tenant\TenantModel;
 
 class GeneralAssemblyMember extends TenantModel
 {
-    use HasAttachments;
 
     protected $connection = 'tenant';
 
-    protected $fillable = [
-        'name',
-        'position',
-        'join_date',
-        'photo',
-        'sort_order',
-        'is_active',
-        'photo_media_id',
-    ];
+    protected $guarded = [];
 
 
     public function photoMedia(): BelongsTo

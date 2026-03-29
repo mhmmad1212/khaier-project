@@ -19,13 +19,15 @@ use Illuminate\Support\Str;
 
 class NewsResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المحتوى والإعلام';
+    protected static ?int $navigationSort = 2;
     protected static ?string $model = News::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
     protected static ?string $navigationLabel = 'الأخبار';
     protected static ?string $modelLabel = 'خبر';
     protected static ?string $pluralModelLabel = 'الأخبار';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -168,6 +170,7 @@ Forms\Components\Section::make('تحسين محركات البحث (SEO)')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

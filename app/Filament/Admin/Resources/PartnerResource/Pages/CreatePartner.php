@@ -8,6 +8,8 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreatePartner extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     use AppliesSelectedMedia;
 
     protected static string $resource = PartnerResource::class;

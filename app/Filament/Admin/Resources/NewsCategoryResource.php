@@ -13,13 +13,15 @@ use Illuminate\Support\Str;
 
 class NewsCategoryResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المحتوى والإعلام';
+    protected static ?int $navigationSort = 1;
     protected static ?string $model = NewsCategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationLabel = 'تصنيفات الأخبار';
     protected static ?string $modelLabel = 'تصنيف خبر';
     protected static ?string $pluralModelLabel = 'تصنيفات الأخبار';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -75,6 +77,7 @@ class NewsCategoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -13,13 +13,15 @@ use Filament\Tables\Table;
 
 class CommitteeResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المجالس واللجان';
+    protected static ?int $navigationSort = 3;
     protected static ?string $model = Committee::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
     protected static ?string $navigationLabel = 'اللجان';
     protected static ?string $modelLabel = 'لجنة';
     protected static ?string $pluralModelLabel = 'اللجان';
-    protected static ?string $navigationGroup = 'الهيكل الإداري';
+    
 
     public static function form(Form $form): Form
     {
@@ -44,10 +46,12 @@ class CommitteeResource extends Resource
 
             Forms\Components\Hidden::make('attachment_media_id')
                 ->dehydrated(false),
+                \Filament\Forms\Components\Hidden::make('attachment'),
 
             MediaPicker::make('attachment_media_id')
                 ->label('المرفق')
                 ->columnSpanFull(),
+                \Filament\Forms\Components\Hidden::make('attachment'),
 
             Forms\Components\Placeholder::make('current_attachment')
                 ->label('المرفق الحالي')
@@ -71,6 +75,29 @@ class CommitteeResource extends Resource
         return $table
             ->defaultSort('sort_order')
             ->columns([
+                \Filament\Tables\Columns\TextColumn::make('attachment_link')
+                    ->label('المرفق')
+                    ->getStateUsing(fn ($record) => $record->attachment_media_id ? 'عرض المرفق' : 'لا يوجد مرفق')
+                    ->badge()
+                    ->color(fn ($record) => $record->attachment_media_id ? 'info' : 'gray')
+                    ->url(function ($record) {
+                        if ($record->attachment_media_id) {
+                            try {
+                                // البحث في قاعدة بيانات الجمعية مباشرة
+                                $file = \Illuminate\Support\Facades\DB::connection('tenant')->table('media_items')->where('id', $record->attachment_media_id)->value('file');
+                                if ($file) return str_starts_with($file, 'http') ? $file : asset('storage/' . $file);
+                            } catch (\Exception $e) {}
+                        }
+                        return null;
+                    })
+                    ->openUrlInNewTab(),
+
+
+
+
+
+
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('اسم اللجنة')
                     ->searchable(),
@@ -83,10 +110,7 @@ class CommitteeResource extends Resource
                     ->label('عدد الأعضاء')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('attachment')
-                    ->label('المرفق')
-                    ->limit(30)
-                    ->placeholder('-'),
+                
 
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')
@@ -98,6 +122,7 @@ class CommitteeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

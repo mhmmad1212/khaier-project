@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditSiteSetting extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = SiteSettingResource::class;
 
     protected function getHeaderActions(): array

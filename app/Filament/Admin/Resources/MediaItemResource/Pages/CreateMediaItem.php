@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 
 class CreateMediaItem extends CreateRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = MediaItemResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array

@@ -14,12 +14,14 @@ use Filament\Tables\Table;
 
 class SliderResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المحتوى والإعلام';
+    protected static ?int $navigationSort = 3;
     protected static ?string $model = Slider::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'السلايدر';
     protected static ?string $modelLabel = 'شريحة';
     protected static ?string $pluralModelLabel = 'السلايدر';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -98,6 +100,7 @@ class SliderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -17,13 +17,15 @@ use Illuminate\Support\Str;
 
 class FinancialReportResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
+    protected static ?int $navigationSort = 3;
     protected static ?string $model = FinancialReport::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationLabel = 'القوائم المالية';
     protected static ?string $modelLabel = 'قائمة مالية';
     protected static ?string $pluralModelLabel = 'القوائم المالية';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -150,6 +152,7 @@ class FinancialReportResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

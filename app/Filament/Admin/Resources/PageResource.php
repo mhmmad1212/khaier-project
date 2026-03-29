@@ -15,13 +15,17 @@ use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
+    protected static ?string $navigationGroup = 'إدارة الموقع';
+    protected static ?int $navigationSort = 1;
+    
+    
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'الصفحات';
     protected static ?string $modelLabel = 'صفحة';
     protected static ?string $pluralModelLabel = 'الصفحات';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -168,6 +172,7 @@ class PageResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

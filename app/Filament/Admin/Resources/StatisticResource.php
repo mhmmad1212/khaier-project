@@ -15,13 +15,15 @@ use Filament\Tables\Table;
 
 class StatisticResource extends Resource
 {
+    protected static ?string $navigationGroup = 'المشاريع والبرامج';
+    protected static ?int $navigationSort = 3;
     protected static ?string $model = Statistic::class;
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $navigationLabel = 'الإحصائيات';
     protected static ?string $modelLabel = 'إحصائية';
     protected static ?string $pluralModelLabel = 'الإحصائيات';
-    protected static ?string $navigationGroup = 'الموقع';
-    protected static ?int $navigationSort = 30;
+    
+    
 
     public static function form(Form $form): Form
     {
@@ -70,6 +72,7 @@ class StatisticResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

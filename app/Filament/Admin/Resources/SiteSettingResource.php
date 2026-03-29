@@ -21,13 +21,15 @@ use Filament\Tables\Table;
 
 class SiteSettingResource extends Resource
 {
+    protected static ?string $navigationGroup = 'إعدادات النظام';
+    protected static ?int $navigationSort = 1;
     protected static ?string $model = SiteSetting::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationLabel = 'إعدادات الموقع';
     protected static ?string $modelLabel = 'إعدادات الموقع';
     protected static ?string $pluralModelLabel = 'إعدادات الموقع';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -269,6 +271,7 @@ class SiteSettingResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([]);
     }

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class EditMediaItem extends EditRecord
 {
+    use \App\Filament\Traits\HasBackButton;
+
     protected static string $resource = MediaItemResource::class;
 
     protected function mutateFormDataBeforeSave(array $data): array

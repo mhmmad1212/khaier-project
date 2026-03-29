@@ -18,13 +18,17 @@ use Illuminate\Support\Facades\Schema;
 
 class MenuItemResource extends Resource
 {
+    protected static ?string $navigationGroup = 'إدارة الموقع';
+    protected static ?int $navigationSort = 4;
+    
+    
     protected static ?string $model = MenuItem::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-link';
     protected static ?string $navigationLabel = 'عناصر القوائم';
     protected static ?string $modelLabel = 'عنصر قائمة';
     protected static ?string $pluralModelLabel = 'عناصر القوائم';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -167,6 +171,7 @@ class MenuItemResource extends Resource
             ->columns($columns)
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

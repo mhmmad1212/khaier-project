@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Schema;
 
 class EmployeeResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الموارد البشرية';
+    protected static ?int $navigationSort = 2;
     protected static ?string $model = Employee::class;
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'الموظفون';
     protected static ?string $modelLabel = 'موظف';
     protected static ?string $pluralModelLabel = 'الموظفون';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -117,6 +119,7 @@ class EmployeeResource extends Resource
             ->columns($columns)
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

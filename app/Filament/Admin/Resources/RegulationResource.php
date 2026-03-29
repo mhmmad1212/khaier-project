@@ -17,13 +17,15 @@ use Illuminate\Support\Str;
 
 class RegulationResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
+    protected static ?int $navigationSort = 2;
     protected static ?string $model = Regulation::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document';
     protected static ?string $navigationLabel = 'اللوائح';
     protected static ?string $modelLabel = 'لائحة';
     protected static ?string $pluralModelLabel = 'اللوائح';
-    protected static ?string $navigationGroup = 'الموقع';
+    
 
     public static function form(Form $form): Form
     {
@@ -137,6 +139,7 @@ class RegulationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
