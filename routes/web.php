@@ -42,7 +42,7 @@ Route::get('/news', [WebsiteController::class, 'newsIndex'])->name('news.index')
 Route::get('/news/{slug}', [FrontendPageController::class, 'newsShow'])->name('news.show');
 Route::get('/page/{slug}', [FrontendPageController::class, 'pageShow'])->name('page.show');
 Route::get('/page/{slug}/news/{newsSlug}', [FrontendPageController::class, 'pageNewsShow']);
-Route::get('/page/{slug}/project/{id}', [FrontendPageController::class, 'pageProjectShow']);
+Route::get('/page/{slug}/project/{id}', [FrontendPageController::class, 'pageProgramProjectShow']);
 Route::get('/projects/{id}', [FrontendPageController::class, 'programProjectShow']);
 Route::get('/board-members', [WebsiteController::class, 'boardMembers'])->name('board-members');
 Route::get('/general-assembly', [WebsiteController::class, 'generalAssembly'])->name('general-assembly.index');
