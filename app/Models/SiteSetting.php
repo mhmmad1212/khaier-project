@@ -52,6 +52,9 @@ class SiteSetting extends TenantModel
         'program_projects_show_template_key',
         'services_template_key',
         'page_template_key',
+        'inner_pages_header_template_key',
+        'inner_pages_footer_template_key',
+        'licenses_template_key',
 
         'primary_color',
         'secondary_color',

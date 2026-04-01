@@ -130,7 +130,7 @@
 
             <div class="page-body">
                 <div class="page-content">
-                    {!! $page->content !!}
+                    {!! filled($page->raw_html ?? null) ? $page->raw_html : $page->content !!}
                 </div>
             </div>
         </article>

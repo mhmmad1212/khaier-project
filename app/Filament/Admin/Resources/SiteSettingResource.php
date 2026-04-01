@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Forms\Components\Select;
+
 use App\Filament\Admin\Resources\SiteSettingResource\Pages;
 use App\Forms\Components\MediaPicker;
 use App\Models\MediaItem;
@@ -21,6 +23,17 @@ use Filament\Tables\Table;
 
 class SiteSettingResource extends Resource
 {
+
+    protected static function templateOptionsByType(string $pageType): array
+    {
+        return PageTemplate::query()
+            ->where('is_active', true)
+            ->where('page_type', $pageType)
+            ->orderBy('sort_order')
+            ->pluck('name', 'template_key')
+            ->toArray();
+    }
+
     protected static ?string $navigationGroup = 'إعدادات النظام';
     protected static ?int $navigationSort = 1;
     protected static ?string $model = SiteSetting::class;
@@ -142,7 +155,25 @@ class SiteSettingResource extends Resource
                                 ->searchable()
                                 ->preload(),
 
-                            Forms\Components\Select::make('program_projects_show_template_key')
+                                            Select::make('inner_pages_header_template_key')
+                    ->label('تصميم هيدر الصفحات الداخلية')
+                    ->options(static::templateOptionsByType('inner_header'))
+                    ->searchable()
+                    ->preload(),
+
+                Select::make('inner_pages_footer_template_key')
+                    ->label('تصميم فوتر الصفحات الداخلية')
+                    ->options(static::templateOptionsByType('inner_footer'))
+                    ->searchable()
+                    ->preload(),
+
+                Select::make('licenses_template_key')
+                    ->label('تصميم صفحة تراخيص الجمعية')
+                    ->options(static::templateOptionsByType('licenses'))
+                    ->searchable()
+                    ->preload(),
+
+                Select::make('program_projects_show_template_key')
                                 ->label('تصميم صفحة تفاصيل المشروع')
                                 ->options(fn () => static::templateOptions('program_projects_show'))
                                 ->searchable()

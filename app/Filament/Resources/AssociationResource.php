@@ -2,6 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Jobs\DispatchAssociationDomainChecksJob;
+
+use App\Jobs\CheckAssociationDomainJob;
+
+use App\Support\AssociationDomainMonitor;
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\AssociationResource\Pages;
 use App\Filament\Resources\AssociationResource\RelationManagers\ActivitiesRelationManager;
 use App\Models\Association;
@@ -156,6 +163,23 @@ class AssociationResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\IconColumn::make('domainCheck.is_pointing_correctly')
+                    ->label('الربط')
+                    ->boolean(),
+
+                Tables\Columns\TextColumn::make('domainCheck.dns_status')
+                    ->label('DNS')
+                    ->badge(),
+
+                Tables\Columns\TextColumn::make('domainCheck.http_status')
+                    ->label('HTTP')
+                    ->badge(),
+
+                Tables\Columns\TextColumn::make('domainCheck.checked_at')
+                    ->label('آخر فحص')
+                    ->since()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
@@ -222,6 +246,18 @@ class AssociationResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->actions([
+                Tables\Actions\Action::make('checkDomain')
+                    ->label('فحص الآن')
+                    ->icon('heroicon-o-magnifying-glass')
+                    ->action(function ($record) {
+                        AssociationDomainMonitor::check($record);
+
+                        Notification::make()
+                            ->title('تم تحديث حالة الدومين')
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('preview')
                         ->label('معاينة الموقع')
@@ -434,6 +470,19 @@ class AssociationResource extends Resource
                 ->button(),
             ])
             ->bulkActions([
+                Tables\Actions\BulkAction::make('checkDomainsBulk')
+                    ->label('فحص الكل المحدد')
+                    ->icon('heroicon-o-arrow-path')
+                    ->action(function ($records) {
+                        DispatchAssociationDomainChecksJob::dispatch($records->pluck('id')->toArray());
+
+                        Notification::make()
+                            ->title('تم إرسال طلب الفحص')
+                            ->body('سيتم التنفيذ في الخلفية، ستظهر النتائج بعد قليل.')
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }

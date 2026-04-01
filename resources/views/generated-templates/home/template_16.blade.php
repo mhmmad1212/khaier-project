@@ -80,8 +80,6 @@
             $html = '';
             foreach ($items as $item) {
                 $hasChildren = $groupedItems->has($item->id);
-                
-                // 🛑 التعديل هنا: إذا كان "أب" نعطل الرابط تماماً، وإذا كان "ابن" نعطيه رابطه الحقيقي 🛑
                 $url = $hasChildren ? 'javascript:void(0);' : resolveMenuUrl($item, $connection);
                 
                 $iconHtml = '';
@@ -108,7 +106,6 @@
                 } else {
                     $liClass = $hasChildren ? 'has-dropdown' : '';
                     $html .= '<li class="'.$liClass.'">';
-                    // منع المؤشر من إظهار يد (Click) إذا كان الرابط معطل واختياري إضافة كلاس
                     $html .= '<a href="'.$url.'" target="'.($item->target ?? '_self').'" style="'.($hasChildren ? 'cursor: default;' : '').'">';
                     $html .= '<div style="display:flex; align-items:center;">' . $iconHtml . $item->title . '</div>';
                     if ($hasChildren) {
@@ -156,7 +153,7 @@
         body { background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2;}
         
         .section-title { text-align: center; margin-bottom: 50px; }
         .section-title h2 { font-size: 2.2rem; color: var(--primary); font-weight: 800; margin-bottom: 10px; position: relative; display: inline-block; }
@@ -166,10 +163,9 @@
            Header
            ========================================= */
         header { position: absolute; top: 25px; left: 0; width: 100%; z-index: 1000; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; height: 75px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 50px 0 0 50px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 95%; max-width: 1300px; margin: 0 auto; position: relative; }
-        .header-right { width: 180px; height: 100%; position: relative; }
-        .logo-card { position: absolute; top: -25px; right: 0; width: 100%; background: #ffffff; padding: 15px 20px 25px; border-radius: 0 0 25px 25px; box-shadow: -5px 15px 25px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; z-index: 1001; transition: var(--transition); }
-        .logo-card:hover { padding-bottom: 35px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; height: 75px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 50px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 95%; max-width: 1300px; margin: 0 auto; position: relative; }
+        .header-right { width: 180px; height: 100%; position: relative; margin: 0; padding: 0;}
+        .logo-card { position: absolute; top: -25px; right: -2px; width: calc(100% + 4px); min-height: 125px; background: #ffffff; padding: 15px 20px; border-radius: 0 0 25px 25px; box-shadow: -5px 15px 25px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; z-index: 1001; transition: var(--transition); }
         .logo-card img { max-height: 80px; object-fit: contain; }
         
         .header-center { flex: 1; display: flex; justify-content: center; }
@@ -216,42 +212,83 @@
         .dot.active { background-color: var(--primary); border-color: white; transform: scale(1.4); }
 
         /* =========================================
-           Sections
+           About Section
            ========================================= */
         .about-section { padding: 100px 0; background-color: var(--bg-white); }
         .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
         .about-text-box { padding: 50px; border: 2px dashed var(--primary); border-radius: 30px; background-color: var(--bg-light); position: relative; box-shadow: var(--shadow-sm); }
         .about-text-box h3 { color: var(--primary); font-size: 2.2rem; margin-bottom: 25px; }
-        .about-text-box p { color: var(--text-muted); font-size: 1.15rem; text-align: justify; white-space: pre-line; line-height: 1.8;}
+        .about-text-box .about-desc, .about-text-box .about-desc p { color: var(--text-muted); font-size: 1.15rem; text-align: justify; line-height: 1.8; margin-bottom: 10px;}
+        .about-text-box .about-desc ul, .about-text-box .about-desc ol { padding-right: 20px; margin-bottom: 10px; color: var(--text-muted); }
+        .about-text-box .about-desc strong { color: var(--text-dark); }
         .video-box { border-radius: 30px; overflow: hidden; box-shadow: var(--shadow-lg); border: 5px solid white; position: relative; padding-bottom: 56.25%; height: 0; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+        /* =========================================
+           Stats Section
+           ========================================= */
         .stats-section { padding: 100px 0; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://www.edarabia.com/ar/wp-content/uploads/2019/12/zakat-islamic-law.jpg') center/cover fixed; color: white; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
         .stat-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 45px 20px; border-radius: 25px; text-align: center; transition: var(--transition); }
         .stat-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.15); border-color: var(--secondary); box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .stat-number { font-size: 3.8rem; font-weight: 800; margin-bottom: 10px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .stat-number { font-size: 3.2rem; font-weight: 800; margin-bottom: 10px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         .stat-title { font-size: 1.3rem; font-weight: 500; color: #cbd5e1; }
 
+        /* =========================================
+           News Section
+           ========================================= */
         .news-section { padding: 100px 0; background-color: var(--bg-light); }
         .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; margin-bottom: 50px; }
-        .news-card { background-color: var(--bg-white); border-radius: 25px; overflow: hidden; box-shadow: var(--shadow-md); transition: var(--transition); border-bottom: 5px solid transparent; }
+        .news-card { background-color: var(--bg-white); border-radius: 25px; overflow: hidden; box-shadow: var(--shadow-md); transition: var(--transition); border-bottom: 5px solid transparent; display: flex; flex-direction: column;}
         .news-card:hover { transform: translateY(-15px); box-shadow: var(--shadow-lg); border-bottom-color: var(--secondary); }
         .news-img { width: 100%; height: 240px; object-fit: cover; }
-        .news-content { padding: 30px; }
+        .news-content { padding: 30px; flex-grow: 1; display: flex; flex-direction: column;}
         .news-date { color: var(--secondary); font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; display: block; }
         .news-title { font-size: 1.4rem; color: var(--primary); margin-bottom: 15px; font-weight: 800; }
-        .news-excerpt { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; line-height: 1.7;}
-        .news-link { display: inline-block; color: var(--primary); font-weight: 800; transition: var(--transition); }
-        .news-link:hover { color: var(--secondary); padding-right: 5px;}
+        .news-excerpt { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; line-height: 1.7; flex-grow: 1;}
+        .news-link { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px;
+            background-color: var(--bg-light); 
+            color: var(--primary); 
+            padding: 10px 20px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 0.95rem;
+            transition: var(--transition); 
+            border: 1px solid #e2e8f0;
+            width: fit-content;
+        }
+        .news-link:hover { 
+            background-color: var(--primary); 
+            color: white; 
+            border-color: var(--primary);
+            transform: translateX(-5px); 
+        }
+        .news-link i { transition: transform 0.3s ease; }
+        .news-link:hover i { transform: translateX(-5px); }
         .btn-view-all { display: block; width: fit-content; margin: 0 auto; background-color: var(--primary); color: white; padding: 15px 40px; border-radius: 50px; font-weight: 800; font-size: 1.15rem; transition: var(--transition); box-shadow: 0 10px 20px rgba(234,88,12,0.2);}
         .btn-view-all:hover { background-color: var(--secondary); transform: translateY(-4px); box-shadow: 0 12px 25px rgba(234,88,12,0.4);}
 
         /* =========================================
            Projects Section
            ========================================= */
-        .projects-section { padding: 100px 0; background-color: var(--bg-white); }
-        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 35px; margin-bottom: 50px; }
+        .projects-section { padding: 100px 0; background-color: var(--bg-white); position: relative; z-index: 1; overflow: hidden;}
+        
+        .projects-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40rem; 
+            color: var(--primary);
+            opacity: 0.05; 
+            z-index: 0; 
+            pointer-events: none; 
+        }
+
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 35px; margin-bottom: 50px; position: relative; z-index: 2;}
         .project-card { background-color: var(--bg-light); border-radius: 25px; overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition); border: 1px solid #f1f5f9; display: flex; flex-direction: column;}
         .project-card:hover { transform: translateY(-15px); box-shadow: var(--shadow-lg); border-color: var(--secondary); }
         .project-img-wrapper { position: relative; width: 100%; height: 220px; }
@@ -270,15 +307,24 @@
         .project-btn:hover { background-color: var(--primary); color: white; }
 
         /* =========================================
-           Partners Section 
+           Partners Section (تحديث الحجم وإيقاف التمرير)
            ========================================= */
         .partners-section { padding: 80px 0; background-color: var(--bg-light); border-top: 1px solid #e2e8f0; }
         .marquee-wrapper { overflow: hidden; position: relative; width: 100%; padding: 20px 0; }
-        .marquee-content { display: flex; gap: 40px; animation: marquee 25s linear infinite; width: max-content; }
-        .partner-box { width: 160px; height: 110px; display: flex; align-items: center; justify-content: center; border: 2px solid #f1f5f9; border-radius: 20px; padding: 20px; background-color: var(--bg-white); transition: var(--transition); box-shadow: var(--shadow-sm);}
+        
+        /* 🔥 إيقاف الشريط عند التمرير بالماوس 🔥 */
+        .marquee-wrapper:hover .marquee-content {
+            animation-play-state: paused;
+        }
+        
+        .marquee-content { display: flex; gap: 50px; animation: marquee 30s linear infinite; width: max-content; }
+        
+        /* 🔥 تكبير حجم صناديق الشركاء والشعار 🔥 */
+        .partner-box { width: 240px; height: 150px; display: flex; align-items: center; justify-content: center; border: 2px solid #f1f5f9; border-radius: 20px; padding: 20px; background-color: var(--bg-white); transition: var(--transition); box-shadow: var(--shadow-sm);}
         .partner-box:hover { border-color: var(--secondary); box-shadow: var(--shadow-md); transform: translateY(-5px);}
         .partner-box img { max-width: 100%; max-height: 100%; object-fit: contain; transition: var(--transition); }
-        .partner-box:hover img { transform: scale(1.05); }
+        .partner-box:hover img { transform: scale(1.1); } 
+        
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(50%); } }
 
         /* =========================================
@@ -304,9 +350,10 @@
             .header-center { display: none; } 
             .desktop-btn { display: none !important; }
             .mobile-menu-btn { display: block; margin-right: 15px;}
-            .navbar { border-radius: 30px 0 0 30px; } 
+            .navbar { border-radius: 30px; } 
             .header-right { width: 130px; }
-            .logo-card { padding: 15px; border-radius: 0 0 20px 20px;}
+            
+            .logo-card { top: -25px; padding: 15px; border-radius: 0 0 20px 20px; min-height: 110px; right: -2px; width: calc(100% + 4px); }
             .logo-card img { max-height: 60px; }
 
             .mobile-menu { display: none; flex-direction: column; position: absolute; top: 90px; left: 5%; right: 5%; width: 90%; background: rgba(255,255,255,0.98); box-shadow: 0 15px 30px rgba(0,0,0,0.15); padding: 10px 0; gap: 0; border-radius: 20px; z-index: 1001; }
@@ -326,10 +373,12 @@
 
         @media (max-width: 768px) { 
             header { top: 15px; }
-            .navbar { height: 65px; border-radius: 25px 0 0 25px; padding-left: 10px;}
+            .navbar { height: 65px; border-radius: 25px; padding-left: 10px;}
             .header-right { width: 100px; }
-            .logo-card { top: -15px; padding: 10px; border-radius: 0 0 15px 15px; }
+            
+            .logo-card { top: -15px; padding: 10px; border-radius: 0 0 15px 15px; min-height: 100px; right: -2px; width: calc(100% + 4px); }
             .logo-card img { max-height: 50px; }
+            
             .mobile-menu { top: 80px; }
             .hero-slider { height: 100vh; min-height: 500px; }
             .slide { background-size: cover; background-position: center; }
@@ -337,6 +386,11 @@
             .hero-content h1 { font-size: 2.5rem; line-height: 1.3;}
             .hero-content p { font-size: 1.1rem; }
             .about-grid { grid-template-columns: 1fr; } 
+            
+            .projects-watermark { font-size: 25rem; }
+            
+            /* تعديل العرض للجوال للشركاء */
+            .partner-box { width: 180px; height: 120px; }
         }
     </style>
 </head>
@@ -417,7 +471,9 @@
         <div class="container about-grid">
             <div class="about-text-box">
                 <h3>عن {{ $assocName }}</h3>
-                <p>{{ $aboutText }}</p>
+                <div class="about-desc">
+                    {!! $aboutText !!}
+                </div>
             </div>
             <div class="video-container">
                 @if($videoUrl)
@@ -489,7 +545,9 @@
                                 <span class="news-date">{{ $item->published_at ? \Carbon\Carbon::parse($item->published_at)->format('Y-m-d') : '' }}</span>
                                 <h3 class="news-title">{{ $item->title }}</h3>
                                 <p class="news-excerpt">{{ Str::limit(strip_tags($item->excerpt ?? $item->content), 100) }}</p>
-                                <a href="/news/{{ $item->slug ?? $item->id }}" class="news-link">اقرأ المزيد <i class="fas fa-arrow-left"></i></a>
+                                <a href="/news/{{ $item->slug ?? $item->id }}" class="news-link">
+                                    اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                                </a>
                             </div>
                         </div>
                     @endforeach
@@ -502,7 +560,9 @@
     </section>
 
     <section id="projects" class="projects-section">
-        <div class="container">
+        <i class="fas fa-hand-holding-heart projects-watermark"></i>
+        
+        <div class="container" style="position: relative; z-index: 2;">
             <div class="section-title">
                 <h2>البرامج والمشاريع</h2>
             </div>
@@ -644,7 +704,7 @@
             const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
             mobileDropdownToggles.forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
-                    // 🛑 هنا نمنع الرابط من الانتقال لصفحة ثانية إذا كان "أب" 🛑
+                    // تعطيل الانتقال في حال كان العنصر أباً
                     e.preventDefault(); 
                     
                     const submenu = this.nextElementSibling;

@@ -356,5 +356,4 @@ class FrontendPageController extends Controller
 
         return view($viewPath, compact('association', 'siteSettings', 'template', 'project'));
     }
-
 }

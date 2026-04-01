@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\FrontendFormController;
+
 use App\Http\Controllers\MediaLibraryController;
 use App\Http\Controllers\Admin\MediaPickerPageController;
 
@@ -61,3 +63,10 @@ Route::get('/admin/media-picker', [\App\Http\Controllers\Admin\MediaPickerPageCo
 
 Route::get('/admin/media-picker', [MediaPickerPageController::class, 'index']);
 Route::post('/admin/media-picker/upload', [MediaPickerPageController::class, 'store']);
+
+
+Route::get('/forms/{slug}', [FrontendFormController::class, 'show']);
+Route::post('/forms/{slug}', [FrontendFormController::class, 'submit']);
+Route::get('/forms/{slug}/track', [FrontendFormController::class, 'track']);
+Route::post('/forms/{slug}/track', [FrontendFormController::class, 'lookup']);
+Route::post('/forms/{slug}/track/{submission}/reply', [FrontendFormController::class, 'customerReply']);

@@ -17,18 +17,19 @@ class PageResource extends Resource
 {
     protected static ?string $navigationGroup = 'إدارة الموقع';
     protected static ?int $navigationSort = 1;
-    
-    
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'الصفحات';
     protected static ?string $modelLabel = 'صفحة';
     protected static ?string $pluralModelLabel = 'الصفحات';
-    
 
     public static function form(Form $form): Form
     {
+        \Illuminate\Support\Facades\Log::info('DEBUG PageResource::form loaded', [
+            'file' => __FILE__,
+            'url' => request()?->fullUrl(),
+        ]);
         return $form->schema([
             Forms\Components\Section::make('نوع الصفحة')
                 ->schema([
@@ -58,12 +59,12 @@ class PageResource extends Resource
             Forms\Components\Section::make('المحتوى الأساسي')
                 ->schema([
                     Forms\Components\Select::make('template_id')
-                    ->label('التصميم')
-                    ->options(PageTemplate::where('is_active', 1)->pluck('name', 'id'))
-                    ->searchable()
-                    ->required(),
+                        ->label('التصميم')
+                        ->options(PageTemplate::where('is_active', 1)->pluck('name', 'id'))
+                        ->searchable()
+                        ->required(),
 
-                Forms\Components\TextInput::make('title')
+                    Forms\Components\TextInput::make('title')
                         ->label('العنوان')
                         ->required()
                         ->maxLength(255)
@@ -81,15 +82,36 @@ class PageResource extends Resource
                         ->unique(ignoreRecord: true),
 
                     Forms\Components\Textarea::make('excerpt')
-                        ->label('الملخص')
+                        ->label('الملخص TEST-RAW-HTML')
                         ->rows(4)
                         ->columnSpanFull(),
+                    Forms\Components\Placeholder::make('debug_raw_html_marker')
+                        ->label('')
+                        ->content('DEBUG: إذا ظهرت هذه الرسالة داخل شاشة الصفحات فهذا يعني أن PageResource الحالي يُقرأ فعليًا من الواجهة.')
+                        ->columnSpanFull(),
+
+
 
                     Forms\Components\RichEditor::make('content')
-                        ->label('المحتوى')
+                        ->label('المحتوى العادي')
+                        ->helperText('استخدم هذا الحقل للمحتوى النصي العادي. إذا كنت تريد HTML خام كامل فاستخدم الحقل التالي.')
                         ->columnSpanFull()
                         ->visible(fn (Get $get) => $get('page_type') === 'content'),
+
+
+
                 ])->columns(2),
+
+            Forms\Components\Section::make('HTML خام للتصميم')
+                ->schema([
+                    Forms\Components\Textarea::make('raw_html')
+                        ->label('HTML خام')
+                        ->rows(24)
+                        ->columnSpanFull()
+                        ->helperText('ألصق هنا HTML خام مباشرة. إذا تم تعبئة هذا الحقل فسيتم عرضه بدل المحتوى العادي. لا تستخدم زر الكود داخل المحرر لهذا الغرض.'),
+                ])
+                ->columns(1)
+                ->collapsible(),
 
             Forms\Components\Section::make('النشر والعرض')
                 ->schema([

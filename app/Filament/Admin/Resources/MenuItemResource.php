@@ -3,35 +3,33 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\MenuItemResource\Pages;
-
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
 use Filament\Forms;
 use App\Forms\Components\LocalIconGrid;
-
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 
 class MenuItemResource extends Resource
 {
     protected static ?string $navigationGroup = 'إدارة الموقع';
     protected static ?int $navigationSort = 4;
-    
-    
     protected static ?string $model = MenuItem::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-link';
     protected static ?string $navigationLabel = 'عناصر القوائم';
     protected static ?string $modelLabel = 'عنصر قائمة';
     protected static ?string $pluralModelLabel = 'عناصر القوائم';
-    
 
     public static function form(Form $form): Form
     {
+        $hasTargetColumn = Schema::connection('tenant')->hasColumn('menu_items', 'target');
+
         $schema = [
             Forms\Components\Select::make('menu_id')
                 ->label('القائمة')
@@ -83,7 +81,38 @@ class MenuItemResource extends Resource
                 ->visible(fn (callable $get) => in_array($get('type'), ['link', 'external', 'news']))
                 ->required(fn (callable $get) => in_array($get('type'), ['link', 'external', 'news']))
                 ->maxLength(255)
-                ->helperText('مثال: / أو /news أو https://example.com'),
+                ->helperText('مثال: / أو /news أو https://example.com أو #')
+                ->rule(function (callable $get) {
+                    return function (string $attribute, $value, \Closure $fail) use ($get) {
+                        $type = $get('type');
+                        $value = trim((string) $value);
+
+                        if ($value === '') {
+                            return;
+                        }
+
+                        if ($type === 'external') {
+                            $isValidExternal =
+                                $value === '#'
+                                || str_starts_with($value, 'http://')
+                                || str_starts_with($value, 'https://');
+
+                            if (! $isValidExternal) {
+                                $fail('يجب كتابة الرابط بشكل صحيح');
+                            }
+                        }
+
+                        if (in_array($type, ['link', 'news'])) {
+                            $isValidInternal =
+                                $value === '#'
+                                || str_starts_with($value, '/');
+
+                            if (! $isValidInternal) {
+                                $fail('يجب كتابة الرابط بشكل صحيح');
+                            }
+                        }
+                    };
+                }),
 
             Forms\Components\Select::make('page_id')
                 ->label('الصفحة الداخلية')
@@ -98,20 +127,22 @@ class MenuItemResource extends Resource
                 ->label('الأيقونة')
                 ->columnSpanFull(),
 
-            Forms\Components\Select::make('target')
+            Forms\Components\TextInput::make('sort_order')
+                ->label('الترتيب')
+                ->numeric()
+                ->default(0),
+        ];
+
+        if ($hasTargetColumn) {
+            $schema[] = Forms\Components\Select::make('target')
                 ->label('فتح الرابط')
                 ->options([
                     '_self' => 'في نفس الصفحة',
                     '_blank' => 'في صفحة جديدة',
                 ])
                 ->default('_self')
-                ->visible(fn (callable $get) => $get('type') === 'external'),
-
-            Forms\Components\TextInput::make('sort_order')
-                ->label('الترتيب')
-                ->numeric()
-                ->default(0),
-        ];
+                ->visible(fn (callable $get) => $get('type') === 'external');
+        }
 
         if (Schema::connection('tenant')->hasColumn('menu_items', 'is_active')) {
             $schema[] = Forms\Components\Toggle::make('is_active')
@@ -120,6 +151,31 @@ class MenuItemResource extends Resource
         }
 
         return $form->schema($schema)->columns(2);
+    }
+
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        return static::sanitizeData($data);
+    }
+
+    public static function mutateFormDataBeforeSave(array $data): array
+    {
+        return static::sanitizeData($data);
+    }
+
+    protected static function sanitizeData(array $data): array
+    {
+        $hasTargetColumn = Schema::connection('tenant')->hasColumn('menu_items', 'target');
+
+        if (! $hasTargetColumn) {
+            unset($data['target']);
+        }
+
+        if (($data['type'] ?? null) === 'page') {
+            $data['url'] = null;
+        }
+
+        return $data;
     }
 
     public static function table(Table $table): Table
