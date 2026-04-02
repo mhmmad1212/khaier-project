@@ -16,6 +16,7 @@ class Page extends TenantModel
         'slug',
         'excerpt',
         'content',
+        'raw_html',
         'page_type',
         'system_key',
         'featured_image',

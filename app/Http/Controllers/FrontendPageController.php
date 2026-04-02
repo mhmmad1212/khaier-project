@@ -6,6 +6,7 @@ use App\Models\BoardMember;
 use App\Models\Employee;
 use App\Models\FinancialReport;
 use App\Models\GeneralAssemblyMember;
+use App\Models\License;
 use App\Models\News;
 use App\Models\Page;
 use App\Models\PageTemplate;
@@ -99,6 +100,22 @@ class FrontendPageController extends Controller
                 ->orderByDesc('year')
                 ->orderByDesc('published_at')
                 ->orderBy('sort_order')
+                ->get();
+
+            return view($viewPath, compact('association', 'siteSettings', 'template', 'page', 'items'));
+        }
+
+        if ($page->page_type === 'system' && $page->system_key === 'licenses') {
+            $template = $this->resolveTemplateByKey($siteSettings->licenses_template_key ?? null);
+            $viewPath = ($template && ! empty($template->view_path))
+                ? $template->view_path
+                : 'themes.default.licenses.index';
+
+            $items = License::query()
+                ->where('is_active', true)
+                ->with('fileMedia')
+                ->orderBy('sort_order')
+                ->orderByDesc('id')
                 ->get();
 
             return view($viewPath, compact('association', 'siteSettings', 'template', 'page', 'items'));

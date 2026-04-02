@@ -70,9 +70,18 @@ class PagesResource extends Resource
 
             CkEditorMediaPicker::make('content')
                 ->label('محتوى الصفحة')
+                ->helperText('للنصوص والمحتوى العادي. إذا أردت لصق HTML خام فاستخدم الحقل التالي.')
                 ->columnSpanFull()
                 ->visible(fn (Get $get) => $get('page_type') !== 'system')
-                ->required(fn (Get $get) => $get('page_type') !== 'system'),
+                ->required(fn (Get $get) => $get('page_type') !== 'system' && blank($get('raw_html'))),
+
+            Forms\Components\Textarea::make('raw_html')
+                ->label('HTML خام')
+                ->rows(24)
+                ->columnSpanFull()
+                ->visible(fn (Get $get) => $get('page_type') !== 'system')
+                ->required(fn (Get $get) => $get('page_type') !== 'system' && blank($get('content')))
+                ->helperText('ألصق هنا HTML خام مباشرة. إذا تم تعبئة هذا الحقل فسيتم عرضه بدل محتوى الصفحة العادي.'),
 
             Forms\Components\Select::make('status')
                 ->label('الحالة')

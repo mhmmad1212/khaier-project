@@ -2,7 +2,6 @@
 
 <main class="content-wrapper">
     @yield('hero')
-@include('themes.default.partials.breadcrumb')
     @yield('content')
 </main>
 
