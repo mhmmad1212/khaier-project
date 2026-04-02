@@ -74,12 +74,20 @@
     // دالة مساعدة لتجهيز الروابط
     if (!function_exists('resolveMenuUrl')) {
         function resolveMenuUrl($item, $connection) {
-            $url = $item->resolved_url ?? $item->url ?? '#';
-            if($item->type === 'page' && !empty($item->page_id) && $url === '#') {
-                $page = $connection->table('pages')->where('id', $item->page_id)->first();
-                $url = $page ? '/p/' . $page->slug : '#';
+            if (!empty($item->resolved_url)) {
+                return $item->resolved_url;
             }
-            return $url;
+
+            if ($item->type === 'page' && !empty($item->page_id)) {
+                $page = $connection->table('pages')->where('id', $item->page_id)->first();
+                return $page ? '/page/' . $page->slug : '#';
+            }
+
+            if (!empty($item->url)) {
+                return $item->url;
+            }
+
+            return '#';
         }
     }
 @endphp
@@ -121,12 +129,10 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
         
-        /* تأثيرات السلايدر المخصصة */
         .slider-fade { transition: opacity 1s ease-in-out; }
         .slide-active { opacity: 1; z-index: 10; }
         .slide-inactive { opacity: 0; z-index: 0; pointer-events: none;}
         
-        /* القوائم المنسدلة في Tailwind */
         .group:hover .group-hover\:block { display: block; }
     </style>
 </head>
@@ -668,7 +674,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Mobile Menu Toggle
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const mobileMenu = document.getElementById('mobileMenu');
             
@@ -686,7 +691,6 @@
                 });
             }
 
-            // 2. Mobile Dropdown Toggle
             const mobileToggles = document.querySelectorAll('.mobile-toggle');
             mobileToggles.forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
@@ -703,7 +707,6 @@
                 });
             });
 
-            // 3. Simple Slider Logic
             const slides = document.querySelectorAll('.slide');
             const dots = document.querySelectorAll('.slider-dot');
             let currentSlide = 0;
@@ -711,11 +714,9 @@
 
             if(slides.length > 1) {
                 window.goToSlide = function(index) {
-                    // Reset all
                     slides.forEach(s => { s.classList.remove('slide-active'); s.classList.add('slide-inactive'); });
                     dots.forEach(d => { d.classList.remove('scale-125', 'bg-white'); d.classList.add('bg-white/50'); });
                     
-                    // Activate new
                     currentSlide = index;
                     slides[currentSlide].classList.remove('slide-inactive');
                     slides[currentSlide].classList.add('slide-active');
@@ -724,7 +725,6 @@
                         dots[currentSlide].classList.add('bg-white', 'scale-125');
                     }
                     
-                    // Reset interval
                     clearInterval(slideInterval);
                     slideInterval = setInterval(nextSlide, 5000);
                 };
@@ -734,11 +734,9 @@
                     goToSlide(next);
                 }
 
-                // Start interval
                 slideInterval = setInterval(nextSlide, 5000);
             }
             
-            // 4. Interactive Donate Form Buttons (Visual Only)
             const amountBtns = document.querySelectorAll('.amount-btn');
             amountBtns.forEach(btn => {
                 btn.addEventListener('click', () => {

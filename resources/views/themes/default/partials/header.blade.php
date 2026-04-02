@@ -6,10 +6,26 @@
     @php
     $associationName = $association->name ?? 'الموقع الرسمي للجمعية';
 
-    if (isset($resolvedTitle)) {
-        if (!str_contains($resolvedTitle, $associationName)) {
-            $resolvedTitle .= ' | ' . $associationName;
-        }
+    $resolvedTitle = null;
+
+    if (isset($page) && is_object($page)) {
+        $resolvedTitle = $page->meta_title ?: $page->title;
+    } elseif (isset($news) && is_object($news)) {
+        $resolvedTitle = $news->meta_title ?: $news->title;
+    } elseif (isset($project) && is_object($project)) {
+        $resolvedTitle = $project->meta_title ?: $project->title;
+    }
+
+    if (blank($resolvedTitle)) {
+        $resolvedTitle = trim($__env->yieldContent('title'));
+    }
+
+    if (blank($resolvedTitle)) {
+        $resolvedTitle = $associationName;
+    }
+
+    if (!str_contains($resolvedTitle, $associationName)) {
+        $resolvedTitle .= ' | ' . $associationName;
     }
 @endphp
 
@@ -689,6 +705,27 @@
 @endif
 
     @stack('styles')
+
+@if(!request()->routeIs('website.home'))
+<style>
+    /* Fix inner pages spacing */
+    .content-wrapper{
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    .content-wrapper > section:first-child,
+    .content-wrapper > div:first-child,
+    .content-wrapper .page-wrap:first-child{
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    .site-footer{
+        margin-top: 0 !important;
+    }
+</style>
+@endif
 </head>
 <body>
 @php

@@ -116,22 +116,16 @@ class PageTemplateResource extends Resource
                     ->label('نوع الصفحة')
                     ->formatStateUsing(fn (string $state): string => PageTypeRegistry::label($state)),
 
-                Tables\Columns\TextColumn::make('template_key')
-                    ->label('المعرف الفني')
-                    ->copyable(),
-
-                Tables\Columns\TextColumn::make('view_path')
-                    ->label('ملف العرض')
-                    ->copyable()
-                    ->limit(40),
-
                 Tables\Columns\TextColumn::make('scope_type')
                     ->label('النطاق')
                     ->formatStateUsing(fn (string $state): string => $state === 'global' ? 'عام' : 'مخصص'),
 
                 Tables\Columns\TextColumn::make('associations_count')
-                    ->label('عدد الجمعيات')
-                    ->counts('associations'),
+                    ->label('الجمعية')
+                    ->getStateUsing(fn (\App\Models\PageTemplate $record): string => $record->scope_type === 'global'
+                        ? 'الكل'
+                        : (string) $record->associations()->count()
+                    ),
 
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')

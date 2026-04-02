@@ -26,17 +26,31 @@
         ? $project
         : null;
 
-    $resolvedTitle = trim(
-        $title
-        ?? $metaTitle
-        ?? ($currentPage->meta_title ?? null)
-        ?? ($newsItem->meta_title ?? null)
-        ?? ($currentProject->meta_title ?? null)
-        ?? ($currentPage->title ?? null)
-        ?? ($newsItem->title ?? null)
-        ?? ($currentProject->title ?? null)
-        ?? $associationName
-    );
+    if ($currentPage) {
+        $resolvedTitle = trim(
+            $currentPage->meta_title
+            ?? $currentPage->title
+            ?? $associationName
+        );
+    } elseif ($newsItem) {
+        $resolvedTitle = trim(
+            $newsItem->meta_title
+            ?? $newsItem->title
+            ?? $associationName
+        );
+    } elseif ($currentProject) {
+        $resolvedTitle = trim(
+            $currentProject->meta_title
+            ?? $currentProject->title
+            ?? $associationName
+        );
+    } else {
+        $resolvedTitle = trim(
+            $metaTitle
+            ?? $title
+            ?? $associationName
+        );
+    }
 
     if ($resolvedTitle !== $associationName && !str_contains($resolvedTitle, $associationName)) {
         $resolvedTitle .= ' | ' . $associationName;
@@ -96,7 +110,6 @@
         $schemaType = 'Article';
     }
 
-    
     $organizationSchema = [
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
@@ -137,6 +150,14 @@
     }
 @endphp
 
+@php logger()->info('SEO_TITLE_DEBUG', [
+    'resolvedTitle' => $resolvedTitle ?? null,
+    'page_title' => $page->title ?? null,
+    'page_slug' => $page->slug ?? null,
+    'news_title' => $news->title ?? null,
+    'project_title' => $project->title ?? null,
+    'url' => url()->current(),
+]); @endphp
 <title>{{ $resolvedTitle }}</title>
 <meta name="description" content="{{ $resolvedDescription }}">
 <meta name="robots" content="index, follow">
