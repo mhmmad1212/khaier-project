@@ -4,6 +4,25 @@
 
     $siteSettings = $siteSettings ?? DB::connection('tenant')->table('site_settings')->orderByDesc('id')->first();
 
+    $associationName = $association->name
+        ?? $siteSettings->association_name
+        ?? $siteSettings->site_name
+        ?? 'الموقع الرسمي للجمعية';
+
+    $pageBrowserTitle = $associationName;
+
+    if (isset($page) && is_object($page)) {
+        $pageBrowserTitle = trim($page->meta_title ?: $page->title ?: $associationName);
+    } elseif (isset($news) && is_object($news)) {
+        $pageBrowserTitle = trim($news->meta_title ?: $news->title ?: $associationName);
+    } elseif (isset($project) && is_object($project)) {
+        $pageBrowserTitle = trim($project->meta_title ?: $project->title ?: $associationName);
+    }
+
+    if (!str_contains($pageBrowserTitle, $associationName)) {
+        $pageBrowserTitle .= ' | ' . $associationName;
+    }
+
     $innerHeaderView = null;
     $innerFooterView = null;
 
@@ -30,6 +49,15 @@
     }
 @endphp
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $pageBrowserTitle }}</title>
+</head>
+<body>
+
 @if($innerHeaderView)
     @include($innerHeaderView)
 @else
@@ -46,3 +74,6 @@
 @else
     @include('themes.default.partials.footer')
 @endif
+
+</body>
+</html>

@@ -106,6 +106,11 @@ class SiteSettingResource extends Resource
                                 ->options(fn () => static::templateOptions('regulations'))
                                 ->searchable()
                                 ->preload(),
+                            Forms\Components\Select::make('disclosure_template_key')
+                                ->label('تصميم صفحة الإفصاح')
+                                ->options(fn () => static::templateOptions('disclosure'))
+                                ->searchable()
+                                ->preload(),
 
                             Forms\Components\Select::make('financial_reports_template_key')
                                 ->label('تصميم صفحة القوائم المالية')

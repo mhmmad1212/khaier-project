@@ -26,31 +26,7 @@
         ? $project
         : null;
 
-    if ($currentPage) {
-        $resolvedTitle = trim(
-            $currentPage->meta_title
-            ?? $currentPage->title
-            ?? $associationName
-        );
-    } elseif ($newsItem) {
-        $resolvedTitle = trim(
-            $newsItem->meta_title
-            ?? $newsItem->title
-            ?? $associationName
-        );
-    } elseif ($currentProject) {
-        $resolvedTitle = trim(
-            $currentProject->meta_title
-            ?? $currentProject->title
-            ?? $associationName
-        );
-    } else {
-        $resolvedTitle = trim(
-            $metaTitle
-            ?? $title
-            ?? $associationName
-        );
-    }
+    $resolvedTitle = $resolvedTitle ?? $associationName;
 
     if ($resolvedTitle !== $associationName && !str_contains($resolvedTitle, $associationName)) {
         $resolvedTitle .= ' | ' . $associationName;
@@ -150,15 +126,7 @@
     }
 @endphp
 
-@php logger()->info('SEO_TITLE_DEBUG', [
-    'resolvedTitle' => $resolvedTitle ?? null,
-    'page_title' => $page->title ?? null,
-    'page_slug' => $page->slug ?? null,
-    'news_title' => $news->title ?? null,
-    'project_title' => $project->title ?? null,
-    'url' => url()->current(),
-]); @endphp
-<title>{{ $resolvedTitle }}</title>
+<!-- title rendered from header.blade.php -->
 <meta name="description" content="{{ $resolvedDescription }}">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="{{ $canonicalUrl }}">

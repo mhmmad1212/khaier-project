@@ -1,28 +1,68 @@
 <div dir="rtl" style="direction: rtl; text-align: right;">
 @php
-    $settings = \App\Models\SiteSetting::query()->latest('id')->first();
-    $logoMedia = $settings?->logoMedia;
-    $logoUrl = $logoMedia && !empty($logoMedia->file) ? asset('storage/' . $logoMedia->file) : null;
+    $connection = \Illuminate\Support\Facades\DB::connection('tenant');
 
-    if (!isset($mainMenuItems)) {
-        $mainMenu = \App\Models\Menu::query()->where('location', 'main')->first();
-        $mainMenuItems = $mainMenu
-            ? \App\Models\MenuItem::query()
-                ->where('menu_id', $mainMenu->id)
-                ->whereNull('parent_id')
-                ->with(['children' => fn ($query) => $query->orderBy('sort_order')])
-                ->orderBy('sort_order')
-                ->get()
-            : collect();
+    $settings = $connection->table('site_settings')->orderBy('id', 'desc')->first();
+
+    $siteName = $settings->site_name ?? 'جمعية الخير';
+    $assocName = $settings->association_name ?? $siteName;
+
+    $logoPath = $settings->logo ?? null;
+    if (empty($logoPath) && !empty($settings->logo_media_id)) {
+        $media = $connection->table('media_items')->where('id', $settings->logo_media_id)->first();
+        if ($media) {
+            $logoPath = $media->file ?? $media->path ?? null;
+        }
     }
 
-    $primary = $settings?->primary_color ?: '#127962';
-    $secondary = $settings?->secondary_color ?: '#0d5948';
+    $finalLogoUrl = null;
+    if (!empty($logoPath)) {
+        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : asset('storage/' . $logoPath);
+    }
+
+    $mainMenu = $connection->table('menus')->where('location', 'header')->first();
+    if (!$mainMenu) {
+        $mainMenu = $connection->table('menus')->first();
+    }
+
+    $allMenuItems = collect();
+    if ($mainMenu) {
+        $allMenuItems = $connection->table('menu_items')
+            ->where('menu_id', $mainMenu->id)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+    }
+
+    $groupedItems = $allMenuItems->groupBy(function($item) {
+        return empty($item->parent_id) ? 'root' : $item->parent_id;
+    });
+
+    $rootItems = $groupedItems->get('root') ?? collect();
+
+    if (!function_exists('resolveMenuUrl')) {
+        function resolveMenuUrl($item, $connection) {
+            if (!empty($item->resolved_url)) {
+                return $item->resolved_url;
+            }
+
+            if ($item->type === 'page' && !empty($item->page_id)) {
+                $page = $connection->table('pages')->where('id', $item->page_id)->first();
+                return $page ? '/page/' . $page->slug : '#';
+            }
+
+            if (!empty($item->url)) {
+                return $item->url;
+            }
+
+            return '#';
+        }
+    }
+
+    $primary = $settings?->primary_color ?? '#127962';
+    $secondary = $settings?->secondary_color ?? '#0d5948';
 @endphp
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&display=swap');
-
     .inner-custom-header,
     .inner-custom-header *{
         direction: rtl;
@@ -37,6 +77,9 @@
         padding:20px 0 12px;
         margin:0;
         box-shadow:0 10px 24px rgba(15,23,42,.10);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
     .inner-custom-header .inner-container{
@@ -52,6 +95,7 @@
         gap:14px;
         text-decoration:none;
         color:#fff;
+        min-width:0;
     }
 
     .inner-custom-header .inner-logo{
@@ -100,6 +144,12 @@
         direction: rtl;
     }
 
+    .inner-custom-header .inner-actions-wrap{
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+
     .inner-custom-header .inner-actions{
         display:flex;
         gap:10px;
@@ -132,6 +182,20 @@
 
     .inner-custom-header .inner-btn:hover{
         transform:translateY(-1px);
+    }
+
+    .inner-custom-header .mobile-menu-btn{
+        display:none;
+        background:rgba(255,255,255,.14);
+        color:#fff;
+        border:1px solid rgba(255,255,255,.18);
+        width:46px;
+        height:46px;
+        border-radius:12px;
+        font-size:22px;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
     }
 
     .inner-custom-header .site-nav,
@@ -239,46 +303,76 @@
         display:block;
     }
 
-    .inner-page-breadcrumb{
-        max-width:1280px;
-        margin:0 auto;
-        padding:14px 28px;
-        color:#475569;
-        font-size:.85rem;
-        direction: rtl;
-        text-align:right;
-        font-family: 'Noto Kufi Arabic', sans-serif;
-    }
-
-    .inner-page-breadcrumb a{
-        color:{{ $primary }};
-        text-decoration:none;
-        font-weight:700;
-    }
-
-    .inner-page-breadcrumb span{
-        margin:0 8px;
-        color:#94a3b8;
-    }
-
     @media (max-width: 991.98px){
         .inner-custom-header .inner-container{
             padding-right: 18px;
             padding-left: 18px;
         }
 
+        .inner-custom-header .inner-top{
+            flex-wrap:nowrap;
+            align-items:center;
+        }
+
+        .inner-custom-header .inner-brand{
+            flex:1 1 auto;
+            min-width:0;
+        }
+
+        .inner-custom-header .inner-brand-title{
+            font-size:.95rem;
+            line-height:1.6;
+        }
+
+        .inner-custom-header .inner-brand-subtitle{
+            font-size:.72rem;
+            line-height:1.6;
+        }
+
+        .inner-custom-header .inner-logo{
+            width:54px;
+            height:54px;
+        }
+
+        .inner-custom-header .mobile-menu-btn{
+            display:inline-flex;
+        }
+
+        .inner-custom-header .inner-actions{
+            display:none;
+        }
+
         .inner-custom-header .site-nav{
-            display:flex;
+            display:none;
             flex-direction:column;
             align-items:stretch;
             width:100%;
             gap:6px;
+            margin-top:14px;
+            background:#fff;
+            border-radius:14px;
+            padding:10px;
+            box-shadow:0 12px 30px rgba(15,23,42,.10);
+        }
+
+        .inner-custom-header .site-nav.show{
+            display:flex;
         }
 
         .inner-custom-header .site-nav-link{
             width:100%;
             padding:14px 12px;
             border-radius:12px;
+            color:#1f2937 !important;
+            background:#f8fafc;
+        }
+
+        .inner-custom-header .site-nav-link::after{
+            display:none;
+        }
+
+        .inner-custom-header .site-nav-arrow{
+            color:#1f2937;
         }
 
         .inner-custom-header .site-subnav{
@@ -300,11 +394,6 @@
         .inner-custom-header .site-subnav .site-nav-link{
             padding:12px 14px;
         }
-
-        .inner-page-breadcrumb{
-            padding-right:18px;
-            padding-left:18px;
-        }
     }
 </style>
 
@@ -313,53 +402,106 @@
         <div class="inner-top">
             <a href="/" class="inner-brand">
                 <div class="inner-logo">
-                    @if($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="{{ $association->name ?? 'الشعار' }}">
+                    @if($finalLogoUrl)
+                        <img src="{{ $finalLogoUrl }}" alt="{{ $assocName ?? 'الشعار' }}">
                     @else
-                        <span style="font-size:1.4rem;font-weight:800;">{{ mb_substr($association->name ?? 'ج', 0, 1) }}</span>
+                        <span style="font-size:1.4rem;font-weight:800;">{{ mb_substr($assocName ?? 'ج', 0, 1) }}</span>
                     @endif
                 </div>
 
                 <div>
-                    <h2 class="inner-brand-title">{{ $association->name ?? 'جمعية رضوان الخيرية' }}</h2>
+                    <h2 class="inner-brand-title">{{ $assocName ?? 'جمعية رضوان الخيرية' }}</h2>
                     <p class="inner-brand-subtitle">جمعية مصرحه من وزارة الموارد البشرية والتنمية الاجتماعية</p>
                 </div>
             </a>
 
-            <div class="inner-actions">
-                <a href="/" class="inner-btn inner-btn--ghost">الرئيسية</a>
-                @if(!empty($settings?->beneficiary_portal_url))
-                    <a href="{{ $settings->beneficiary_portal_url }}" class="inner-btn inner-btn--light">بوابة المستفيدين</a>
-                @elseif(!empty($settings?->store_url))
-                    <a href="{{ $settings->store_url }}" class="inner-btn inner-btn--light">المتجر</a>
-                @endif
+            <div class="inner-actions-wrap">
+                <button type="button" id="mobileMenuBtn" class="mobile-menu-btn" aria-label="فتح القائمة">
+                    ☰
+                </button>
+
+                <div class="inner-actions">
+                    <a href="/" class="inner-btn inner-btn--ghost">الرئيسية</a>
+                    @if(!empty($settings?->beneficiary_portal_url))
+                        <a href="{{ $settings->beneficiary_portal_url }}" class="inner-btn inner-btn--light">بوابة المستفيدين</a>
+                    @elseif(!empty($settings?->store_url))
+                        <a href="{{ $settings->store_url }}" class="inner-btn inner-btn--light">المتجر</a>
+                    @endif
+                </div>
             </div>
         </div>
 
-        @if($mainMenuItems->count())
-            @include('themes.default.partials.navigation-tree', ['items' => $mainMenuItems])
+        @if($rootItems->count() > 0)
+            <ul id="mainMobileNav" class="site-nav">
+                @foreach($rootItems as $item)
+                    @php
+                        $children = $groupedItems->get($item->id) ?? collect();
+                        $hasChildren = $children->count() > 0;
+                        $url = $hasChildren ? 'javascript:void(0);' : resolveMenuUrl($item, $connection);
+                    @endphp
+                    <li class="site-nav-item">
+                        <a href="{{ $url }}" class="site-nav-link">
+                            <span class="site-nav-link-main">
+                                <span>{{ $item->title }}</span>
+                            </span>
+                            @if($hasChildren)
+                                <span class="site-nav-arrow">▾</span>
+                            @endif
+                        </a>
+
+                        @if($hasChildren)
+                            <ul class="site-subnav">
+                                @foreach($children as $subItem)
+                                    @php
+                                        $subChildren = $groupedItems->get($subItem->id) ?? collect();
+                                        $subHasChildren = $subChildren->count() > 0;
+                                        $subUrl = $subHasChildren ? 'javascript:void(0);' : resolveMenuUrl($subItem, $connection);
+                                    @endphp
+                                    <li class="site-nav-item">
+                                        <a href="{{ $subUrl }}" class="site-nav-link">
+                                            <span class="site-nav-link-main">
+                                                <span>{{ $subItem->title }}</span>
+                                            </span>
+                                            @if($subHasChildren)
+                                                <span class="site-nav-arrow">◂</span>
+                                            @endif
+                                        </a>
+
+                                        @if($subHasChildren)
+                                            <ul class="site-subnav">
+                                                @foreach($subChildren as $childItem)
+                                                    <li class="site-nav-item">
+                                                        <a href="{{ resolveMenuUrl($childItem, $connection) }}" class="site-nav-link">
+                                                            <span class="site-nav-link-main">
+                                                                <span>{{ $childItem->title }}</span>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
         @endif
     </div>
 </header>
 
-<div class="inner-page-breadcrumb">
-    <a href="{{ url('/') }}">الرئيسية</a>
-    @php
-        $currentPageTitle = $page->meta_title ?? $page->title ?? null;
-
-        if (blank($currentPageTitle) && isset($page?->slug)) {
-            $currentPageTitle = str_replace('-', ' ', $page->slug);
-        }
-    @endphp
-
-    @if(!empty($currentPageTitle))
-        <span>/</span>
-        <strong>{{ $currentPageTitle }}</strong>
-    @endif
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mainMobileNav = document.getElementById('mainMobileNav');
+
+    if (mobileMenuBtn && mainMobileNav) {
+        mobileMenuBtn.addEventListener('click', function () {
+            mainMobileNav.classList.toggle('show');
+        });
+    }
+
     document.querySelectorAll('.inner-custom-header .site-nav-item').forEach(function (item) {
         const trigger = item.querySelector(':scope > .site-nav-link');
         const submenu = item.querySelector(':scope > .site-subnav');
