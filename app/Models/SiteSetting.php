@@ -11,6 +11,9 @@ class SiteSetting extends TenantModel
         'site_name',
         'association_name',
         'site_description',
+        'default_meta_title',
+        'default_meta_description',
+        'robots_indexing',
         'about_text',
         'vision',
         'mission',
@@ -55,6 +58,7 @@ class SiteSetting extends TenantModel
         'inner_pages_header_template_key',
         'inner_pages_footer_template_key',
         'licenses_template_key',
+        'association_plans_template_key',
 
         'primary_color',
         'secondary_color',

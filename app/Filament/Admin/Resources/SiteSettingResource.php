@@ -189,7 +189,59 @@ class SiteSettingResource extends Resource
                                 ->options(fn () => static::templateOptions('services'))
                                 ->searchable()
                                 ->preload(),
+                            Forms\Components\Select::make('association_plans_template_key')
+                                ->label('تصميم صفحة خطط الجمعية')
+                                ->options(fn () => static::templateOptions('association_plans'))
+                                ->searchable()
+                                ->preload(),
                         ])->columns(2),
+
+                    Forms\Components\Tabs\Tab::make('الأرشفة و SEO')
+                        ->schema([
+                            Actions::make([
+                                Action::make('fill_seo_from_site_settings')
+                                    ->label('جلب الأرشفة تلقائيًا')
+                                    ->icon('heroicon-o-sparkles')
+                                    ->color('primary')
+                                    ->action(function (Get $get, Set $set) {
+                                        $siteName = trim((string) ($get('site_name') ?? ''));
+                                        $siteDescription = trim((string) ($get('site_description') ?? ''));
+
+                                        if ($siteName !== '' && trim((string) ($get('default_meta_title') ?? '')) === '') {
+                                            $set('default_meta_title', $siteName);
+                                        }
+
+                                        if ($siteDescription !== '' && trim((string) ($get('default_meta_description') ?? '')) === '') {
+                                            $set('default_meta_description', $siteDescription);
+                                        }
+
+                                        if (trim((string) ($get('robots_indexing') ?? '')) === '') {
+                                            $set('robots_indexing', 'index,follow');
+                                        }
+                                    }),
+                            ])->columnSpanFull(),
+
+                            Forms\Components\TextInput::make('default_meta_title')
+                                ->label('عنوان SEO الافتراضي')
+                                ->maxLength(255)
+                                ->columnSpanFull(),
+
+                            Forms\Components\Textarea::make('default_meta_description')
+                                ->label('وصف SEO الافتراضي')
+                                ->rows(4)
+                                ->columnSpanFull(),
+
+                            Forms\Components\Select::make('robots_indexing')
+                                ->label('إعداد الأرشفة لمحركات البحث')
+                                ->options([
+                                    'index,follow' => 'مفهرس - يتبع الروابط (index,follow)',
+                                    'noindex,follow' => 'غير مفهرس - يتبع الروابط (noindex,follow)',
+                                    'noindex,nofollow' => 'غير مفهرس - لا يتبع الروابط (noindex,nofollow)',
+                                ])
+                                ->default('index,follow')
+                                ->native(false)
+                                ->columnSpanFull(),
+                        ]),
 
                     Forms\Components\Tabs\Tab::make('الهوية والألوان')
                         ->schema([

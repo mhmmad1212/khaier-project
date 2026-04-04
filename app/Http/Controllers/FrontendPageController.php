@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssociationPlan;
 use App\Models\BoardMember;
 use App\Models\Committee;
 use App\Models\Disclosure;
@@ -167,6 +168,19 @@ class FrontendPageController extends Controller
                 ->get();
 
             return view($viewPath, compact('association', 'siteSettings', 'template', 'page', 'services'));
+        }
+
+        if ($page->page_type === 'system' && $page->system_key === 'association_plans') {
+            $template = $this->resolveTemplateByKey($siteSettings->association_plans_template_key ?? null);
+            $viewPath = ($template && ! empty($template->view_path))
+                ? $template->view_path
+                : 'themes.default.association-plans.index';
+
+            $items = AssociationPlan::query()
+                ->orderByDesc('id')
+                ->get();
+
+            return view($viewPath, compact('association', 'siteSettings', 'template', 'page', 'items'));
         }
 
         if ($page->page_type === 'system' && $page->system_key === 'employees') {
