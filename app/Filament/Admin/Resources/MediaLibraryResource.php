@@ -9,20 +9,16 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class MediaLibraryResource extends Resource
 {
     protected static ?string $navigationGroup = 'المحتوى والإعلام';
     protected static ?int $navigationSort = 6;
     protected static ?string $model = MediaItem::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-photo';
     protected static ?string $navigationLabel = 'مكتبة الوسائط';
     protected static ?string $modelLabel = 'ملف';
     protected static ?string $pluralModelLabel = 'مكتبة الوسائط';
-    
-    
 
     public static function form(Form $form): Form
     {
@@ -44,13 +40,13 @@ class MediaLibraryResource extends Resource
                             }
 
                             $path = is_array($state) ? ($state[0] ?? null) : $state;
-
                             if (! $path) {
                                 return;
                             }
 
                             $filename = basename($path);
                             $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
                             $mime = match ($extension) {
                                 'jpg', 'jpeg' => 'image/jpeg',
                                 'png' => 'image/png',
@@ -58,6 +54,10 @@ class MediaLibraryResource extends Resource
                                 'gif' => 'image/gif',
                                 'svg' => 'image/svg+xml',
                                 'pdf' => 'application/pdf',
+                                'doc' => 'application/msword',
+                                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'xls' => 'application/vnd.ms-excel',
+                                'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                                 default => null,
                             };
 
@@ -81,9 +81,7 @@ class MediaLibraryResource extends Resource
                         ->default('public'),
 
                     Forms\Components\Hidden::make('directory'),
-
                     Forms\Components\Hidden::make('mime_type'),
-
                     Forms\Components\Hidden::make('extension'),
 
                     Forms\Components\Hidden::make('is_image')
@@ -102,7 +100,6 @@ class MediaLibraryResource extends Resource
 
         if ($path) {
             $fullPath = storage_path('app/public/' . $path);
-
             $data['size'] = file_exists($fullPath) ? filesize($fullPath) : null;
 
             if (empty($data['hash']) && file_exists($fullPath)) {
@@ -123,7 +120,6 @@ class MediaLibraryResource extends Resource
 
         if ($path) {
             $fullPath = storage_path('app/public/' . $path);
-
             $data['size'] = file_exists($fullPath) ? filesize($fullPath) : null;
 
             if (empty($data['hash']) && file_exists($fullPath)) {
@@ -143,11 +139,9 @@ class MediaLibraryResource extends Resource
         return $table
             ->defaultSort('id', 'desc')
             ->columns([
-                Tables\Columns\ImageColumn::make('file')
+                Tables\Columns\ViewColumn::make('preview')
                     ->label('معاينة')
-                    ->disk('public')
-                    ->square()
-                    ->defaultImageUrl(fn (MediaItem $record) => $record->is_image ? null : 'https://placehold.co/80x80?text=FILE'),
+                    ->view('filament.tables.columns.media-preview'),
 
                 Tables\Columns\TextColumn::make('title')
                     ->label('العنوان')
@@ -158,10 +152,6 @@ class MediaLibraryResource extends Resource
                     ->label('الامتداد')
                     ->badge(),
 
-                Tables\Columns\TextColumn::make('mime_type')
-                    ->label('النوع')
-                    ->toggleable(),
-
                 Tables\Columns\TextColumn::make('size')
                     ->label('الحجم')
                     ->formatStateUsing(function ($state) {
@@ -171,9 +161,13 @@ class MediaLibraryResource extends Resource
                         return round($state / (1024 * 1024), 1) . ' MB';
                     }),
 
-                Tables\Columns\IconColumn::make('is_image')
-                    ->label('صورة')
-                    ->boolean(),
+                Tables\Columns\TextColumn::make('file')
+                    ->label('🔥 رابط الملف 🔥')
+                    ->formatStateUsing(fn ($state) => asset('storage/' . ltrim((string) $state, '/')))
+                    ->copyable()
+                    ->copyMessage('تم نسخ رابط الملف')
+                    ->wrap()
+                    ->limit(80),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('تاريخ الرفع')

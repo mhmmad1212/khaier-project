@@ -6,6 +6,7 @@ use App\Filament\Central\Pages\AssociationActivities;
 
 use App\Filament\Central\Auth\Login;
 use App\Filament\Central\Pages\AssociationsMonitoring;
+use App\Filament\Central\Pages\Dashboard;
 use App\Filament\Resources\AssociationResource;
 use App\Filament\Resources\UserResource;
 use Filament\Http\Middleware\Authenticate;
@@ -55,7 +56,7 @@ class CentralPanelProvider extends PanelProvider
                 for: 'App\\Filament\\Central\\Pages'
             )
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
                 AssociationsMonitoring::class,
             ])
             ->middleware([

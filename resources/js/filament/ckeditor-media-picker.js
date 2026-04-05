@@ -110,14 +110,25 @@ window.openCkMediaLibrary = async function (editor) {
 
     let items = Array.isArray(window.ckEditorMediaItems) ? [...window.ckEditorMediaItems] : [];
 
-    const insertImageIntoEditor = (url, title = '') => {
-        editor.model.change((writer) => {
-            const imageElement = writer.createElement('imageBlock', {
-                src: url,
-                alt: title,
-            });
+    const insertMediaIntoEditor = (item) => {
+        const isImage = !!item.is_image || /\.(jpg|jpeg|png|gif|webp|bmp|svg|avif)$/i.test(item.file || '');
 
-            editor.model.insertContent(imageElement, editor.model.document.selection);
+        editor.model.change((writer) => {
+            if (isImage) {
+                const imageElement = writer.createElement('imageBlock', {
+                    src: item.url,
+                    alt: item.alt_text || item.title || '',
+                });
+
+                editor.model.insertContent(imageElement, editor.model.document.selection);
+            } else {
+                const insertPosition = editor.model.document.selection.getFirstPosition();
+                const textNode = writer.createText(item.title || 'تحميل الملف', {
+                    linkHref: item.url,
+                });
+
+                editor.model.insertContent(textNode, insertPosition);
+            }
 
             const root = editor.model.document.getRoot();
             const paragraph = writer.createElement('paragraph');
@@ -161,7 +172,13 @@ window.openCkMediaLibrary = async function (editor) {
 
         body.querySelectorAll('.ck-media-item').forEach((btn) => {
             btn.addEventListener('click', () => {
-                insertImageIntoEditor(btn.dataset.url, btn.dataset.title || '');
+                const item = list.find(i => i.url === btn.dataset.url) || {
+                    url: btn.dataset.url,
+                    title: btn.dataset.title || '',
+                    file: btn.dataset.url,
+                    is_image: true,
+                };
+                insertMediaIntoEditor(item);
             });
         });
     };
@@ -236,7 +253,7 @@ window.openCkMediaLibrary = async function (editor) {
                 window.ckEditorMediaItems = items;
 
                 renderLibrary(items);
-                insertImageIntoEditor(data.item.url, data.item.alt_text || data.item.title || '');
+                insertMediaIntoEditor(data.item);
             } catch (error) {
                 console.error(error);
                 statusEl.textContent = error.message || 'تعذر رفع الملف.';
