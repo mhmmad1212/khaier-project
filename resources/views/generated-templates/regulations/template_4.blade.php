@@ -41,8 +41,8 @@
                     </div>
 
                     <div style="flex: 1 1 150px; display: flex; justify-content: flex-end; margin-right: auto;">
-                        @if(!empty($item->fileMedia) && !empty($item->fileMedia->file))
-                            <a href="{{ asset('storage/' . ltrim($item->fileMedia->file, '/')) }}" target="_blank" style="display: inline-block; padding: 10px 24px; background-color: {{ $siteSettings->primary_color ?? '#2ea36b' }}; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold; border: 1px solid {{ $siteSettings->primary_color ?? '#2ea36b' }}; white-space: nowrap;">
+                        @if(!empty($item->fileMedia) && !empty($item->fileMedia->url))
+                            <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($item->fileMedia->url, '/')) }}" target="_blank" style="display: inline-block; padding: 10px 24px; background-color: {{ $siteSettings->primary_color ?? '#2ea36b' }}; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold; border: 1px solid {{ $siteSettings->primary_color ?? '#2ea36b' }}; white-space: nowrap;">
                                 عرض الملف
                             </a>
                         @else

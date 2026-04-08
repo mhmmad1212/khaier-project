@@ -113,8 +113,8 @@
                     </div>
 
                     <div class="regulation-action">
-                        @if(!empty($item->fileMedia) && !empty($item->fileMedia->file))
-                            <a href="{{ asset('storage/' . ltrim($item->fileMedia->file, '/')) }}"
+                        @if(!empty($item->fileMedia) && !empty($item->fileMedia->url))
+                            <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($item->fileMedia->url, '/')) }}"
                                target="_blank"
                                class="regulation-btn"
                                style="background-color: {{ $btnColor }}; border: 1px solid {{ $btnColor }};">

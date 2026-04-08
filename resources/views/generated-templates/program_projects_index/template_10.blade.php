@@ -193,7 +193,7 @@
                 @php
                     $title = $project->title ?? 'بدون عنوان';
                     $image = $project->cover_image
-                        ?? ($project->coverMedia->file ?? null)
+                        ?? ($project->coverMedia->url ?? null)
                         ?? null;
 
                     $projectAmount = $project->project_amount ?? null;
@@ -204,8 +204,8 @@
                 <div class="project-card">
                     <div class="project-image-wrap">
                         @if(!empty($image))
-                            <img loading="lazy" decoding="async"
-                                src="{{ asset('storage/' . ltrim($image, '/')) }}"
+                            <img
+                                src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($image, '/')) }}"
                                 alt="{{ $title }}"
                                 class="project-image"
                             >

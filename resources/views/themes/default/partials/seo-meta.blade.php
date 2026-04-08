@@ -57,13 +57,13 @@
     $rawImage = null;
 
     if (!empty($currentProject?->coverMedia?->file)) {
-        $rawImage = $currentProject->coverMedia->file;
+        $rawImage = $currentProject->coverMedia->url;
     } elseif (!empty($newsItem?->featuredMedia?->file)) {
-        $rawImage = $newsItem->featuredMedia->file;
+        $rawImage = $newsItem->featuredMedia->url;
     } elseif (!empty($newsItem?->image)) {
         $rawImage = $newsItem->image;
     } elseif (!empty($siteSettings?->logoMedia?->file)) {
-        $rawImage = $siteSettings->logoMedia->file;
+        $rawImage = $siteSettings->logoMedia->url;
     }
 
     $shareImage = null;
@@ -74,7 +74,7 @@
         } elseif (\Illuminate\Support\Str::startsWith($rawImage, 'storage/')) {
             $shareImage = asset($rawImage);
         } else {
-            $shareImage = asset('storage/' . ltrim($rawImage, '/'));
+            $shareImage = \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($rawImage, '/'));
         }
     }
 

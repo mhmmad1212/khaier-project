@@ -37,7 +37,7 @@
             color:#fff;
             background:
                 linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),
-                url('{{ $project->cover_image ? asset('storage/' . ltrim($project->cover_image, '/')) : "https://via.placeholder.com/1600x800?text=Project" }}') center/cover no-repeat;
+                url('{{ $project->cover_image ? \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($project->cover_image, '/')) : "https://via.placeholder.com/1600x800?text=Project" }}') center/cover no-repeat;
         }
         .hero-content{padding:70px 0;max-width:800px}
         .hero-badge{display:inline-block;background:rgba(255,255,255,.14);padding:8px 14px;border-radius:999px;font-weight:800;margin-bottom:16px}
@@ -81,7 +81,7 @@
     <div class="container nav">
         <a href="{{ url('/') }}" class="brand">
             @if(!empty($siteSettings->logo))
-                <img src="{{ asset('storage/' . ltrim($siteSettings->logo, '/')) }}" alt="{{ $siteSettings->association_name ?? 'الشعار' }}">
+                <img src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($siteSettings->logo, '/')) }}" alt="{{ $siteSettings->association_name ?? 'الشعار' }}">
             @endif
             <div class="brand-title">
                 {{ $siteSettings->association_name ?? $siteSettings->site_name ?? 'الجمعية' }}
@@ -105,7 +105,7 @@
         <div class="grid">
             <div>
                 <div class="card">
-                    <img class="main-image" src="{{ $project->cover_image ? asset('storage/' . ltrim($project->cover_image, '/')) : 'https://via.placeholder.com/1200x700?text=Project' }}" alt="{{ $project->title }}">
+                    <img class="main-image" src="{{ $project->cover_image ? \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($project->cover_image, '/')) : 'https://via.placeholder.com/1200x700?text=Project' }}" alt="{{ $project->title }}">
                     <div class="content">
                         <h2 class="section-title">وصف المشروع</h2>
                         <div class="desc">{{ $project->description ?? 'لا يوجد وصف متاح لهذا المشروع حالياً.' }}</div>
@@ -120,9 +120,9 @@
                                 @php
                                     $galleryUrl = null;
                                     if (!empty($image->mediaItem?->file)) {
-                                        $galleryUrl = asset('storage/' . ltrim($image->mediaItem->file, '/'));
+                                        $galleryUrl = \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($image->mediaItem->file, '/'));
                                     } elseif (!empty($image->file)) {
-                                        $galleryUrl = asset('storage/' . ltrim($image->file, '/'));
+                                        $galleryUrl = \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($image->file, '/'));
                                     }
                                 @endphp
                                 @if($galleryUrl)
@@ -143,7 +143,7 @@
                                 @php
                                     $attachmentUrl = null;
                                     if (!empty($attachment->mediaItem?->file)) {
-                                        $attachmentUrl = asset('storage/' . ltrim($attachment->mediaItem->file, '/'));
+                                        $attachmentUrl = \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($attachment->mediaItem->file, '/'));
                                     }
                                 @endphp
                                 <div class="attachment">

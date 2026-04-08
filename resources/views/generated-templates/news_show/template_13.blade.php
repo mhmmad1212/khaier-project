@@ -13,7 +13,7 @@
     $publishedAt = $newsItem->published_at ?? $newsItem->created_at ?? null;
 
     $image = $newsItem->image
-        ?? ($newsItem->featuredMedia->file ?? null)
+        ?? ($newsItem->featuredMedia->url ?? null)
         ?? ($newsItem->featured_media?->file ?? null)
         ?? null;
 
@@ -167,8 +167,8 @@
         <div class="news-show-card">
             @if(!empty($image))
                 <div class="news-show-image-wrap">
-                    <img loading="lazy" decoding="async"
-                        src="{{ asset('storage/' . ltrim($image, '/')) }}"
+                    <img
+                        src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($image, '/')) }}"
                         alt="{{ $title }}"
                         class="news-show-image"
                     >

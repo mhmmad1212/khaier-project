@@ -27,7 +27,7 @@ class MediaLibraryResource extends Resource
                 ->schema([
                     Forms\Components\FileUpload::make('file')
                         ->label('الملف')
-                        ->disk('public')
+                        ->disk(config('filesystems.media_disk', 'public'))
                         ->directory('media-library/' . now()->format('Y/m'))
                         ->preserveFilenames()
                         ->visibility('public')
@@ -66,7 +66,7 @@ class MediaLibraryResource extends Resource
                             $set('mime_type', $mime);
                             $set('is_image', in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']));
                             $set('directory', dirname($path) === '.' ? null : dirname($path));
-                            $set('disk', 'public');
+                            $set('disk', config('filesystems.media_disk', 'public'));
                         }),
 
                     Forms\Components\TextInput::make('title')
@@ -78,7 +78,7 @@ class MediaLibraryResource extends Resource
                         ->maxLength(255),
 
                     Forms\Components\Hidden::make('disk')
-                        ->default('public'),
+                        ->default(config('filesystems.media_disk', 'public')),
 
                     Forms\Components\Hidden::make('directory'),
                     Forms\Components\Hidden::make('mime_type'),

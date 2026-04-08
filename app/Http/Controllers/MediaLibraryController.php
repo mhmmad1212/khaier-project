@@ -69,8 +69,8 @@ class MediaLibraryController extends Controller
         ]);
 
         $file = $request->file('file');
+        $disk = $this->resolveMediaDisk();
 
-        $disk = 'public';
         $directory = 'media-library/' . now()->format('Y/m');
         $storedPath = $file->store($directory, $disk);
 
@@ -96,7 +96,8 @@ class MediaLibraryController extends Controller
 
         $mimeType = $file->getMimeType();
         $extension = strtolower($file->getClientOriginalExtension());
-        $isImage = Str::startsWith((string) $mimeType, 'image/');
+        $isImage = Str::startsWith((string) $mimeType, 'image/')
+            || in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'avif'], true);
 
         $item = MediaItem::query()->create([
             'title' => $request->input('title') ?: $file->getClientOriginalName(),
@@ -125,6 +126,35 @@ class MediaLibraryController extends Controller
                 'alt_text' => $item->alt_text,
             ],
         ]);
+    }
+
+    protected function resolveMediaDisk(): string
+    {
+        $preferred = env('MEDIA_UPLOAD_DISK');
+
+        if (filled($preferred) && array_key_exists($preferred, config('filesystems.disks', []))) {
+            return $preferred;
+        }
+
+        $s3 = config('filesystems.disks.s3', []);
+
+        $hasS3CoreConfig =
+            filled($s3['key'] ?? null) &&
+            filled($s3['secret'] ?? null) &&
+            filled($s3['bucket'] ?? null) &&
+            filled($s3['endpoint'] ?? null);
+
+        $hasS3PublicUrl =
+            filled($s3['url'] ?? null) ||
+            filled(env('R2_PUBLIC_URL')) ||
+            filled(env('CLOUDFLARE_R2_PUBLIC_URL')) ||
+            filled(env('AWS_URL'));
+
+        if ($hasS3CoreConfig && $hasS3PublicUrl) {
+            return 's3';
+        }
+
+        return 'public';
     }
 
     protected function bootTenantFromRequest(Request $request): void

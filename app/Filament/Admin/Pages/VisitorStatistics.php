@@ -3,6 +3,8 @@
 namespace App\Filament\Admin\Pages;
 
 use App\Models\PageVisit;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +24,45 @@ class VisitorStatistics extends Page
     public function mount(): void
     {
         $this->loadStats();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('refresh_statistics')
+                ->label('تحديث الإحصائيات')
+                ->icon('heroicon-o-arrow-path')
+                ->color('gray')
+                ->action(function (): void {
+                    $this->refreshStats();
+
+                    Notification::make()
+                        ->title('تم تحديث الإحصائيات')
+                        ->success()
+                        ->send();
+                }),
+
+            Action::make('reset_statistics')
+                ->label('تصفير الإحصائيات')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('تصفير الإحصائيات')
+                ->modalDescription('سيتم حذف جميع إحصائيات الدخول والصفحات الحالية والبدء من جديد. هل تريد المتابعة؟')
+                ->modalSubmitActionLabel('نعم، صفّر الإحصائيات')
+                ->action(function (): void {
+                    DB::connection('tenant')->transaction(function () {
+                        PageVisit::query()->delete();
+                    });
+
+                    $this->loadStats();
+
+                    Notification::make()
+                        ->title('تم تصفير الإحصائيات بنجاح')
+                        ->success()
+                        ->send();
+                }),
+        ];
     }
 
     public function refreshStats(): void

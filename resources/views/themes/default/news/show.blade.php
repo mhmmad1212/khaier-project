@@ -5,15 +5,15 @@
     $imageUrl = null;
 
     if (!empty($news->featured_image)) {
-        $imageUrl = asset('storage/' . $news->featured_image);
+        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $news->featured_image);
     } elseif (!empty($news->image)) {
-        $imageUrl = asset('storage/' . $news->image);
+        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $news->image);
     } elseif (!empty($news->photo)) {
-        $imageUrl = asset('storage/' . $news->photo);
+        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $news->photo);
     } elseif (!empty($news->cover_image)) {
-        $imageUrl = asset('storage/' . $news->cover_image);
-    } elseif (method_exists($news, 'featuredMedia') && $news->featuredMedia && !empty($news->featuredMedia->file)) {
-        $imageUrl = asset('storage/' . $news->featuredMedia->file);
+        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $news->cover_image);
+    } elseif (method_exists($news, 'featuredMedia') && $news->featuredMedia && !empty($news->featuredMedia->url)) {
+        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $news->featuredMedia->url);
     }
 
     $publishedAt = $news->published_at ?? $news->created_at;

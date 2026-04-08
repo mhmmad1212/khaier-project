@@ -152,7 +152,7 @@
             @foreach($membersList as $item)
                 @php
                     $photo = $item->photo
-                        ?? ($item->photoMedia->file ?? null)
+                        ?? ($item->photoMedia->url ?? null)
                         ?? ($item->image ?? null);
 
                     $name = $item->name ?? $item->title ?? 'بدون اسم';
@@ -163,8 +163,8 @@
                 <div class="ga-card">
                     <div class="ga-avatar-wrap">
                         @if(!empty($photo))
-                            <img loading="lazy" decoding="async"
-                                src="{{ asset('storage/' . ltrim($photo, '/')) }}"
+                            <img
+                                src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($photo, '/')) }}"
                                 alt="{{ $name }}"
                                 class="ga-avatar"
                             >

@@ -53,8 +53,8 @@
                             <div class="mt-auto d-flex justify-content-between">
                                 <small>{{ optional($item->published_at)->format('Y-m-d') }}</small>
 
-                                @if($item->fileMedia && $item->fileMedia->file)
-                                    <a href="{{ asset('storage/' . $item->fileMedia->file) }}" target="_blank" class="btn btn-success">
+                                @if($item->fileMedia && $item->fileMedia->url)
+                                    <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $item->fileMedia->url) }}" target="_blank" class="btn btn-success">
                                         تحميل
                                     </a>
                                 @endif

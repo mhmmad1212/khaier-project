@@ -46,8 +46,8 @@
                                     {{ optional($item->published_at)->format('Y-m-d') ?: '—' }}
                                 </small>
 
-                                @if($item->fileMedia && $item->fileMedia->file)
-                                    <a href="{{ asset('storage/' . $item->fileMedia->file) }}" target="_blank" class="btn btn-primary">
+                                @if($item->fileMedia && $item->fileMedia->url)
+                                    <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $item->fileMedia->url) }}" target="_blank" class="btn btn-primary">
                                         عرض / تحميل الملف
                                     </a>
                                 @else

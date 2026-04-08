@@ -9,12 +9,12 @@
     // 3. تجهيز الشعار بأمان
     $logo = null;
     if (!empty($safeSettings->logo)) {
-        $logo = asset('storage/' . ltrim($safeSettings->logo, '/'));
+        $logo = \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($safeSettings->logo, '/'));
     } elseif (!empty($safeSettings->logo_media_id)) {
         // إذا كان يقرأ من جدول الميديا
         $mediaLogo = \App\Models\MediaItem::find($safeSettings->logo_media_id);
         if ($mediaLogo && !empty($mediaLogo->file)) {
-            $logo = asset('storage/' . ltrim($mediaLogo->file, '/'));
+            $logo = \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($mediaLogo->file, '/'));
         }
     }
 
@@ -268,7 +268,7 @@
             <div class="logo">
                 <a href="/">
                     @if($logo)
-                        <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $associationName }}">
+                        <img src="{{ $logo }}" alt="{{ $associationName }}">
                     @else
                         <h2>{{ $associationName }}</h2>
                     @endif
@@ -294,7 +294,7 @@
             @if(isset($sliders) && is_iterable($sliders) && count($sliders) > 0)
                 @foreach($sliders as $index => $slide)
                     @php
-                        $slideImg = !empty($slide->image) ? asset('storage/' . ltrim($slide->image, '/')) : 'https://via.placeholder.com/1600x900/0b4b3c/ffffff?text=صورة+السلايدر';
+                        $slideImg = !empty($slide->image) ? \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($slide->image, '/')) : 'https://via.placeholder.com/1600x900/0b4b3c/ffffff?text=صورة+السلايدر';
                         $slideTitle = $slide->title ?? 'مرحباً بكم';
                         $slideSubtitle = $slide->subtitle ?? '';
                         $slideDesc = $slide->description ?? '';
@@ -402,7 +402,7 @@
                 <div class="projects-col">
                     <h3 class="col-title">أبرز مشاريعنا</h3>
                     <div class="card project-card">
-                        <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=كفالة+يتيم" alt="كفالة يتيم">
+                        <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=كفالة+يتيم" alt="كفالة يتيم">
                         <div class="project-content">
                             <h3 class="news-title">مشروع كفالة يتيم</h3>
                             <p class="news-text">توفير الرعاية الشاملة للأيتام ودعمهم في مسيرتهم التعليمية والاجتماعية.</p>
@@ -410,7 +410,7 @@
                         </div>
                     </div>
                     <div class="card project-card">
-                        <img loading="lazy" decoding="async" src="https://via.placeholder.com/600x400/eeeeee/333333?text=سقيا+الماء" alt="سقيا الماء">
+                        <img src="https://via.placeholder.com/600x400/eeeeee/333333?text=سقيا+الماء" alt="سقيا الماء">
                         <div class="project-content">
                             <h3 class="news-title">مشروع سقيا الماء</h3>
                             <p class="news-text">توفير مياه صالحة للشرب في الأماكن العامة والمناطق النائية.</p>
@@ -426,7 +426,7 @@
                         @foreach($news as $item)
                             @if($newsCount >= 3) @break @endif
                             @php
-                                $newsImg = !empty($item->featured_image) ? asset('storage/' . ltrim($item->featured_image, '/')) : 'https://via.placeholder.com/400x250/eeeeee/333333?text=خبر';
+                                $newsImg = !empty($item->featured_image) ? \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($item->featured_image, '/')) : 'https://via.placeholder.com/400x250/eeeeee/333333?text=خبر';
                                 $newsTitle = $item->title ?? 'عنوان الخبر';
                                 // جلب الملخص أو تنظيف المحتوى
                                 $newsExcerpt = $item->excerpt ?? '';
@@ -438,7 +438,7 @@
                                 $newsCount++;
                             @endphp
                             <div class="card news-card">
-                                <img loading="lazy" decoding="async" src="{{ $newsImg }}" alt="{{ $newsTitle }}">
+                                <img src="{{ $newsImg }}" alt="{{ $newsTitle }}">
                                 <div class="news-content">
                                     @if(!empty($newsDate))
                                         <span class="news-date"><i class="far fa-clock"></i> {{ $newsDate }}</span>
@@ -472,16 +472,16 @@
                 @if(isset($partners) && is_iterable($partners) && count($partners) > 0)
                     @foreach($partners as $partner)
                         @php
-                            $partnerLogo = !empty($partner->logo) ? asset('storage/' . ltrim($partner->logo, '/')) : 'https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك';
+                            $partnerLogo = !empty($partner->logo) ? \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($partner->logo, '/')) : 'https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك';
                             $partnerName = $partner->name ?? 'شريك نجاح';
                         @endphp
-                        <img loading="lazy" decoding="async" src="{{ $partnerLogo }}" alt="{{ $partnerName }}" class="partner-img">
+                        <img src="{{ $partnerLogo }}" alt="{{ $partnerName }}" class="partner-img">
                     @endforeach
                 @else
-                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+1" alt="شريك 1" class="partner-img">
-                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+2" alt="شريك 2" class="partner-img">
-                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+3" alt="شريك 3" class="partner-img">
-                    <img loading="lazy" decoding="async" src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+4" alt="شريك 4" class="partner-img">
+                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+1" alt="شريك 1" class="partner-img">
+                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+2" alt="شريك 2" class="partner-img">
+                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+3" alt="شريك 3" class="partner-img">
+                    <img src="https://via.placeholder.com/150x80/ffffff/cccccc?text=شريك+4" alt="شريك 4" class="partner-img">
                 @endif
             </div>
         </div>
@@ -503,7 +503,7 @@
         <div class="container footer-grid">
             <div class="footer-col">
                 @if($logo)
-                    <img loading="lazy" decoding="async" src="{{ $logo }}" alt="{{ $associationName }}" style="max-height: 50px; margin-bottom: 20px; filter: brightness(0) invert(1);">
+                    <img src="{{ $logo }}" alt="{{ $associationName }}" style="max-height: 50px; margin-bottom: 20px; filter: brightness(0) invert(1);">
                 @else
                     <h4>{{ $associationName }}</h4>
                 @endif

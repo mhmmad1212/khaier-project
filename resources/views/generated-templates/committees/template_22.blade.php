@@ -25,7 +25,7 @@
 
                 <div data-label="الملف">
                     @if(!empty($committee->attachment))
-                        <a href="{{ asset('storage/' . $committee->attachment) }}" target="_blank" class="btn">عرض</a>
+                        <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $committee->attachment) }}" target="_blank" class="btn">عرض</a>
                     @else
                         <span class="no-file">-</span>
                     @endif

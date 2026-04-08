@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\NewsResource\Pages;
+use App\Forms\Components\CkEditor;
 use App\Forms\Components\MediaPicker;
 use App\Models\News;
 use App\Models\MediaItem;
@@ -112,21 +113,18 @@ Forms\Components\Section::make('تحسين محركات البحث (SEO)')
                 ->rows(3)
                 ->columnSpanFull(),
 
-            Forms\Components\RichEditor::make('content')
+            CkEditor::make('content')
                 ->label('المحتوى')
                 ->columnSpanFull(),
-
 
             MediaPicker::make('image_media_id')
                 ->label('الصورة البارزة')
                 ->default(fn () => request('selected_media_id'))
                 ->columnSpanFull(),
 
-            Forms\Components\Hidden::make('image')
-                ->default(fn () => request('selected_media_file')),
-
             Forms\Components\DateTimePicker::make('published_at')
-                ->label('تاريخ النشر'),
+                ->label('تاريخ النشر')
+                ->required(),
 
             Forms\Components\Toggle::make('is_active')
                 ->label('نشط')
@@ -139,9 +137,9 @@ Forms\Components\Section::make('تحسين محركات البحث (SEO)')
         return $table
             ->defaultSort('published_at', 'desc')
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
+                Tables\Columns\ViewColumn::make('image_preview')
                     ->label('الصورة')
-                    ->disk('public'),
+                    ->view('filament.tables.columns.news-media-image'),
 
                 Tables\Columns\TextColumn::make('title')
                     ->label('العنوان')

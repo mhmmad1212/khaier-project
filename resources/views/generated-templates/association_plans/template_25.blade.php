@@ -116,7 +116,7 @@
                             </div>
 
                             @if(!empty($item->file) || !empty($item->file_url))
-                                <a href="{{ $item->file_url ?? asset('storage/' . ltrim($item->file, '/')) }}"
+                                <a href="{{ $item->file_url ?? \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($item->file, '/')) }}"
                                    target="_blank"
                                    style="
                                         display:inline-flex;

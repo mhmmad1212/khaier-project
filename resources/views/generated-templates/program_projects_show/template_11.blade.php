@@ -9,7 +9,7 @@
     $title = $project->title ?? 'بدون عنوان';
     $description = $project->description ?? null;
     $coverImage = $project->cover_image
-        ?? ($project->coverMedia->file ?? null)
+        ?? ($project->coverMedia->url ?? null)
         ?? null;
 
     $projectAmount = $project->project_amount ?? null;
@@ -18,7 +18,7 @@
     $endDate = $project->end_date ?? null;
     $donationUrl = $project->donation_url ?? null;
     $reportFile = $project->report_file
-        ?? ($project->reportMedia->file ?? null)
+        ?? ($project->reportMedia->url ?? null)
         ?? null;
 
     $galleryItems = collect($project->galleryImages ?? []);
@@ -273,8 +273,8 @@
         <div class="project-show-card">
             <div class="project-show-image-wrap">
                 @if(!empty($coverImage))
-                    <img loading="lazy" decoding="async"
-                        src="{{ asset('storage/' . ltrim($coverImage, '/')) }}"
+                    <img
+                        src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($coverImage, '/')) }}"
                         alt="{{ $title }}"
                         class="project-show-image"
                     >
@@ -326,7 +326,7 @@
                     @endif
 
                     @if(!empty($reportFile))
-                        <a href="{{ asset('storage/' . ltrim($reportFile, '/')) }}" target="_blank" class="project-show-btn project-show-btn-secondary">
+                        <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($reportFile, '/')) }}" target="_blank" class="project-show-btn project-show-btn-secondary">
                             تحميل تقرير المشروع
                         </a>
                     @endif
@@ -348,8 +348,8 @@
 
                         @if(!empty($galleryFile))
                             <div class="project-gallery-item">
-                                <img loading="lazy" decoding="async"
-                                    src="{{ asset('storage/' . ltrim($galleryFile, '/')) }}"
+                                <img
+                                    src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($galleryFile, '/')) }}"
                                     alt="{{ $title }}"
                                     class="project-gallery-image"
                                 >

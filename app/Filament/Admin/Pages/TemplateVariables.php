@@ -53,6 +53,7 @@ class TemplateVariables extends Page
             ['group' => 'متغيرات الصفحة', 'label' => 'رابط الصفحة', 'code' => '{{ page.url }}', 'description' => 'الرابط الكامل للصفحة الحالية'],
             ['group' => 'متغيرات الصفحة', 'label' => 'المسار المختصر', 'code' => '{{ page.slug }}', 'description' => 'slug الصفحة الحالية'],
             ['group' => 'متغيرات الصفحة', 'label' => 'محتوى الصفحة', 'code' => '{{ page.content }}', 'description' => 'محتوى الصفحة الحالية'],
+            ['group' => 'متغيرات الصفحة', 'label' => 'رابط الصورة البارزة', 'code' => '{{ page.featured_image_url }}', 'description' => 'الرابط المباشر للصورة البارزة للصفحة إن وجدت'],
 
             ['group' => 'متغيرات السياسة', 'label' => 'اسم السياسة', 'code' => '{{ policy.title }}', 'description' => 'عنوان السياسة الحالية'],
             ['group' => 'متغيرات السياسة', 'label' => 'وصف السياسة', 'code' => '{{ policy.description }}', 'description' => 'وصف السياسة الحالية'],
@@ -82,6 +83,9 @@ class TemplateVariables extends Page
             ['group' => 'متغيرات الترخيص', 'label' => 'تاريخ الإصدار', 'code' => '{{ license.issue_date }}', 'description' => 'تاريخ إصدار الترخيص'],
             ['group' => 'متغيرات الترخيص', 'label' => 'اسم الجهة المصدرة', 'code' => '{{ license.issuer }}', 'description' => 'الجهة المصدرة للترخيص'],
 
+            ['group' => 'متغيرات خطة الجمعية', 'label' => 'اسم الخطة', 'code' => '{{ association_plan.title }}', 'description' => 'عنوان خطة الجمعية الحالية'],
+            ['group' => 'متغيرات خطة الجمعية', 'label' => 'رابط ملف الخطة', 'code' => '{{ association_plan.file_url }}', 'description' => 'الرابط المباشر لملف خطة الجمعية إن وجد'],
+
             ['group' => 'متغيرات الخدمة', 'label' => 'اسم الخدمة', 'code' => '{{ service.title }}', 'description' => 'عنوان الخدمة الحالية'],
             ['group' => 'متغيرات الخدمة', 'label' => 'وصف الخدمة', 'code' => '{{ service.description }}', 'description' => 'وصف الخدمة الحالية'],
             ['group' => 'متغيرات الخدمة', 'label' => 'رابط الخدمة', 'code' => '{{ service.url }}', 'description' => 'رابط صفحة الخدمة الحالية'],
@@ -96,21 +100,22 @@ class TemplateVariables extends Page
 
             ['group' => 'متغيرات المشروع', 'label' => 'اسم المشروع', 'code' => '{{ project.title }}', 'description' => 'عنوان المشروع الحالي'],
             ['group' => 'متغيرات المشروع', 'label' => 'وصف المشروع', 'code' => '{{ project.description }}', 'description' => 'وصف المشروع الحالي'],
-            ['group' => 'متغيرات المشروع', 'label' => 'محتوى المشروع', 'code' => '{{ project.content }}', 'description' => 'المحتوى الكامل للمشروع'],
             ['group' => 'متغيرات المشروع', 'label' => 'رابط المشروع', 'code' => '{{ project.url }}', 'description' => 'رابط صفحة المشروع الحالية'],
-            ['group' => 'متغيرات المشروع', 'label' => 'صورة المشروع', 'code' => '{{ project.image_url }}', 'description' => 'رابط صورة المشروع الحالية'],
+            ['group' => 'متغيرات المشروع', 'label' => 'صورة المشروع', 'code' => '{{ project.image_url }}', 'description' => 'الرابط المباشر لصورة المشروع الحالية'],
+            ['group' => 'متغيرات المشروع', 'label' => 'رابط ملف تقرير المشروع', 'code' => '{{ project.report_file_url }}', 'description' => 'الرابط المباشر لملف تقرير المشروع إن وجد'],
 
             ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'اسم العضو', 'code' => '{{ board_member.name }}', 'description' => 'اسم عضو مجلس الإدارة الحالي'],
             ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'المنصب', 'code' => '{{ board_member.position }}', 'description' => 'منصب عضو مجلس الإدارة'],
             ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'الصورة', 'code' => '{{ board_member.image_url }}', 'description' => 'رابط صورة عضو مجلس الإدارة'],
-            ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'الوصف', 'code' => '{{ board_member.description }}', 'description' => 'نبذة عن عضو مجلس الإدارة'],
+            ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'النبذة', 'code' => '{{ board_member.bio }}', 'description' => 'نبذة عن عضو مجلس الإدارة الحالية'],
 
             ['group' => 'متغيرات اللجنة', 'label' => 'اسم اللجنة', 'code' => '{{ committee.name }}', 'description' => 'اسم اللجنة الحالية'],
             ['group' => 'متغيرات اللجنة', 'label' => 'وصف اللجنة', 'code' => '{{ committee.description }}', 'description' => 'وصف اللجنة الحالية'],
             ['group' => 'متغيرات اللجنة', 'label' => 'رابط اللجنة', 'code' => '{{ committee.url }}', 'description' => 'رابط صفحة اللجنة الحالية'],
+            ['group' => 'متغيرات اللجنة', 'label' => 'رابط مرفق اللجنة', 'code' => '{{ committee.attachment_url }}', 'description' => 'الرابط المباشر لمرفق اللجنة إن وجد'],
 
             ['group' => 'متغيرات الموظف', 'label' => 'اسم الموظف', 'code' => '{{ employee.name }}', 'description' => 'اسم الموظف الحالي'],
-            ['group' => 'متغيرات الموظف', 'label' => 'المسمى الوظيفي', 'code' => '{{ employee.job_title }}', 'description' => 'المسمى الوظيفي'],
+            ['group' => 'متغيرات الموظف', 'label' => 'المسمى الوظيفي', 'code' => '{{ employee.position }}', 'description' => 'المسمى الوظيفي الحالي للموظف'],
             ['group' => 'متغيرات الموظف', 'label' => 'البريد الإلكتروني', 'code' => '{{ employee.email }}', 'description' => 'بريد الموظف'],
             ['group' => 'متغيرات الموظف', 'label' => 'رقم الجوال', 'code' => '{{ employee.phone }}', 'description' => 'رقم الموظف'],
             ['group' => 'متغيرات الموظف', 'label' => 'الصورة', 'code' => '{{ employee.image_url }}', 'description' => 'رابط صورة الموظف'],
@@ -155,7 +160,6 @@ class TemplateVariables extends Page
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'w');
 
-            // UTF-8 BOM for Excel Arabic support
             fwrite($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, ['القسم', 'الاسم', 'المتغير', 'الاستخدام']);

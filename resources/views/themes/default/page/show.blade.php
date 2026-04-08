@@ -120,10 +120,10 @@
         </div>
 
         <article class="page-card">
-            @if($featuredMedia && !empty($featuredMedia->file) && $featuredMedia->is_image)
+            @if($featuredMedia && !empty($featuredMedia->url) && $featuredMedia->is_image)
                 <img loading="lazy" decoding="async"
                     class="page-featured-image"
-                    src="{{ asset('storage/' . $featuredMedia->file) }}"
+                    src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $featuredMedia->url) }}"
                     alt="{{ $featuredMedia->alt_text ?: $page->title }}"
                 >
             @endif

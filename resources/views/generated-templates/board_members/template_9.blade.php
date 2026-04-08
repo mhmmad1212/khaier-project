@@ -35,8 +35,8 @@
 
                     {{-- الصورة --}}
                     <div style="margin-bottom: 15px;">
-                        @if(!empty($member->imageMedia) && !empty($member->imageMedia->file))
-                            <img loading="lazy" decoding="async" src="{{ asset('storage/' . $member->imageMedia->file) }}"
+                        @if(!empty($member->imageMedia) && !empty($member->imageMedia->url))
+                            <img src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $member->imageMedia->url) }}"
                                  style="
                                     width: 110px;
                                     height: 110px;

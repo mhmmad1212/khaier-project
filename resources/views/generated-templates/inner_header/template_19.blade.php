@@ -17,7 +17,7 @@
 
     $finalLogoUrl = null;
     if (!empty($logoPath)) {
-        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : asset('storage/' . $logoPath);
+        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
     }
 
     $mainMenu = $connection->table('menus')->where('location', 'header')->first();

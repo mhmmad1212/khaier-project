@@ -21,7 +21,7 @@
                                 </div>
 
                                 @if(!empty($item->file))
-                                    <a href="{{ asset('storage/' . $item->file) }}"
+                                    <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $item->file) }}"
                                        target="_blank"
                                        style="display:inline-flex;align-items:center;gap:8px;background:#127962;color:#fff;text-decoration:none;padding:10px 16px;border-radius:12px;font-weight:700;">
                                         عرض المرفق

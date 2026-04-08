@@ -30,11 +30,11 @@
 
                 <div data-label="الملف">
                     @if(!empty($item->attachment))
-                        <a href="{{ asset('storage/' . $item->attachment) }}" target="_blank" class="btn">
+                        <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $item->attachment) }}" target="_blank" class="btn">
                             عرض
                         </a>
                     @elseif(!empty($item->file))
-                        <a href="{{ asset('storage/' . $item->file) }}" target="_blank" class="btn">
+                        <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $item->file) }}" target="_blank" class="btn">
                             عرض
                         </a>
                     @else

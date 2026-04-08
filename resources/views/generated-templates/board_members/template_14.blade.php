@@ -203,18 +203,18 @@
                             $imageSrc = null;
                             
                             // التحقق أولاً من العلاقة photoMedia
-                            if (isset($member->photoMedia) && !empty($member->photoMedia->file)) {
-                                $imageSrc = asset('storage/' . $member->photoMedia->file);
+                            if (isset($member->photoMedia) && !empty($member->photoMedia->url)) {
+                                $imageSrc = \App\Support\Media\MediaUrl::forDiskPath('public', $member->photoMedia->url);
                             } 
                             // التحقق ثانياً من حقل photo المباشر
                             elseif (!empty($member->photo)) {
-                                $imageSrc = asset('storage/' . $member->photo);
+                                $imageSrc = \App\Support\Media\MediaUrl::forDiskPath('public', $member->photo);
                             }
                         @endphp
 
                         @if($imageSrc)
                             {{-- استخدمنا onerror هنا حتى لو كان الرابط خطأ تتحول الصورة للأيقونة الرمزية --}}
-                            <img loading="lazy" decoding="async" src="{{ $imageSrc }}" 
+                            <img src="{{ $imageSrc }}" 
                                  class="member-avatar" 
                                  alt="{{ $member->name ?? 'صورة العضو' }}" 
                                  onerror="this.onerror=null; this.outerHTML='<div class=\'member-avatar fallback-avatar\'>👤</div>';">

@@ -177,7 +177,7 @@
                 @php
                     $title = $item->title ?? 'بدون عنوان';
                     $image = $item->image
-                        ?? ($item->featuredMedia->file ?? null)
+                        ?? ($item->featuredMedia->url ?? null)
                         ?? ($item->featured_media?->file ?? null)
                         ?? null;
 
@@ -195,8 +195,8 @@
                 <div class="news-card">
                     <div class="news-image-wrap">
                         @if(!empty($image))
-                            <img loading="lazy" decoding="async"
-                                src="{{ asset('storage/' . ltrim($image, '/')) }}"
+                            <img
+                                src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($image, '/')) }}"
                                 alt="{{ $title }}"
                                 class="news-image"
                             >

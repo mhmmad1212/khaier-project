@@ -21,7 +21,6 @@ class CommitteeResource extends Resource
     protected static ?string $navigationLabel = 'اللجان';
     protected static ?string $modelLabel = 'لجنة';
     protected static ?string $pluralModelLabel = 'اللجان';
-    
 
     public static function form(Form $form): Form
     {
@@ -44,19 +43,26 @@ class CommitteeResource extends Resource
                 ->label('عدد الأعضاء')
                 ->numeric(),
 
-            Forms\Components\Hidden::make('attachment_media_id')
-                ->dehydrated(false),
-                \Filament\Forms\Components\Hidden::make('attachment'),
-
             MediaPicker::make('attachment_media_id')
                 ->label('المرفق')
                 ->columnSpanFull(),
-                \Filament\Forms\Components\Hidden::make('attachment'),
+
+            Forms\Components\Hidden::make('attachment'),
 
             Forms\Components\Placeholder::make('current_attachment')
                 ->label('المرفق الحالي')
-                ->content(fn ($record) => $record && $record->attachment ? $record->attachment : 'لا يوجد مرفق حالي')
-                ->visible(fn ($record) => filled($record?->attachment))
+                ->content(function ($record) {
+                    if (! $record) {
+                        return 'لا يوجد مرفق حالي';
+                    }
+
+                    if ($record->attachmentMedia?->title) {
+                        return $record->attachmentMedia->title;
+                    }
+
+                    return $record->attachment ?: 'لا يوجد مرفق حالي';
+                })
+                ->visible(fn ($record) => filled($record?->attachment) || filled($record?->attachment_media_id))
                 ->columnSpanFull(),
 
             Forms\Components\TextInput::make('sort_order')
@@ -75,28 +81,27 @@ class CommitteeResource extends Resource
         return $table
             ->defaultSort('sort_order')
             ->columns([
-                \Filament\Tables\Columns\TextColumn::make('attachment_link')
+                Tables\Columns\TextColumn::make('attachment_link')
                     ->label('المرفق')
-                    ->getStateUsing(fn ($record) => $record->attachment_media_id ? 'عرض المرفق' : 'لا يوجد مرفق')
+                    ->getStateUsing(fn ($record) => ($record->attachment_media_id || $record->attachment) ? 'عرض المرفق' : 'لا يوجد مرفق')
                     ->badge()
-                    ->color(fn ($record) => $record->attachment_media_id ? 'info' : 'gray')
+                    ->color(fn ($record) => ($record->attachment_media_id || $record->attachment) ? 'info' : 'gray')
                     ->url(function ($record) {
-                        if ($record->attachment_media_id) {
-                            try {
-                                // البحث في قاعدة بيانات الجمعية مباشرة
-                                $file = \Illuminate\Support\Facades\DB::connection('tenant')->table('media_items')->where('id', $record->attachment_media_id)->value('file');
-                                if ($file) return str_starts_with($file, 'http') ? $file : asset('storage/' . $file);
-                            } catch (\Exception $e) {}
+                        if ($record->attachmentMedia?->url) {
+                            return $record->attachmentMedia->url;
                         }
+
+                        if (filled($record->attachment)) {
+                            if (\Illuminate\Support\Str::startsWith($record->attachment, ['http://', 'https://'])) {
+                                return $record->attachment;
+                            }
+
+                            return \Illuminate\Support\Facades\Storage::disk('public')->url($record->attachment);
+                        }
+
                         return null;
                     })
                     ->openUrlInNewTab(),
-
-
-
-
-
-
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('اسم اللجنة')
@@ -109,8 +114,6 @@ class CommitteeResource extends Resource
                 Tables\Columns\TextColumn::make('members_count')
                     ->label('عدد الأعضاء')
                     ->sortable(),
-
-                
 
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('الترتيب')

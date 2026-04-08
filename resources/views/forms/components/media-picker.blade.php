@@ -19,7 +19,7 @@
             selectedExtension: @js($media?->extension ?: null),
             selectedIsImage: @js((bool) ($media?->is_image)),
             selectedAlt: @js($media?->alt_text ?: $media?->title),
-            selectedMediaPublicUrl: @js($media ? asset('storage/' . $media->file) : null),
+            selectedMediaPublicUrl: @js($media?->url),
 
             init() {
                 this.restoreState();
@@ -97,13 +97,14 @@
                 const selectedField = urlParams.get('selected_media_field');
                 const selectedId = urlParams.get('selected_media_id');
                 const selectedFile = urlParams.get('selected_media_file');
+                const selectedUrl = urlParams.get('selected_media_url');
 
                 if (!selectedField || !selectedId) return;
                 if (selectedField !== '{{ $statePath }}') return;
 
                 this.selectedId = selectedId;
                 this.selectedFile = selectedFile;
-                this.selectedMediaPublicUrl = selectedFile ? ('/storage/' + selectedFile.replace(/^\/+/, '')) : null;
+                this.selectedMediaPublicUrl = selectedUrl || null;
                 this.selectedTitle = selectedFile ? selectedFile.split('/').pop() : 'ملف مختار';
                 this.selectedExtension = selectedFile && selectedFile.includes('.') ? selectedFile.split('.').pop() : 'FILE';
 

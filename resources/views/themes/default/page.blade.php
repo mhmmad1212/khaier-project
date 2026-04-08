@@ -14,7 +14,7 @@
             @if(!empty($page->featuredMedia?->file))
                 <div>
                     <img
-                        src="{{ asset('storage/' . ltrim($page->featuredMedia->file, '/')) }}"
+                        src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($page->featuredMedia->url, '/')) }}"
                         alt="{{ $page->title }}"
                         style="width:100%; max-height:380px; object-fit:cover; display:block;"
                     >

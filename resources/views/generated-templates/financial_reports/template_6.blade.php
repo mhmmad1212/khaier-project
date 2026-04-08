@@ -120,8 +120,8 @@
                     </div>
 
                     <div class="report-action">
-                        @if(!empty($item->fileMedia) && !empty($item->fileMedia->file))
-                            <a href="{{ asset('storage/' . ltrim($item->fileMedia->file, '/')) }}"
+                        @if(!empty($item->fileMedia) && !empty($item->fileMedia->url))
+                            <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($item->fileMedia->url, '/')) }}"
                                target="_blank"
                                class="report-btn"
                                style="background-color: {{ $buttonColor }}; border: 1px solid {{ $buttonColor }};">

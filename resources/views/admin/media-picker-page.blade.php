@@ -109,9 +109,16 @@ h1{margin:0;font-size:28px}
             @else
                 <div class="grid">
                     @foreach($items as $item)
+                        @php
+                            $url = $item->url;
+                            $useHref = $returnUrl
+                                ? $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'selected_media_id=' . $item->id . '&selected_media_file=' . urlencode($item->file) . '&selected_media_url=' . urlencode($url) . '&selected_media_field=' . urlencode($field)
+                                : '#';
+                        @endphp
+
                         <div class="card">
                             @if($item->is_image)
-                                <img src="{{ asset('storage/' . $item->file) }}" alt="{{ $item->alt_text ?: $item->title }}">
+                                <img src="{{ $url }}" alt="{{ $item->alt_text ?: $item->title }}">
                             @else
                                 <div class="file-box">{{ strtoupper($item->extension ?: 'FILE') }}</div>
                             @endif
@@ -120,8 +127,14 @@ h1{margin:0;font-size:28px}
                             <div class="meta-title">{{ $item->title ?: basename((string) $item->file) }}</div>
 
                             <a
-                                href="{{ $returnUrl ? $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'selected_media_id=' . $item->id . '&selected_media_file=' . urlencode($item->file) . '&selected_media_field=' . urlencode($field) : '#' }}"
+                                href="{{ $useHref }}"
                                 class="choose-btn"
+                                data-media-id="{{ $item->id }}"
+                                data-media-url="{{ $url }}"
+                                data-media-title="{{ $item->title ?: basename((string) $item->file) }}"
+                                data-media-alt="{{ $item->alt_text ?: '' }}"
+                                data-media-file="{{ $item->file }}"
+                                data-media-is-image="{{ $item->is_image ? '1' : '0' }}"
                             >
                                 استخدام هذا الملف
                             </a>
@@ -132,5 +145,37 @@ h1{margin:0;font-size:28px}
         @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const isCkEditorPicker = @json($field === '__ckeditor_content__');
+
+    if (!isCkEditorPicker || !window.opener) {
+        return;
+    }
+
+    document.querySelectorAll('.choose-btn').forEach((button) => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const item = {
+                id: this.dataset.mediaId,
+                url: this.dataset.mediaUrl,
+                title: this.dataset.mediaTitle || '',
+                alt_text: this.dataset.mediaAlt || '',
+                file: this.dataset.mediaFile || '',
+                is_image: this.dataset.mediaIsImage === '1',
+            };
+
+            window.opener.postMessage({
+                type: 'khaier:ckeditor-media-selected',
+                item,
+            }, window.location.origin);
+
+            window.close();
+        });
+    });
+});
+</script>
 </body>
 </html>

@@ -23,7 +23,7 @@
     
     $finalLogoUrl = null;
     if (!empty($logoPath)) {
-        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : asset('storage/' . $logoPath);
+        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
     }
 
     $mainMenu = $connection->table('menus')->where('location', 'header')->first();
@@ -687,7 +687,7 @@
         @if(isset($sliders) && $sliders->count() > 0)
             @foreach($sliders as $index => $slider)
                 <div class="slide slider-fade absolute inset-0 w-full h-full {{ $index == 0 ? 'slide-active' : 'slide-inactive' }}">
-                    <img src="{{ asset('storage/' . $slider->image) }}" class="absolute inset-0 w-full h-full object-cover" alt="Slide">
+                    <img src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $slider->image) }}" class="absolute inset-0 w-full h-full object-cover" alt="Slide">
                     <div class="absolute inset-0 bg-emerald-900/60 mix-blend-multiply"></div>
                     
                     <div class="container mx-auto px-4 relative z-10 h-full flex flex-col justify-center items-center text-center">
@@ -798,7 +798,7 @@
                 @php
                     $featuredNews = $newsItems->first();
                     $otherNews = $newsItems->skip(1);
-                    $featuredImage = !empty($featuredNews->image) ? asset('storage/' . $featuredNews->image) : 'https://via.placeholder.com/900x600?text=News';
+                    $featuredImage = !empty($featuredNews->image) ? \App\Support\Media\MediaUrl::forDiskPath('public', $featuredNews->image) : 'https://via.placeholder.com/900x600?text=News';
                     $featuredUrl = !empty($featuredNews->slug) ? url('/news/' . $featuredNews->slug) : '#';
                     $featuredDate = $featuredNews->published_at ?: $featuredNews->created_at;
                 @endphp
@@ -835,7 +835,7 @@
                 <div class="lg:col-span-5 space-y-6">
                     @foreach($otherNews as $item)
                         @php
-                            $newsImage = !empty($item->image) ? asset('storage/' . $item->image) : 'https://via.placeholder.com/400x300?text=News';
+                            $newsImage = !empty($item->image) ? \App\Support\Media\MediaUrl::forDiskPath('public', $item->image) : 'https://via.placeholder.com/400x300?text=News';
                             $newsUrl = !empty($item->slug) ? url('/news/' . $item->slug) : '#';
                             $newsDate = $item->published_at ?: $item->created_at;
                         @endphp
@@ -900,7 +900,7 @@
                                 $pm = $connection->table('media_items')->where('id', $project->cover_image_media_id)->first();
                                 if ($pm) $img = $pm->file ?? $pm->path ?? null;
                             }
-                            $imgUrl = $img ? asset('storage/' . $img) : 'https://via.placeholder.com/400x250?text=مشروع+خيري';
+                            $imgUrl = $img ? \App\Support\Media\MediaUrl::forDiskPath('public', $img) : 'https://via.placeholder.com/400x250?text=مشروع+خيري';
                         @endphp
 
                         <div class="project-slide">
@@ -966,7 +966,7 @@
                 <div class="partners-track">
                     @foreach($partners as $partner)
                         @php
-                            $partnerLogo = !empty($partner->logo) ? asset('storage/' . $partner->logo) : null;
+                            $partnerLogo = !empty($partner->logo) ? \App\Support\Media\MediaUrl::forDiskPath('public', $partner->logo) : null;
                             $partnerUrl = $partner->url ?: '#';
                         @endphp
                         <div class="partner-card">
@@ -996,7 +996,7 @@
 
                     @foreach($partners as $partner)
                         @php
-                            $partnerLogo = !empty($partner->logo) ? asset('storage/' . $partner->logo) : null;
+                            $partnerLogo = !empty($partner->logo) ? \App\Support\Media\MediaUrl::forDiskPath('public', $partner->logo) : null;
                             $partnerUrl = $partner->url ?: '#';
                         @endphp
                         <div class="partner-card">

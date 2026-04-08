@@ -18,15 +18,15 @@
                     $imageUrl = null;
 
                     if (!empty($item->featured_image)) {
-                        $imageUrl = asset('storage/' . $item->featured_image);
+                        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $item->featured_image);
                     } elseif (!empty($item->image)) {
-                        $imageUrl = asset('storage/' . $item->image);
+                        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $item->image);
                     } elseif (!empty($item->photo)) {
-                        $imageUrl = asset('storage/' . $item->photo);
+                        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $item->photo);
                     } elseif (!empty($item->cover_image)) {
-                        $imageUrl = asset('storage/' . $item->cover_image);
-                    } elseif (method_exists($item, 'featuredMedia') && $item->featuredMedia && !empty($item->featuredMedia->file)) {
-                        $imageUrl = asset('storage/' . $item->featuredMedia->file);
+                        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $item->cover_image);
+                    } elseif (method_exists($item, 'featuredMedia') && $item->featuredMedia && !empty($item->featuredMedia->url)) {
+                        $imageUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $item->featuredMedia->url);
                     }
                 @endphp
 

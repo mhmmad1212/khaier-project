@@ -111,7 +111,7 @@
                     if (!empty($member->photo_media_id)) {
                         $media = \App\Models\MediaItem::query()->find($member->photo_media_id);
                         if ($media && !empty($media->file) && $media->is_image) {
-                            $photoUrl = asset('storage/' . $media->file);
+                            $photoUrl = \App\Support\Media\MediaUrl::forDiskPath('public', $media->file);
                         }
                     }
 

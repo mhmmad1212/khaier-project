@@ -3,9 +3,9 @@
 namespace App\Filament\Admin\Resources\NewsResource\Pages;
 
 use App\Filament\Admin\Resources\NewsResource;
+use App\Models\MediaItem;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Facades\Storage;
 
 class EditNews extends EditRecord
 {
@@ -15,23 +15,11 @@ class EditNews extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $removeCurrentImage = (bool) ($this->data['remove_current_image'] ?? false);
-        $oldImage = $this->record->image;
-        $newImage = $data['image'] ?? null;
+        $media = filled($data['image_media_id'] ?? null)
+            ? MediaItem::query()->find($data['image_media_id'])
+            : null;
 
-        if ($removeCurrentImage && $oldImage && ! $newImage) {
-            if (Storage::disk('public')->exists($oldImage)) {
-                Storage::disk('public')->delete($oldImage);
-            }
-
-            $data['image'] = null;
-        }
-
-        if ($newImage && $oldImage && $newImage !== $oldImage) {
-            if (Storage::disk('public')->exists($oldImage)) {
-                Storage::disk('public')->delete($oldImage);
-            }
-        }
+        $data['image'] = $media?->file;
 
         return $data;
     }

@@ -18,9 +18,9 @@
                         <div style="margin-top:8px;color:#6b7280;">{{ $item->description }}</div>
                     @endif
 
-                    @if(!empty($item->fileMedia) && !empty($item->fileMedia->file))
+                    @if(!empty($item->fileMedia) && !empty($item->fileMedia->url))
                         <div style="margin-top:12px;">
-                            <a href="{{ asset('storage/' . $item->fileMedia->file) }}" target="_blank" style="background:#127962;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600;">
+                            <a href="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $item->fileMedia->url) }}" target="_blank" style="background:#127962;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600;">
                                 عرض الملف
                             </a>
                         </div>

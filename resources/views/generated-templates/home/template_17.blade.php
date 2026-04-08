@@ -29,7 +29,7 @@
     }
     $finalLogoUrl = null;
     if (!empty($logoPath)) {
-        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : asset('storage/' . $logoPath);
+        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
     }
     // ----------------------------
 
@@ -612,7 +612,7 @@
     <section class="hero-slider">
         @if(isset($sliders) && $sliders->count() > 0)
             @foreach($sliders as $index => $slider)
-                <div class="slide {{ $index === 0 ? 'active' : '' }}" style="background-image: url('{{ asset('storage/' . $slider->image) }}');">
+                <div class="slide {{ $index === 0 ? 'active' : '' }}" style="background-image: url('{{ \App\Support\Media\MediaUrl::forDiskPath('public', $slider->image) }}');">
                     <div class="hero-content">
                         <h1>{{ $slider->title }}</h1>
                         <p>{{ $slider->description }}</p>
@@ -654,7 +654,7 @@
                                 $pm = $connection->table('media_items')->where('id', $project->cover_image_media_id)->first();
                                 if ($pm) $img = $pm->file ?? $pm->path ?? null;
                             }
-                            $imgUrl = $img ? asset('storage/' . $img) : 'https://via.placeholder.com/400x250?text=مشروع+خيري';
+                            $imgUrl = $img ? \App\Support\Media\MediaUrl::forDiskPath('public', $img) : 'https://via.placeholder.com/400x250?text=مشروع+خيري';
                             
                             $target = $project->project_amount ?? 1;
                             $collected = $project->donation_amount ?? 0;
@@ -703,7 +703,7 @@
                 @if(isset($news) && $news->count() > 0)
                     @php $featuredNews = $news->first(); @endphp
                     <a href="/news/{{ $featuredNews->slug ?? $featuredNews->id }}" class="news-featured">
-                        <img src="{{ $featuredNews->image ? asset('storage/' . $featuredNews->image) : 'https://via.placeholder.com/600x400' }}" alt="{{ $featuredNews->title }}">
+                        <img src="{{ $featuredNews->image ? \App\Support\Media\MediaUrl::forDiskPath('public', $featuredNews->image) : 'https://via.placeholder.com/600x400' }}" alt="{{ $featuredNews->title }}">
                         <div class="content">
                             <h3>{{ $featuredNews->title }}</h3>
                             <span class="date">{{ $featuredNews->published_at ? \Carbon\Carbon::parse($featuredNews->published_at)->format('l, d F Y') : '' }}</span>
@@ -713,7 +713,7 @@
                     <div class="news-stacked">
                         @foreach($news->skip(1)->take(4) as $item)
                             <a href="/news/{{ $item->slug ?? $item->id }}" class="news-small-card">
-                                <img src="{{ $item->image ? asset('storage/' . $item->image) : 'https://via.placeholder.com/150x150' }}" alt="{{ $item->title }}">
+                                <img src="{{ $item->image ? \App\Support\Media\MediaUrl::forDiskPath('public', $item->image) : 'https://via.placeholder.com/150x150' }}" alt="{{ $item->title }}">
                                 <div class="content">
                                     <h4>{{ Str::limit($item->title, 60) }}</h4>
                                     <span class="date">{{ $item->published_at ? \Carbon\Carbon::parse($item->published_at)->format('l, d F Y') : '' }}</span>
@@ -743,10 +743,10 @@
                 <div class="marquee-content">
                     @if(isset($partners) && $partners->count() > 0)
                         @foreach($partners as $partner)
-                            <div class="partner-logo"><img src="{{ asset('storage/' . $partner->logo) }}" alt="{{ $partner->name }}" title="{{ $partner->name }}"></div>
+                            <div class="partner-logo"><img src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $partner->logo) }}" alt="{{ $partner->name }}" title="{{ $partner->name }}"></div>
                         @endforeach
                         @foreach($partners as $partner)
-                            <div class="partner-logo"><img src="{{ asset('storage/' . $partner->logo) }}" alt="{{ $partner->name }}" title="{{ $partner->name }}"></div>
+                            <div class="partner-logo"><img src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $partner->logo) }}" alt="{{ $partner->name }}" title="{{ $partner->name }}"></div>
                         @endforeach
                     @else
                         <div class="partner-logo"><img src="https://via.placeholder.com/150x80?text=شريك" alt="شريك"></div>

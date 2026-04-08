@@ -67,7 +67,9 @@ class GeneralAssemblyMemberResource extends Resource
         return $table
             ->defaultSort('sort_order')
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('photo')->label('الصورة')->circular(),
+                \Filament\Tables\Columns\ViewColumn::make('photo_media_id')
+                    ->label('الصورة')
+                    ->view('filament.tables.columns.general-assembly-member-media-image'),
                 
                 Tables\Columns\TextColumn::make('name')
                     ->label('الاسم')
