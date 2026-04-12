@@ -80,7 +80,6 @@ class PagesResource extends Resource
                 ->rows(24)
                 ->columnSpanFull()
                 ->visible(fn (Get $get) => $get('page_type') !== 'system')
-                ->required(fn (Get $get) => $get('page_type') !== 'system' && blank($get('content')))
                 ->helperText('ألصق هنا HTML خام مباشرة. إذا تم تعبئة هذا الحقل فسيتم عرضه بدل محتوى الصفحة العادي.'),
 
             Forms\Components\Select::make('status')

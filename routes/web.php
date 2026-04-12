@@ -46,6 +46,8 @@ Route::get('/page/{slug}', [FrontendPageController::class, 'pageShow'])->name('p
 Route::get('/page/{slug}/news/{newsSlug}', [FrontendPageController::class, 'pageNewsShow']);
 Route::get('/page/{slug}/project/{id}', [FrontendPageController::class, 'pageProgramProjectShow']);
 Route::get('/projects/{id}', [FrontendPageController::class, 'programProjectShow']);
+Route::get('/volunteer-opportunities/{slug}', [FrontendPageController::class, 'volunteerOpportunityShow'])->name('volunteer-opportunities.show');
+Route::get('/page/{slug}/volunteer/{volunteerSlug}', [FrontendPageController::class, 'pageVolunteerOpportunityShow'])->name('page.volunteer-opportunities.show');
 Route::get('/board-members', [WebsiteController::class, 'boardMembers'])->name('board-members');
 Route::get('/general-assembly', [WebsiteController::class, 'generalAssembly'])->name('general-assembly.index');
 

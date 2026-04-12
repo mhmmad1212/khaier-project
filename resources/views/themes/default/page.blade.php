@@ -44,6 +44,10 @@
                     ">
                         {!! $page->content !!}
                     </div>
+                @elseif(!empty($renderedRawHtml))
+                    <div>
+                        {!! $renderedRawHtml !!}
+                    </div>
                 @elseif(!empty($page->raw_html))
                     <div>
                         {!! $page->raw_html !!}

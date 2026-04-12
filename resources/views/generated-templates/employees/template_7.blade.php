@@ -175,9 +175,19 @@
         <div class="employees-grid">
             @foreach($employeesList as $item)
                 @php
-                    $photo = $item->photo
+                    // تعديل جلب الصورة ليشمل متغيرات ملف الإكسل (image_url)
+                    $photo = $item->image_url
+                        ?? $item->photo
                         ?? ($item->photoMedia->url ?? null)
                         ?? ($item->image ?? null);
+
+                    // معالجة الرابط بشكل صحيح (سواء كان رابط كامل أو مسار داخلي)
+                    $finalPhotoUrl = null;
+                    if (!empty($photo)) {
+                        $finalPhotoUrl = str_starts_with($photo, 'http') 
+                            ? $photo 
+                            : \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($photo, '/'));
+                    }
 
                     $name = $item->name ?? $item->title ?? 'بدون اسم';
                     $position = $item->position ?? $item->job_title ?? null;
@@ -188,9 +198,9 @@
 
                 <div class="employee-card">
                     <div class="employee-image-wrap">
-                        @if(!empty($photo))
+                        @if(!empty($finalPhotoUrl))
                             <img
-                                src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($photo, '/')) }}"
+                                src="{{ $finalPhotoUrl }}"
                                 alt="{{ $name }}"
                                 class="employee-image"
                             >
@@ -219,7 +229,7 @@
                             @if(!empty($phone))
                                 <div class="employee-meta-item">
                                     <span class="employee-meta-label">الهاتف:</span>
-                                    {{ $phone }}
+                                    <span dir="ltr">{{ $phone }}</span>
                                 </div>
                             @endif
 

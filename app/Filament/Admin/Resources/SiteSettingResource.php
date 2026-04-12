@@ -148,6 +148,24 @@ class SiteSettingResource extends Resource
                                 ->searchable()
                                 ->preload(),
 
+                            Forms\Components\Select::make('meeting_minutes_board_template_key')
+                                ->label('تصميم محاضر اجتماع مجلس الإدارة')
+                                ->options(fn () => static::templateOptions('meeting_minutes_board'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('meeting_minutes_general_template_key')
+                                ->label('تصميم محاضر اجتماع الجمعية العمومية')
+                                ->options(fn () => static::templateOptions('meeting_minutes_general'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('meeting_minutes_committee_template_key')
+                                ->label('تصميم محاضر اجتماع اللجان')
+                                ->options(fn () => static::templateOptions('meeting_minutes_committee'))
+                                ->searchable()
+                                ->preload(),
+
                             Forms\Components\Select::make('employees_template_key')
                                 ->label('تصميم صفحة الموظفين')
                                 ->options(fn () => static::templateOptions('employees'))
@@ -184,9 +202,39 @@ class SiteSettingResource extends Resource
                                 ->searchable()
                                 ->preload(),
 
+                            Forms\Components\Select::make('volunteer_opportunities_index_template_key')
+                                ->label('تصميم قائمة فرص التطوع')
+                                ->options(fn () => static::templateOptions('volunteer_opportunities_index'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('volunteer_opportunities_show_template_key')
+                                ->label('تصميم تفاصيل فرصة التطوع')
+                                ->options(fn () => static::templateOptions('volunteer_opportunities_show'))
+                                ->searchable()
+                                ->preload(),
+
                             Forms\Components\Select::make('services_template_key')
                                 ->label('تصميم صفحة الخدمات')
                                 ->options(fn () => static::templateOptions('services'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('bank_accounts_template_key')
+                                ->label('تصميم صفحة الحسابات البنكية')
+                                ->options(fn () => static::templateOptions('bank_accounts'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('beneficiary_services_template_key')
+                                ->label('تصميم صفحة خدمات المستفيدين')
+                                ->options(fn () => static::templateOptions('beneficiary_services'))
+                                ->searchable()
+                                ->preload(),
+
+                            Forms\Components\Select::make('executive_director_template_key')
+                                ->label('تصميم صفحة المدير التنفيذي')
+                                ->options(fn () => static::templateOptions('executive_director'))
                                 ->searchable()
                                 ->preload(),
                             Forms\Components\Select::make('association_plans_template_key')

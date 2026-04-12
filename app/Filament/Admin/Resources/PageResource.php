@@ -48,10 +48,18 @@ class PageResource extends Resource
                         ->options([
                             'board_members' => 'مجلس الإدارة',
                             'general_assembly_members' => 'الجمعية العمومية',
+                            'meeting_minutes_board' => 'محاضر اجتماعات مجلس الإدارة',
+                            'meeting_minutes_general' => 'محاضر اجتماعات الجمعية العمومية',
+                            'meeting_minutes_committee' => 'محاضر اجتماعات اللجان',
                             'employees' => 'الموظفون',
                             'committees' => 'اللجان',
+                            'beneficiary_services' => 'خدمات المستفيدين',
+                            'bank_accounts' => 'الحسابات البنكية',
+                            'executive_director' => 'المدير التنفيذي',
+                            'licenses' => 'تراخيص الجمعية',
                             'news_index' => 'قائمة الأخبار',
                             'program_projects_index' => 'قائمة المشاريع',
+                            'volunteer_opportunities_index' => 'فرص التطوع',
                         ])
                         ->visible(fn (Get $get) => $get('page_type') === 'system' && (\Illuminate\Support\Facades\App::bound('currentAssociation') ? (bool) \Illuminate\Support\Facades\App::make('currentAssociation')->can_edit_system_pages : false)),
                 ])->columns(3),
@@ -108,7 +116,8 @@ class PageResource extends Resource
                         ->label('HTML خام')
                         ->rows(24)
                         ->columnSpanFull()
-                        ->helperText('ألصق هنا HTML خام مباشرة. إذا تم تعبئة هذا الحقل فسيتم عرضه بدل المحتوى العادي. لا تستخدم زر الكود داخل المحرر لهذا الغرض.'),
+                        ->helperText('ألصق هنا HTML خام مباشرة. إذا تم تعبئة هذا الحقل فسيتم عرضه بدل المحتوى العادي. لا تستخدم زر الكود داخل المحرر لهذا الغرض.')
+                        ->required(false),
                 ])
                 ->columns(1)
                 ->collapsible(),

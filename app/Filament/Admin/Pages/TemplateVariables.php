@@ -91,6 +91,17 @@ class TemplateVariables extends Page
             ['group' => 'متغيرات الخدمة', 'label' => 'رابط الخدمة', 'code' => '{{ service.url }}', 'description' => 'رابط صفحة الخدمة الحالية'],
             ['group' => 'متغيرات الخدمة', 'label' => 'الأيقونة', 'code' => '{{ service.icon }}', 'description' => 'أيقونة الخدمة الحالية'],
 
+            ['group' => 'متغيرات الحساب البنكي', 'label' => 'اسم الحساب', 'code' => '{{ bank_account.name }}', 'description' => 'اسم الحساب البنكي الحالي'],
+            ['group' => 'متغيرات الحساب البنكي', 'label' => 'اسم البنك', 'code' => '{{ bank_account.bank_name }}', 'description' => 'اسم البنك الحالي'],
+            ['group' => 'متغيرات الحساب البنكي', 'label' => 'رقم الحساب', 'code' => '{{ bank_account.account_number }}', 'description' => 'رقم الحساب الحالي'],
+            ['group' => 'متغيرات الحساب البنكي', 'label' => 'الشعار', 'code' => '{{ bank_account.bank_logo_url }}', 'description' => 'رابط شعار البنك الحالي'],
+
+            ['group' => 'متغيرات خدمة المستفيد', 'label' => 'اسم الخدمة', 'code' => '{{ beneficiary_service.name }}', 'description' => 'اسم خدمة المستفيد الحالية'],
+            ['group' => 'متغيرات خدمة المستفيد', 'label' => 'الأيقونة', 'code' => '{{ beneficiary_service.icon }}', 'description' => 'أيقونة خدمة المستفيد الحالية'],
+            ['group' => 'متغيرات خدمة المستفيد', 'label' => 'شروط الخدمة', 'code' => '{{ beneficiary_service.conditions }}', 'description' => 'شروط خدمة المستفيد الحالية'],
+            ['group' => 'متغيرات خدمة المستفيد', 'label' => 'رابط الشرح', 'code' => '{{ beneficiary_service.guide_url }}', 'description' => 'رابط شرح التقديم الحالي'],
+            ['group' => 'متغيرات خدمة المستفيد', 'label' => 'رابط التقديم', 'code' => '{{ beneficiary_service.application_url }}', 'description' => 'رابط تقديم الطلب الحالي'],
+
             ['group' => 'متغيرات الخبر', 'label' => 'عنوان الخبر', 'code' => '{{ news.title }}', 'description' => 'عنوان الخبر الحالي'],
             ['group' => 'متغيرات الخبر', 'label' => 'ملخص الخبر', 'code' => '{{ news.excerpt }}', 'description' => 'ملخص الخبر الحالي'],
             ['group' => 'متغيرات الخبر', 'label' => 'محتوى الخبر', 'code' => '{{ news.content }}', 'description' => 'محتوى الخبر الحالي'],
@@ -103,6 +114,16 @@ class TemplateVariables extends Page
             ['group' => 'متغيرات المشروع', 'label' => 'رابط المشروع', 'code' => '{{ project.url }}', 'description' => 'رابط صفحة المشروع الحالية'],
             ['group' => 'متغيرات المشروع', 'label' => 'صورة المشروع', 'code' => '{{ project.image_url }}', 'description' => 'الرابط المباشر لصورة المشروع الحالية'],
             ['group' => 'متغيرات المشروع', 'label' => 'رابط ملف تقرير المشروع', 'code' => '{{ project.report_file_url }}', 'description' => 'الرابط المباشر لملف تقرير المشروع إن وجد'],
+
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'اسم الفرصة', 'code' => '{{ volunteer_opportunity.title }}', 'description' => 'اسم فرصة التطوع الحالية'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'الوصف', 'code' => '{{ volunteer_opportunity.description }}', 'description' => 'وصف فرصة التطوع الحالية'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'نوع الفرصة', 'code' => '{{ volunteer_opportunity.opportunity_type }}', 'description' => 'نوع الفرصة الحالية'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'بداية التطوع', 'code' => '{{ volunteer_opportunity.start_date }}', 'description' => 'تاريخ بداية التطوع'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'نهاية الفرصة', 'code' => '{{ volunteer_opportunity.end_date }}', 'description' => 'تاريخ نهاية الفرصة'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'عدد الساعات', 'code' => '{{ volunteer_opportunity.hours_count }}', 'description' => 'عدد ساعات الفرصة'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'رابط منصة تطوع', 'code' => '{{ volunteer_opportunity.platform_url }}', 'description' => 'رابط منصة تطوع للفرصة الحالية'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'الصورة', 'code' => '{{ volunteer_opportunity.image_url }}', 'description' => 'رابط صورة فرصة التطوع الحالية'],
+            ['group' => 'متغيرات فرصة التطوع', 'label' => 'الرابط', 'code' => '{{ volunteer_opportunity.url }}', 'description' => 'رابط صفحة تفاصيل الفرصة الحالية'],
 
             ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'اسم العضو', 'code' => '{{ board_member.name }}', 'description' => 'اسم عضو مجلس الإدارة الحالي'],
             ['group' => 'متغيرات عضو مجلس الإدارة', 'label' => 'المنصب', 'code' => '{{ board_member.position }}', 'description' => 'منصب عضو مجلس الإدارة'],
@@ -119,6 +140,12 @@ class TemplateVariables extends Page
             ['group' => 'متغيرات الموظف', 'label' => 'البريد الإلكتروني', 'code' => '{{ employee.email }}', 'description' => 'بريد الموظف'],
             ['group' => 'متغيرات الموظف', 'label' => 'رقم الجوال', 'code' => '{{ employee.phone }}', 'description' => 'رقم الموظف'],
             ['group' => 'متغيرات الموظف', 'label' => 'الصورة', 'code' => '{{ employee.image_url }}', 'description' => 'رابط صورة الموظف'],
+
+            ['group' => 'متغيرات المدير التنفيذي', 'label' => 'اسم المدير التنفيذي', 'code' => '{{ executive_director.name }}', 'description' => 'اسم المدير التنفيذي الحالي'],
+            ['group' => 'متغيرات المدير التنفيذي', 'label' => 'رقم التواصل', 'code' => '{{ executive_director.phone }}', 'description' => 'رقم التواصل للمدير التنفيذي'],
+            ['group' => 'متغيرات المدير التنفيذي', 'label' => 'البريد الإلكتروني', 'code' => '{{ executive_director.email }}', 'description' => 'البريد الإلكتروني للمدير التنفيذي'],
+            ['group' => 'متغيرات المدير التنفيذي', 'label' => 'النبذة', 'code' => '{{ executive_director.bio }}', 'description' => 'نبذة المدير التنفيذي الحالية'],
+            ['group' => 'متغيرات المدير التنفيذي', 'label' => 'الصورة', 'code' => '{{ executive_director.image_url }}', 'description' => 'رابط صورة المدير التنفيذي الحالية'],
 
             ['group' => 'متغيرات الجمعية العمومية', 'label' => 'اسم العضو', 'code' => '{{ assembly_member.name }}', 'description' => 'اسم عضو الجمعية العمومية'],
             ['group' => 'متغيرات الجمعية العمومية', 'label' => 'الصفة', 'code' => '{{ assembly_member.position }}', 'description' => 'صفة أو منصب العضو'],

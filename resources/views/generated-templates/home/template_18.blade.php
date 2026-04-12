@@ -933,7 +933,7 @@
                                     </div>
 
                                     <div class="mt-auto flex gap-3">
-                                        <a href="{{ url('/project/' . ($project->id ?? '#')) }}" class="flex-1 text-center bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-colors">
+                                        <a href="{{ url('/projects/' . ($project->id ?? '#')) }}" class="flex-1 text-center bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-colors">
                                             تفاصيل
                                         </a>
 
@@ -1082,10 +1082,13 @@
                     </div>
                 </div>
 
-                <button type="button" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xl py-4 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
-                    <i class="fas fa-heart"></i>
-                    إتمام التبرع جزاك الله خيراً
-                </button>
+                @php
+                        $donateNowUrl = $settings->store_url ?? $settings->beneficiary_portal_url ?? '#';
+                    @endphp
+                    <a href="{{ $donateNowUrl }}" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xl py-4 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex justify-center items-center gap-2 flex justify-center items-center gap-2">
+                        <i class="fas fa-heart"></i>
+                        إتمام التبرع جزاك الله خيراً
+                    </a>
                 <div class="text-center text-gray-400 text-sm mt-5 flex items-center justify-center gap-2 font-medium">
                     <i class="fas fa-lock"></i>
                     <span>جميع معاملاتك المالية آمنة ومشفرة بالكامل</span>
