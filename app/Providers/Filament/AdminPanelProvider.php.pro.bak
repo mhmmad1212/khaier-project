@@ -12,6 +12,7 @@ use Filament\Pages;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Illuminate\Support\HtmlString;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
@@ -47,22 +48,34 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label('خدمات المستفيدين'),
                 NavigationGroup::make()->label('إعدادات الموقع'),
             ])
-            ->navigationGroups([
-                \Filament\Navigation\NavigationGroup::make("لوحة التحكم"),
-                \Filament\Navigation\NavigationGroup::make("إدارة المحتوى"),
-                \Filament\Navigation\NavigationGroup::make("الحوكمة والوثائق"),
-                \Filament\Navigation\NavigationGroup::make("خدمات المستفيدين"),
-                \Filament\Navigation\NavigationGroup::make("إعدادات الموقع"),
-            ])
+            
+            ->font('Cairo')
             ->renderHook(
-                \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => new \Illuminate\Support\HtmlString("
+                PanelsRenderHook::HEAD_END,
+                fn (): string => new HtmlString("
                     <style>
-                        .fi-sidebar { background-color: #ffffff !important; border-left: 1px solid #cbd5e1 !important; }
-                        .fi-sidebar-group-label { color: #1e293b !important; font-weight: 800 !important; font-size: 0.95rem !important; padding-bottom: 8px !important; margin-top: 25px !important; margin-bottom: 8px !important; border-bottom: 2px solid #b48600 !important; display: block; width: 90%; }
-                        .fi-sidebar-item { border-bottom: 1px solid #f1f5f9 !important; }
-                        .fi-sidebar-item-button { border-radius: 4px !important; padding: 10px 12px !important; margin: 2px 8px !important; }
-                        .fi-sidebar-item-active .fi-sidebar-item-button { background-color: #385833 !important; color: #ffffff !important; border-right: 4px solid #b48600 !important; }
+                        /* تصميم الحاوية */
+                        .fi-sidebar { border-left: 1px solid #e2e8f0; background-color: #ffffff !important; }
+                        
+                        /* تصميم أزرار المنيو - حواف دائرية واحترافية */
+                        .fi-sidebar-item-button { border-radius: 10px !important; margin: 5px 12px !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; padding: 10px 14px !important; }
+                        
+                        /* تصميم العنصر النشط (الصفحة المفتوحة حالياً) */
+                        .fi-sidebar-item-active .fi-sidebar-item-button { background-color: #355e3b !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(53, 94, 59, 0.25) !important; position: relative; }
+                        
+                        /* الخط الذهبي الجانبي للعنصر النشط */
+                        .fi-sidebar-item-active .fi-sidebar-item-button::after { content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 5px; background-color: #b48600; border-radius: 4px 0 0 4px; }
+                        
+                        /* التأثير عند تمرير الماوس */
+                        .fi-sidebar-item-button:hover:not(.fi-sidebar-item-active .fi-sidebar-item-button) { background-color: #f0fdf4 !important; transform: translateX(-4px); color: #355e3b !important; }
+                        
+                        /* تصميم عناوين الأقسام الرئيسية */
+                        .fi-sidebar-group-label { color: #b48600 !important; font-weight: 800 !important; font-size: 0.85rem !important; margin-top: 18px !important; padding-bottom: 8px !important; text-transform: uppercase; border-bottom: 1px dashed #e2e8f0; margin-right: 12px; margin-left: 12px; }
+                        
+                        /* تحسين شكل الأيقونات */
+                        .fi-sidebar-item-icon { color: #64748b !important; width: 1.4rem !important; height: 1.4rem !important; }
+                        .fi-sidebar-item-active .fi-sidebar-item-icon { color: #ffffff !important; }
+                        .fi-sidebar-item-button:hover .fi-sidebar-item-icon { color: #355e3b !important; }
                     </style>
                 ")
             )

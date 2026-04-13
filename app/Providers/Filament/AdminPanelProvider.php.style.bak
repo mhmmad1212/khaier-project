@@ -47,25 +47,6 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label('خدمات المستفيدين'),
                 NavigationGroup::make()->label('إعدادات الموقع'),
             ])
-            ->navigationGroups([
-                \Filament\Navigation\NavigationGroup::make("لوحة التحكم"),
-                \Filament\Navigation\NavigationGroup::make("إدارة المحتوى"),
-                \Filament\Navigation\NavigationGroup::make("الحوكمة والوثائق"),
-                \Filament\Navigation\NavigationGroup::make("خدمات المستفيدين"),
-                \Filament\Navigation\NavigationGroup::make("إعدادات الموقع"),
-            ])
-            ->renderHook(
-                \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => new \Illuminate\Support\HtmlString("
-                    <style>
-                        .fi-sidebar { background-color: #ffffff !important; border-left: 1px solid #cbd5e1 !important; }
-                        .fi-sidebar-group-label { color: #1e293b !important; font-weight: 800 !important; font-size: 0.95rem !important; padding-bottom: 8px !important; margin-top: 25px !important; margin-bottom: 8px !important; border-bottom: 2px solid #b48600 !important; display: block; width: 90%; }
-                        .fi-sidebar-item { border-bottom: 1px solid #f1f5f9 !important; }
-                        .fi-sidebar-item-button { border-radius: 4px !important; padding: 10px 12px !important; margin: 2px 8px !important; }
-                        .fi-sidebar-item-active .fi-sidebar-item-button { background-color: #385833 !important; color: #ffffff !important; border-right: 4px solid #b48600 !important; }
-                    </style>
-                ")
-            )
             ->discoverResources(
                 in: app_path('Filament/Admin/Resources'),
                 for: 'App\\Filament\\Admin\\Resources'

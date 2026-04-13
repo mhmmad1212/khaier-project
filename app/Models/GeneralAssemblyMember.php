@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 use App\Models\Tenant\TenantModel;
 
 class GeneralAssemblyMember extends TenantModel

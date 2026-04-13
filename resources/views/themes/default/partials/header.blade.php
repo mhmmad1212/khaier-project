@@ -732,7 +732,7 @@
 @php
     $settings = \App\Models\SiteSetting::query()->latest('id')->first();
     $logoMedia = $settings?->logoMedia;
-    $logoUrl = $logoMedia && !empty($logoMedia->url) ? \App\Support\Media\MediaUrl::forDiskPath('public', $logoMedia->url) : null;
+    $logoUrl = $logoMedia && !empty($logoMedia->url) ? $logoMedia->url : null;
 
     $settings = $settings ?? \App\Models\SiteSetting::query()->latest('id')->first();
 
