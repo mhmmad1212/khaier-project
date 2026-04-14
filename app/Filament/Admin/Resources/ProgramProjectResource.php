@@ -14,8 +14,11 @@ use Filament\Tables\Table;
 
 class ProgramProjectResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المشاريع والبرامج';
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 4;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = ProgramProject::class;
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationLabel = 'البرامج والمشاريع';

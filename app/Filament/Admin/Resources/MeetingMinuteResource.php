@@ -12,8 +12,11 @@ use App\Forms\Components\MediaPicker;
 
 class MeetingMinuteResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المجالس واللجان';
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 6;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = MeetingMinute::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $modelLabel = 'محضر';

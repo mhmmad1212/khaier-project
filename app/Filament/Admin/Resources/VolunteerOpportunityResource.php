@@ -14,13 +14,17 @@ use Illuminate\Support\Str;
 
 class VolunteerOpportunityResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 9;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = VolunteerOpportunity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
     protected static ?string $navigationLabel = 'التطوع';
     protected static ?string $modelLabel = 'فرصة تطوع';
     protected static ?string $pluralModelLabel = 'فرص التطوع';
-    protected static ?string $navigationGroup = 'إدارة المحتوى';
 
     public static function form(Form $form): Form
     {
@@ -34,8 +38,6 @@ class VolunteerOpportunityResource extends Resource
                         ->live(onBlur: true)
                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                             if (blank($get('slug'))) {
-                                $slug = Str::slug((string) $state);
-                                $set('slug', filled($slug) ? $slug : 'volunteer-opportunity');
                             }
                         }),
 

@@ -12,13 +12,17 @@ use Filament\Tables\Table;
 
 class BankAccountResource extends Resource
 {
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 8;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = BankAccount::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
     protected static ?string $navigationLabel = 'الحسابات البنكية';
     protected static ?string $modelLabel = 'حساب بنكي';
     protected static ?string $pluralModelLabel = 'الحسابات البنكية';
-    protected static ?string $navigationGroup = 'إدارة المحتوى';
 
     public static function form(Form $form): Form
     {

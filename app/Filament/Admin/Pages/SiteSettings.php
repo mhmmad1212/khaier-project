@@ -2,101 +2,27 @@
 
 namespace App\Filament\Admin\Pages;
 
-use App\Forms\Components\MediaPicker;
+use App\Filament\Admin\Resources\SiteSettingResource;
 use App\Models\SiteSetting;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
-class SiteSettings extends Page implements Forms\Contracts\HasForms
+class SiteSettings extends Page
 {
     protected static bool $shouldRegisterNavigation = false;
-    use Forms\Concerns\InteractsWithForms;
-
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static ?string $navigationLabel = 'إعدادات الموقع';
-    protected static ?string $title = 'إعدادات الموقع';
-    protected static ?string $navigationGroup = 'الموقع';
+    protected static ?string $slug = 'legacy-site-settings';
     protected static string $view = 'filament.admin.pages.site-settings';
-
-    public ?array $data = [];
-    public SiteSetting $record;
 
     public function mount(): void
     {
-        $this->record = SiteSetting::query()->firstOrCreate([]);
-        $this->form->fill($this->record->toArray());
-    }
+        $record = SiteSetting::query()->latest('id')->first();
 
-    public function form(Form $form): Form
-    {
-        return $form
-            ->statePath('data')
-            ->schema([
-                Forms\Components\Section::make('البيانات الأساسية')
-                    ->schema([
-                        Forms\Components\TextInput::make('site_name')
-                            ->label('اسم الموقع')
-                            ->maxLength(255),
+        if (! $record) {
+            $record = SiteSetting::query()->create([]);
+        }
 
-                        Forms\Components\Textarea::make('site_description')
-                            ->label('وصف الموقع')
-                            ->rows(3)
-                            ->columnSpanFull(),
-
-                        Forms\Components\TextInput::make('license_number')
-                            ->label('رقم الترخيص'),
-
-                        Forms\Components\TextInput::make('phone')
-                            ->label('الهاتف'),
-
-                        Forms\Components\TextInput::make('email')
-                            ->label('البريد الإلكتروني')
-                            ->email(),
-
-                        Forms\Components\TextInput::make('address')
-                            ->label('العنوان')
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
-
-                Forms\Components\Section::make('الهوية البصرية')
-                    ->schema([
-                        MediaPicker::make('logo_media_id')
-                            ->label('الشعار')
-                            ->columnSpanFull(),
-
-                        MediaPicker::make('favicon_media_id')
-                            ->label('الفافيكون')
-                            ->columnSpanFull(),
-                    ]),
-
-                Forms\Components\Section::make('التواصل الاجتماعي')
-                    ->schema([
-                        Forms\Components\TextInput::make('facebook')
-                            ->label('رابط فيسبوك'),
-
-                        Forms\Components\TextInput::make('twitter')
-                            ->label('رابط إكس / تويتر'),
-
-                        Forms\Components\TextInput::make('instagram')
-                            ->label('رابط إنستغرام'),
-
-                        Forms\Components\TextInput::make('youtube')
-                            ->label('رابط يوتيوب'),
-                    ])
-                    ->columns(2),
-            ]);
-    }
-
-    public function save(): void
-    {
-        $this->record->update($this->form->getState());
-
-        Notification::make()
-            ->title('تم حفظ إعدادات الموقع')
-            ->success()
-            ->send();
+        $this->redirect(
+            SiteSettingResource::getUrl('edit', ['record' => $record]),
+            navigate: true
+        );
     }
 }

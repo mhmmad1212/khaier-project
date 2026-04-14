@@ -8,11 +8,15 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TemplateVariables extends Page
 {
+    protected static ?string $navigationGroup = 'إعدادات الموقع';
+    protected static ?int $navigationSort = 5;
+    protected static ?string $slug = 'template-variables';
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $navigationIcon = 'heroicon-o-code-bracket-square';
     protected static ?string $navigationLabel = 'متغيرات القوالب';
     protected static ?string $title = 'متغيرات القوالب';
-    protected static ?string $navigationGroup = 'إعدادات النظام';
-    protected static ?int $navigationSort = 90;
 
     protected static string $view = 'filament.admin.pages.template-variables';
 

@@ -13,8 +13,11 @@ use Filament\Tables\Table;
 
 class ServiceResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المشاريع والبرامج';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 5;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = Service::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';

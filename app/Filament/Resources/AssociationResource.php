@@ -275,39 +275,59 @@ class AssociationResource extends Resource
                         ->form([
                             Forms\Components\Select::make('user_id')
                                 ->label('المستخدم')
+                                ->helperText('إذا تأخر التحميل فغالبًا هناك مشكلة اتصال بقاعدة بيانات الجمعية.')
                                 ->options(function (Association $record): array {
                                     $connectionName = 'tenant_reset_' . $record->id;
 
-                                    config([
-                                        'database.connections.' . $connectionName => [
-                                            'driver' => 'mysql',
-                                            'host' => $record->database_host ?: '127.0.0.1',
-                                            'port' => $record->database_port ?: 3306,
-                                            'database' => $record->database_name,
-                                            'username' => $record->database_username,
-                                            'password' => $record->database_password,
-                                            'charset' => 'utf8mb4',
-                                            'collation' => 'utf8mb4_unicode_ci',
-                                            'prefix' => '',
-                                            'prefix_indexes' => true,
-                                            'strict' => true,
-                                            'engine' => null,
-                                        ],
-                                    ]);
+                                    try {
+                                        config([
+                                            'database.connections.' . $connectionName => [
+                                                'driver' => 'mysql',
+                                                'host' => $record->database_host ?: '127.0.0.1',
+                                                'port' => $record->database_port ?: 3306,
+                                                'database' => $record->database_name,
+                                                'username' => $record->database_username,
+                                                'password' => $record->database_password,
+                                                'charset' => 'utf8mb4',
+                                                'collation' => 'utf8mb4_unicode_ci',
+                                                'prefix' => '',
+                                                'prefix_indexes' => true,
+                                                'strict' => true,
+                                                'engine' => null,
+                                                'options' => extension_loaded('pdo_mysql')
+                                                    ? [\PDO::ATTR_TIMEOUT => 5]
+                                                    : [],
+                                            ],
+                                        ]);
 
-                                    \Illuminate\Support\Facades\DB::purge($connectionName);
+                                        \Illuminate\Support\Facades\DB::purge($connectionName);
 
-                                    return \Illuminate\Support\Facades\DB::connection($connectionName)
-                                        ->table('users')
-                                        ->orderBy('name')
-                                        ->get()
-                                        ->mapWithKeys(fn ($user) => [
-                                            $user->id => trim(($user->name ?? '') . ' - ' . ($user->email ?? ''))
-                                        ])
-                                        ->toArray();
+                                        $users = \Illuminate\Support\Facades\DB::connection($connectionName)
+                                            ->table('users')
+                                            ->orderBy('name')
+                                            ->limit(200)
+                                            ->get()
+                                            ->mapWithKeys(fn ($user) => [
+                                                $user->id => trim(($user->name ?? '') . ' - ' . ($user->email ?? ''))
+                                            ])
+                                            ->toArray();
+
+                                        \Illuminate\Support\Facades\DB::disconnect($connectionName);
+
+                                        return $users;
+                                    } catch (\Throwable $e) {
+                                        \Illuminate\Support\Facades\DB::disconnect($connectionName);
+
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('تعذر تحميل مستخدمي الجمعية')
+                                            ->body('يوجد خلل في الاتصال بقاعدة بيانات الجمعية أو بيانات الدخول الخاصة بها.')
+                                            ->danger()
+                                            ->send();
+
+                                        return [];
+                                    }
                                 })
                                 ->searchable()
-                                ->preload()
                                 ->required()
                                 ->native(false),
 
@@ -328,61 +348,74 @@ class AssociationResource extends Resource
                         ->action(function (Association $record, array $data): void {
                             $connectionName = 'tenant_reset_' . $record->id;
 
-                            config([
-                                'database.connections.' . $connectionName => [
-                                    'driver' => 'mysql',
-                                    'host' => $record->database_host ?: '127.0.0.1',
-                                    'port' => $record->database_port ?: 3306,
-                                    'database' => $record->database_name,
-                                    'username' => $record->database_username,
-                                    'password' => $record->database_password,
-                                    'charset' => 'utf8mb4',
-                                    'collation' => 'utf8mb4_unicode_ci',
-                                    'prefix' => '',
-                                    'prefix_indexes' => true,
-                                    'strict' => true,
-                                    'engine' => null,
-                                ],
-                            ]);
-
-                            \Illuminate\Support\Facades\DB::purge($connectionName);
-
-                            $user = \Illuminate\Support\Facades\DB::connection($connectionName)
-                                ->table('users')
-                                ->where('id', $data['user_id'])
-                                ->first();
-
-                            if (! $user) {
-                                \Filament\Notifications\Notification::make()
-                                    ->title('تعذر العثور على المستخدم')
-                                    ->body('لم يتم العثور على المستخدم المحدد داخل قاعدة الجمعية.')
-                                    ->danger()
-                                    ->send();
-
-                                return;
-                            }
-
-                            \Illuminate\Support\Facades\DB::connection($connectionName)
-                                ->table('users')
-                                ->where('id', $user->id)
-                                ->update([
-                                    'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
-                                    'updated_at' => now(),
+                            try {
+                                config([
+                                    'database.connections.' . $connectionName => [
+                                        'driver' => 'mysql',
+                                        'host' => $record->database_host ?: '127.0.0.1',
+                                        'port' => $record->database_port ?: 3306,
+                                        'database' => $record->database_name,
+                                        'username' => $record->database_username,
+                                        'password' => $record->database_password,
+                                        'charset' => 'utf8mb4',
+                                        'collation' => 'utf8mb4_unicode_ci',
+                                        'prefix' => '',
+                                        'prefix_indexes' => true,
+                                        'strict' => true,
+                                        'engine' => null,
+                                        'options' => extension_loaded('pdo_mysql')
+                                            ? [\PDO::ATTR_TIMEOUT => 5]
+                                            : [],
+                                    ],
                                 ]);
 
-                            AssociationActivityLogger::log(
-                                $record,
-                                4,
-                                'password_reset',
-                                'تم تغيير كلمة المرور',
-                                'تم تغيير كلمة المرور للمستخدم: ' . (($user->name ?? '') !== '' ? ($user->name . ' - ') : '') . ($user->email ?? ('#' . $user->id))
-                            );
+                                \Illuminate\Support\Facades\DB::purge($connectionName);
 
-                            \Filament\Notifications\Notification::make()
-                                ->title('تم تحديث كلمة المرور')
-                                ->body('تم تغيير كلمة المرور للمستخدم: ' . ($user->email ?? ('#' . $user->id)))
-                                ->success()
-                                ->send();
+                                $user = \Illuminate\Support\Facades\DB::connection($connectionName)
+                                    ->table('users')
+                                    ->where('id', $data['user_id'])
+                                    ->first();
+
+                                if (! $user) {
+                                    \Filament\Notifications\Notification::make()
+                                        ->title('تعذر العثور على المستخدم')
+                                        ->body('لم يتم العثور على المستخدم المحدد داخل قاعدة الجمعية.')
+                                        ->danger()
+                                        ->send();
+
+                                    return;
+                                }
+
+                                \Illuminate\Support\Facades\DB::connection($connectionName)
+                                    ->table('users')
+                                    ->where('id', $user->id)
+                                    ->update([
+                                        'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+                                        'updated_at' => now(),
+                                    ]);
+
+                                AssociationActivityLogger::log(
+                                    $record,
+                                    4,
+                                    'password_reset',
+                                    'تم تغيير كلمة المرور',
+                                    'تم تغيير كلمة المرور للمستخدم: ' . (($user->name ?? '') !== '' ? ($user->name . ' - ') : '') . ($user->email ?? ('#' . $user->id))
+                                );
+
+                                \Filament\Notifications\Notification::make()
+                                    ->title('تم تحديث كلمة المرور')
+                                    ->body('تم تغيير كلمة المرور للمستخدم: ' . ($user->email ?? ('#' . $user->id)))
+                                    ->success()
+                                    ->send();
+                            } catch (\Throwable $e) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('فشل تحديث كلمة المرور')
+                                    ->body('يوجد خلل في الاتصال بقاعدة بيانات الجمعية أو بيانات الدخول الخاصة بها.')
+                                    ->danger()
+                                    ->send();
+                            } finally {
+                                \Illuminate\Support\Facades\DB::disconnect($connectionName);
+                            }
                         }),
 
                     Tables\Actions\Action::make('activities')

@@ -13,13 +13,17 @@ use Illuminate\Support\Str;
 
 class SiteFormResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 8;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = SiteForm::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationLabel = 'النماذج';
     protected static ?string $modelLabel = 'نموذج';
     protected static ?string $pluralModelLabel = 'النماذج';
-    protected static ?string $navigationGroup = 'إدارة المحتوى';
 
     public static function form(Form $form): Form
     {

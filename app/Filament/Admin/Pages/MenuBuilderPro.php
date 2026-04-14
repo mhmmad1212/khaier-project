@@ -9,8 +9,12 @@ use Filament\Pages\Page;
 
 class MenuBuilderPro extends Page
 {
-    protected static ?string $navigationGroup = 'إدارة الموقع';
-    protected static ?int $navigationSort = 6;
+    protected static ?string $navigationGroup = 'إعدادات الموقع';
+    protected static ?int $navigationSort = 4;
+    protected static ?string $slug = 'menu-builder-pro';
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';
     protected static string $view = 'filament.admin.pages.menu-builder-pro';
     protected static ?string $navigationLabel = 'بناء القوائم PRO';

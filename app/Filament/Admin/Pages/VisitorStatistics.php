@@ -10,11 +10,15 @@ use Illuminate\Support\Facades\DB;
 
 class VisitorStatistics extends Page
 {
+    protected static ?string $navigationGroup = 'لوحة التحكم';
+    protected static ?int $navigationSort = 2;
+    protected static ?string $slug = 'visitor-statistics';
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
     protected static ?string $navigationLabel = 'إحصائيات الزوار';
     protected static ?string $title = 'إحصائيات الزوار';
-    protected static ?string $navigationGroup = 'التقارير والإحصائيات';
-    protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.admin.pages.visitor-statistics';
 

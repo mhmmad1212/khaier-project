@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Schema;
 
 class MenuBuilder extends Page implements Forms\Contracts\HasForms
 {
-    protected static ?string $navigationGroup = 'إدارة الموقع';
-    protected static ?int $navigationSort = 5;
+    protected static bool $shouldRegisterNavigation = false;
+
+
     
     
     use Forms\Concerns\InteractsWithForms;
@@ -294,8 +295,4 @@ class MenuBuilder extends Page implements Forms\Contracts\HasForms
         return $make(0);
     }
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
 }

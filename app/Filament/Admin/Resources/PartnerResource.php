@@ -13,8 +13,11 @@ use Filament\Tables\Table;
 
 class PartnerResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المحتوى والإعلام';
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 6;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = Partner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';

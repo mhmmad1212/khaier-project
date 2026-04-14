@@ -13,11 +13,14 @@ use Filament\Tables\Table;
 
 class LicenseResource extends Resource
 {
-    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 4;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = License::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
     protected static ?string $navigationLabel = 'التراخيص';
     protected static ?string $modelLabel = 'ترخيص';
     protected static ?string $pluralModelLabel = 'التراخيص';

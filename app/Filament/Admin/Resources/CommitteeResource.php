@@ -13,11 +13,14 @@ use Filament\Tables\Table;
 
 class CommitteeResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المجالس واللجان';
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 12;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = Committee::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'اللجان';
     protected static ?string $modelLabel = 'لجنة';
     protected static ?string $pluralModelLabel = 'اللجان';

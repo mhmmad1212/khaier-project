@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Schema;
 
 class BoardMemberResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المجالس واللجان';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 10;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = BoardMember::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = 'مجلس الإدارة';
     protected static ?string $modelLabel = 'عضو';
     protected static ?string $pluralModelLabel = 'أعضاء مجلس الإدارة';

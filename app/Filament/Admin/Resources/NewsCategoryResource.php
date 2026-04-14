@@ -13,8 +13,9 @@ use Illuminate\Support\Str;
 
 class NewsCategoryResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المحتوى والإعلام';
-    protected static ?int $navigationSort = 1;
+    protected static bool $shouldRegisterNavigation = false;
+
+
     protected static ?string $model = NewsCategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';

@@ -15,8 +15,9 @@ use Filament\Tables\Table;
 
 class StatisticResource extends Resource
 {
-    protected static ?string $navigationGroup = 'المشاريع والبرامج';
-    protected static ?int $navigationSort = 3;
+    protected static bool $shouldRegisterNavigation = false;
+
+
     protected static ?string $model = Statistic::class;
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $navigationLabel = 'الإحصائيات';

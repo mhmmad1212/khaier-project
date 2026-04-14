@@ -10,12 +10,15 @@ use Filament\Tables\Table;
 
 class DisclosureResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 1;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = Disclosure::class;
-    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
+    protected static ?string $navigationIcon = 'heroicon-o-eye';
     protected static ?string $modelLabel = 'إفصاح';
     protected static ?string $pluralModelLabel = 'الإفصاح';
-    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
-    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

@@ -13,14 +13,17 @@ use Filament\Pages\Page;
 
 class ExecutiveDirectorSettings extends Page implements HasForms
 {
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 9;
+    protected static ?string $slug = 'executive-director';
+    protected static bool $shouldRegisterNavigation = true;
+
+
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = 'المدير التنفيذي';
     protected static ?string $title = 'المدير التنفيذي';
-    protected static ?string $navigationGroup = 'إدارة الجمعية';
-    protected static ?int $navigationSort = 1;
-    protected static ?string $slug = 'executive-director';
 
     protected static string $view = 'filament.admin.pages.executive-director-settings';
 

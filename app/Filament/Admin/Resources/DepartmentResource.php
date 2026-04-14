@@ -13,11 +13,12 @@ use Illuminate\Database\Eloquent\Builder;
 
 class DepartmentResource extends Resource
 {
-    protected static ?string $navigationGroup = 'الموارد البشرية';
-    protected static ?int $navigationSort = 1;
+    protected static bool $shouldRegisterNavigation = false;
+
+
     protected static ?string $model = Department::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     protected static ?string $navigationLabel = 'الأقسام';
     protected static ?string $modelLabel = 'قسم';
     protected static ?string $pluralModelLabel = 'الأقسام';
@@ -95,8 +96,4 @@ class DepartmentResource extends Resource
         ];
     }
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
 }

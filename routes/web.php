@@ -72,3 +72,8 @@ Route::post('/forms/{slug}', [FrontendFormController::class, 'submit']);
 Route::get('/forms/{slug}/track', [FrontendFormController::class, 'track']);
 Route::post('/forms/{slug}/track', [FrontendFormController::class, 'lookup']);
 Route::post('/forms/{slug}/track/{submission}/reply', [FrontendFormController::class, 'customerReply']);
+
+// Temporary fallback for missing Filament route: site-settings
+\Illuminate\Support\Facades\Route::get('/admin/site-settings', function () {
+    return redirect('/admin');
+})->name('filament.admin.pages.site-settings');

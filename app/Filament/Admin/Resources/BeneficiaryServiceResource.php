@@ -15,6 +15,9 @@ class BeneficiaryServiceResource extends Resource
 {
     protected static ?string $navigationGroup = 'خدمات المستفيدين';
     protected static ?int $navigationSort = 1;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = BeneficiaryService::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';

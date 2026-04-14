@@ -49,8 +49,6 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make()->label('لوحة التحكم'),
                 NavigationGroup::make()->label('إدارة المحتوى'),
-
- NavigationGroup::make()->label('المحتوى والإعلام'),
                 NavigationGroup::make()->label('الحوكمة والوثائق'),
                 NavigationGroup::make()->label('خدمات المستفيدين'),
                 NavigationGroup::make()->label('إعدادات الموقع'),

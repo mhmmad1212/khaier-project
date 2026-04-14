@@ -12,8 +12,11 @@ use Filament\Tables\Table;
 
 class MenuResource extends Resource
 {
-    protected static ?string $navigationGroup = 'إدارة الموقع';
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'إعدادات الموقع';
+    protected static ?int $navigationSort = 2;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     
     
     protected static ?string $model = Menu::class;

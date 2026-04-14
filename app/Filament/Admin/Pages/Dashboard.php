@@ -25,15 +25,18 @@ use Illuminate\Support\Facades\DB;
 
 class Dashboard extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static ?string $navigationGroup = 'لوحة التحكم';
     protected static ?int $navigationSort = 1;
+    protected static ?string $slug = '/';
+    protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $navigationGroup = 'لوحة التحكم والمتابعة';
+
+    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+
 
     protected static string $view = 'filament.admin.pages.dashboard';
     protected static ?string $title = 'لوحة التحكم';
     protected static ?string $navigationLabel = 'لوحة التحكم';
-    protected static ?string $slug = '/';
 
     public array $stats = [];
     public ?object $siteSettings = null;

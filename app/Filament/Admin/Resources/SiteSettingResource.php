@@ -23,6 +23,9 @@ use Filament\Tables\Table;
 
 class SiteSettingResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
+
 
     protected static function templateOptionsByType(string $pageType): array
     {
@@ -34,8 +37,6 @@ class SiteSettingResource extends Resource
             ->toArray();
     }
 
-    protected static ?string $navigationGroup = 'إعدادات النظام';
-    protected static ?int $navigationSort = 1;
     protected static ?string $model = SiteSetting::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';

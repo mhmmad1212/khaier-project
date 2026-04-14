@@ -17,8 +17,11 @@ use Illuminate\Validation\ValidationException;
 
 class MenuItemResource extends Resource
 {
-    protected static ?string $navigationGroup = 'إدارة الموقع';
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'إعدادات الموقع';
+    protected static ?int $navigationSort = 3;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = MenuItem::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-link';

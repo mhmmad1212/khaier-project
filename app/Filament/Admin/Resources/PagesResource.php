@@ -17,8 +17,11 @@ use Illuminate\Support\Str;
 
 class PagesResource extends Resource
 {
-    protected static ?string $navigationGroup = 'إدارة الموقع';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 1;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     
     
     protected static ?string $model = Page::class;

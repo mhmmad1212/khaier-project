@@ -13,12 +13,15 @@ use Filament\Tables\Table;
 
 class AssociationPlanResource extends Resource
 {
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 7;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = AssociationPlan::class;
 
-    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
-    protected static ?int $navigationSort = 4;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-map';
     protected static ?string $navigationLabel = 'خطط الجمعية';
     protected static ?string $modelLabel = 'خطة جمعية';
     protected static ?string $pluralModelLabel = 'خطط الجمعية';

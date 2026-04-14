@@ -11,13 +11,17 @@ use Illuminate\Support\Facades\Hash;
 
 class ChangePassword extends Page implements Forms\Contracts\HasForms
 {
+    protected static ?string $navigationGroup = 'لوحة التحكم';
+    protected static ?int $navigationSort = 3;
+    protected static ?string $slug = 'change-password';
+    protected static bool $shouldRegisterNavigation = true;
+
+
     use Forms\Concerns\InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
     protected static ?string $navigationLabel = 'تغيير كلمة المرور';
     protected static ?string $title = 'تغيير كلمة المرور';
-    protected static ?string $navigationGroup = 'إعدادات النظام';
-    protected static ?int $navigationSort = 95;
 
     protected static string $view = 'filament.admin.pages.change-password';
 

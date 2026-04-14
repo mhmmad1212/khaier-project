@@ -17,11 +17,14 @@ use Illuminate\Support\Str;
 
 class RegulationResource extends Resource
 {
-    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 3;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = Regulation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document';
+    protected static ?string $navigationIcon = 'heroicon-o-scale';
     protected static ?string $navigationLabel = 'اللوائح';
     protected static ?string $modelLabel = 'لائحة';
     protected static ?string $pluralModelLabel = 'اللوائح';

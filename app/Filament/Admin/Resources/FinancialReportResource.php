@@ -17,11 +17,14 @@ use Illuminate\Support\Str;
 
 class FinancialReportResource extends Resource
 {
-    protected static ?string $navigationGroup = 'الشفافية والحوكمة';
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'الحوكمة والوثائق';
+    protected static ?int $navigationSort = 5;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = FinancialReport::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $navigationLabel = 'القوائم المالية';
     protected static ?string $modelLabel = 'قائمة مالية';
     protected static ?string $pluralModelLabel = 'القوائم المالية';

@@ -12,13 +12,17 @@ use Filament\Tables\Table;
 
 class VideoLibraryResource extends Resource
 {
+    protected static ?string $navigationGroup = 'إدارة المحتوى';
+    protected static ?int $navigationSort = 7;
+    protected static bool $shouldRegisterNavigation = true;
+
+
     protected static ?string $model = VideoLibrary::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-play-circle';
     protected static ?string $navigationLabel = 'مكتبة الفيديو';
     protected static ?string $modelLabel = 'مقطع فيديو';
     protected static ?string $pluralModelLabel = 'مكتبة الفيديو';
-    protected static ?string $navigationGroup = 'إدارة المحتوى';
 
     public static function form(Form $form): Form
     {

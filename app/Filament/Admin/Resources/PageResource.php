@@ -15,8 +15,9 @@ use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
-    protected static ?string $navigationGroup = 'إدارة الموقع';
-    protected static ?int $navigationSort = 1;
+    protected static bool $shouldRegisterNavigation = false;
+
+
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
