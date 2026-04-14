@@ -7,7 +7,6 @@ use App\Filament\Admin\Pages\ChangePassword;
 use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Admin\Pages\ExecutiveDirectorSettings;
 use App\Filament\Admin\Pages\MenuBuilderPro;
-use App\Filament\Admin\Pages\SiteSettings;
 use App\Filament\Admin\Pages\TemplateVariables;
 use App\Filament\Admin\Pages\VisitorStatistics;
 use Filament\Http\Middleware\Authenticate;
@@ -37,40 +36,39 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render("@vite(['resources/css/app.css', 'resources/js/app.js'])"),
-            )
             ->authGuard('tenant')
             ->brandName('لوحة الجمعية')
             ->colors([
                 'primary' => Color::Emerald,
             ])
-            ->navigationGroups([
-                NavigationGroup::make()->label('لوحة التحكم'),
-                NavigationGroup::make()->label('إدارة المحتوى'),
-
- NavigationGroup::make()->label('المحتوى والإعلام'),
-                NavigationGroup::make()->label('الحوكمة والوثائق'),
-                NavigationGroup::make()->label('خدمات المستفيدين'),
-                NavigationGroup::make()->label('إعدادات الموقع'),
-            ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): string => new HtmlString("
+                fn (): string => Blade::render("@vite(['resources/css/app.css', 'resources/js/app.js'])"),
+            )
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => new HtmlString('
                     <style>
-                        .fi-sidebar { background-color: #ffffff !important
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn () => view('filament.admin.partials.sidebar-icon-colors'),
-            ); border-left: 1px solid #cbd5e1 !important; }
+                        .fi-sidebar { background-color: #ffffff !important; border-left: 1px solid #cbd5e1 !important; }
                         .fi-sidebar-group-label { color: #1e293b !important; font-weight: 800 !important; font-size: .95rem !important; padding-bottom: 8px !important; margin-top: 25px !important; margin-bottom: 8px !important; border-bottom: 2px solid #b48600 !important; display: block; width: 90%; }
                         .fi-sidebar-item { border-bottom: 1px solid #f1f5f9 !important; }
                         .fi-sidebar-item-button { border-radius: 4px !important; padding: 10px 12px !important; margin: 2px 8px !important; }
                         .fi-sidebar-item-active .fi-sidebar-item-button { background-color: #385833 !important; color: #ffffff !important; border-right: 4px solid #b48600 !important; }
                     </style>
-                "),
+                '),
             )
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn () => view('filament.admin.partials.sidebar-icon-colors'),
+            )
+            ->navigationGroups([
+                NavigationGroup::make()->label('لوحة التحكم'),
+                NavigationGroup::make()->label('لوحة التحكم والمتابعة'),
+                NavigationGroup::make()->label('إدارة المحتوى'),
+                NavigationGroup::make()->label('الحوكمة والوثائق'),
+                NavigationGroup::make()->label('خدمات المستفيدين'),
+                NavigationGroup::make()->label('إعدادات الموقع'),
+            ])
             ->discoverResources(
                 in: app_path('Filament/Admin/Resources'),
                 for: 'App\\Filament\\Admin\\Resources'
@@ -79,7 +77,6 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
                 VisitorStatistics::class,
                 ChangePassword::class,
-                SiteSettings::class,
                 MenuBuilderPro::class,
                 TemplateVariables::class,
                 ExecutiveDirectorSettings::class,

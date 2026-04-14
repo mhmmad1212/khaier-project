@@ -5,7 +5,6 @@ namespace App\Filament\Admin\Resources\SiteSettingResource\Pages;
 use App\Filament\Admin\Resources\SiteSettingResource;
 use App\Models\SiteSetting;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Http\RedirectResponse;
 
 class ListSiteSettings extends ListRecords
 {
@@ -19,7 +18,10 @@ class ListSiteSettings extends ListRecords
             $record = SiteSetting::query()->create([]);
         }
 
-        redirect()->to(SiteSettingResource::getUrl('edit', ['record' => $record]));
+        $this->redirect(
+            SiteSettingResource::getUrl('edit', ['record' => $record]),
+            navigate: true
+        );
     }
 
     protected function getHeaderActions(): array

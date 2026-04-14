@@ -3,19 +3,35 @@
 namespace App\Filament\Admin\Resources\SiteSettingResource\Pages;
 
 use App\Filament\Admin\Resources\SiteSettingResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSiteSetting extends EditRecord
 {
-    use \App\Filament\Traits\HasBackButton;
-
     protected static string $resource = SiteSettingResource::class;
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            url()->current() => 'إعدادات الموقع',
+        ];
+    }
 
     protected function getHeaderActions(): array
     {
+        return [];
+    }
+
+    protected function getFormActions(): array
+    {
         return [
-            Actions\DeleteAction::make(),
+            $this->getSaveFormAction(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('edit', [
+            'record' => $this->record,
+        ]);
     }
 }

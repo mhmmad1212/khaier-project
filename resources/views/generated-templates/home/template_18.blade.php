@@ -13,17 +13,32 @@
     $email = $settings->email ?? ($settings->official_email ?? 'info@charity.org');
     $desc = $settings->site_description ?? 'نعمل بشفافية عالية لتحقيق أهدافنا التنموية لخدمة المجتمع.';
 
-    $logoPath = $settings->logo ?? null;
-    if (empty($logoPath) && !empty($settings->logo_media_id)) {
-        $media = $connection->table('media_items')->where('id', $settings->logo_media_id)->first();
-        if ($media) {
-            $logoPath = $media->file ?? $media->path ?? null;
+    /*
+    |--------------------------------------------------------------------------
+    | حل الشعار: دعم R2 + دعم الصور القديمة
+    |--------------------------------------------------------------------------
+    */
+    $finalLogoUrl = null;
+    $logoMedia = null;
+
+    if (!empty($settings->logo_media_id)) {
+        try {
+            $logoMedia = \App\Models\MediaItem::query()->find($settings->logo_media_id);
+        } catch (\Throwable $e) {
+            $logoMedia = null;
         }
     }
-    
-    $finalLogoUrl = null;
-    if (!empty($logoPath)) {
-        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
+
+    if ($logoMedia && !empty($logoMedia->url)) {
+        $finalLogoUrl = $logoMedia->url;
+    } else {
+        $logoPath = $settings->logo ?? null;
+
+        if (!empty($logoPath)) {
+            $finalLogoUrl = str_starts_with($logoPath, 'http')
+                ? $logoPath
+                : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
+        }
     }
 
     $mainMenu = $connection->table('menus')->where('location', 'header')->first();
@@ -103,6 +118,63 @@
 
     $primary = $settings?->primary_color ?? '#127962';
     $secondary = $settings?->secondary_color ?? '#0d5948';
+
+    $usefulLinks = [
+        [
+            'title' => 'منصة أبشر',
+            'url' => 'https://www.absher.sa',
+        ],
+        [
+            'title' => 'الضمان الاجتماعي',
+            'url' => 'https://sbis.hrsd.gov.sa',
+        ],
+        [
+            'title' => 'المركز الوطني لتنمية القطاع غير الربحي',
+            'url' => 'https://ncnp.gov.sa',
+        ],
+        [
+            'title' => 'التقاعد والتأمينات الاجتماعية',
+            'url' => 'https://www.gosi.gov.sa',
+        ],
+    ];
+
+    $socialLinks = collect([
+        [
+            'url' => $settings->facebook ?? null,
+            'icon' => 'fab fa-facebook-f',
+            'label' => 'فيسبوك',
+        ],
+        [
+            'url' => $settings->twitter_url ?? null,
+            'icon' => 'fab fa-x-twitter',
+            'label' => 'إكس',
+        ],
+        [
+            'url' => $settings->instagram_url ?? null,
+            'icon' => 'fab fa-instagram',
+            'label' => 'إنستغرام',
+        ],
+        [
+            'url' => $settings->youtube_url ?? null,
+            'icon' => 'fab fa-youtube',
+            'label' => 'يوتيوب',
+        ],
+        [
+            'url' => $settings->tiktok_url ?? null,
+            'icon' => 'fab fa-tiktok',
+            'label' => 'تيك توك',
+        ],
+        [
+            'url' => $settings->snapchat_url ?? null,
+            'icon' => 'fab fa-snapchat-ghost',
+            'label' => 'سناب شات',
+        ],
+        [
+            'url' => $settings->whatsapp_url ?? null,
+            'icon' => 'fab fa-whatsapp',
+            'label' => 'واتساب',
+        ],
+    ])->filter(fn ($item) => !empty($item['url']))->values();
 @endphp
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -1083,12 +1155,12 @@
                 </div>
 
                 @php
-                        $donateNowUrl = $settings->store_url ?? $settings->beneficiary_portal_url ?? '#';
-                    @endphp
-                    <a href="{{ $donateNowUrl }}" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xl py-4 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex justify-center items-center gap-2 flex justify-center items-center gap-2">
-                        <i class="fas fa-heart"></i>
-                        إتمام التبرع جزاك الله خيراً
-                    </a>
+                    $donateNowUrl = $settings->store_url ?? $settings->beneficiary_portal_url ?? '#';
+                @endphp
+                <a href="{{ $donateNowUrl }}" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xl py-4 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex justify-center items-center gap-2 flex justify-center items-center gap-2">
+                    <i class="fas fa-heart"></i>
+                    إتمام التبرع جزاك الله خيراً
+                </a>
                 <div class="text-center text-gray-400 text-sm mt-5 flex items-center justify-center gap-2 font-medium">
                     <i class="fas fa-lock"></i>
                     <span>جميع معاملاتك المالية آمنة ومشفرة بالكامل</span>
@@ -1173,14 +1245,25 @@
                         <span class="font-bold text-2xl tracking-wide">{{ $siteName }}</span>
                     @endif
                 </div>
+
                 <p class="text-slate-400 mb-6 leading-loose max-w-md text-justify">
                     {{ $desc }}
                 </p>
-                <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-emerald-600 hover:text-white transition-colors"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-emerald-600 hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-emerald-600 hover:text-white transition-colors"><i class="fab fa-youtube"></i></a>
-                </div>
+
+                @if($socialLinks->count())
+                    <div class="flex gap-4 flex-wrap">
+                        @foreach($socialLinks as $social)
+                            <a href="{{ $social['url'] }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="{{ $social['label'] }}"
+                               title="{{ $social['label'] }}"
+                               class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-emerald-600 hover:text-white transition-colors">
+                                <i class="{{ $social['icon'] }}"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             </div>
             
             <div>
@@ -1198,14 +1281,21 @@
 
             <div>
                 <h4 class="font-bold text-lg mb-6 text-white relative inline-block pb-3">
-                    معلومات هامة
+                    مواقع مفيدة
                     <span class="absolute bottom-0 right-0 w-12 h-1 bg-emerald-500 rounded-full"></span>
                 </h4>
                 <ul class="space-y-3 text-slate-400">
-                    <li><a href="#" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fas fa-angle-left text-xs"></i> سياسة الخصوصية</a></li>
-                    <li><a href="#" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fas fa-angle-left text-xs"></i> الشروط والأحكام</a></li>
-                    <li><a href="#" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fas fa-angle-left text-xs"></i> التقارير المالية</a></li>
-                    <li><a href="#" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fas fa-angle-left text-xs"></i> الحوكمة والشفافية</a></li>
+                    @foreach($usefulLinks as $link)
+                        <li>
+                            <a href="{{ $link['url'] }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="hover:text-emerald-400 transition-colors flex items-center gap-2">
+                                <i class="fas fa-angle-left text-xs"></i>
+                                {{ $link['title'] }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
         </div>
@@ -1303,7 +1393,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const slideWidth = firstSlide.getBoundingClientRect().width + 24;
             projectsTrack.style.transform = `translateX(${projectIndex * slideWidth}px)`;
         });
-    }
+    });
     
     const amountBtns = document.querySelectorAll('.amount-btn');
     amountBtns.forEach(btn => {

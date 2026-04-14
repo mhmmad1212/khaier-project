@@ -2,30 +2,45 @@
 
 namespace App\Filament\Admin\Resources;
 
-use Filament\Forms\Components\Select;
-
 use App\Filament\Admin\Resources\SiteSettingResource\Pages;
 use App\Forms\Components\MediaPicker;
 use App\Models\MediaItem;
-use App\Models\SiteSetting;
 use App\Models\PageTemplate;
-use Illuminate\Support\Facades\DB;
+use App\Models\SiteSetting;
 use App\Support\LogoColorExtractor;
 use Filament\Forms;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class SiteSettingResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $model = SiteSetting::class;
 
+    protected static ?string $navigationGroup = 'إعدادات الموقع';
+    protected static bool $shouldRegisterNavigation = true;
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static ?string $navigationLabel = 'إعدادات الموقع';
+    protected static ?string $modelLabel = 'إعدادات الموقع';
+    protected static ?string $pluralModelLabel = 'إعدادات الموقع';
 
+    public static function getNavigationUrl(): string
+    {
+        $record = SiteSetting::query()->latest('id')->first();
+
+        if (! $record) {
+            $record = SiteSetting::query()->create([]);
+        }
+
+        return static::getUrl('edit', ['record' => $record]);
+    }
 
     protected static function templateOptionsByType(string $pageType): array
     {
@@ -37,13 +52,35 @@ class SiteSettingResource extends Resource
             ->toArray();
     }
 
-    protected static ?string $model = SiteSetting::class;
+    protected static function templateOptions(string $pageType): array
+    {
+        $associationId = DB::connection('mysql')
+            ->table('associations')
+            ->where('domain', request()->getHost())
+            ->value('id');
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static ?string $navigationLabel = 'إعدادات الموقع';
-    protected static ?string $modelLabel = 'إعدادات الموقع';
-    protected static ?string $pluralModelLabel = 'إعدادات الموقع';
-    
+        return PageTemplate::query()
+            ->where('page_type', $pageType)
+            ->where('is_active', true)
+            ->where(function ($query) use ($associationId) {
+                $query->where('scope_type', 'global');
+
+                if ($associationId) {
+                    $query->orWhere(function ($subQuery) use ($associationId) {
+                        $subQuery->where('scope_type', 'restricted')
+                            ->whereExists(function ($existsQuery) use ($associationId) {
+                                $existsQuery->select(DB::raw(1))
+                                    ->from('page_template_associations')
+                                    ->whereColumn('page_template_associations.page_template_id', 'page_templates.id')
+                                    ->where('page_template_associations.association_id', $associationId);
+                            });
+                    });
+                }
+            })
+            ->orderBy('sort_order')
+            ->pluck('name', 'template_key')
+            ->toArray();
+    }
 
     public static function form(Form $form): Form
     {
@@ -90,159 +127,32 @@ class SiteSettingResource extends Resource
 
                     Forms\Components\Tabs\Tab::make('التصاميم')
                         ->schema([
-                            Forms\Components\Select::make('home_template_key')
-                                ->label('تصميم الصفحة الرئيسية')
-                                ->options(fn () => static::templateOptions('home'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('policies_template_key')
-                                ->label('تصميم صفحة السياسات')
-                                ->options(fn () => static::templateOptions('policies'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('regulations_template_key')
-                                ->label('تصميم صفحة اللوائح')
-                                ->options(fn () => static::templateOptions('regulations'))
-                                ->searchable()
-                                ->preload(),
-                            Forms\Components\Select::make('disclosure_template_key')
-                                ->label('تصميم صفحة الإفصاح')
-                                ->options(fn () => static::templateOptions('disclosure'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('financial_reports_template_key')
-                                ->label('تصميم صفحة القوائم المالية')
-                                ->options(fn () => static::templateOptions('financial_reports'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('news_index_template_key')
-                                ->label('تصميم قائمة الأخبار')
-                                ->options(fn () => static::templateOptions('news_index'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('news_show_template_key')
-                                ->label('تصميم تفاصيل الخبر')
-                                ->options(fn () => static::templateOptions('news_show'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('committees_template_key')
-                                ->label('تصميم صفحة اللجان')
-                                ->options(fn () => static::templateOptions('committees'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('board_members_template_key')
-                                ->label('تصميم صفحة مجلس الإدارة')
-                                ->options(fn () => static::templateOptions('board_members'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('general_assembly_members_template_key')
-                                ->label('تصميم صفحة الجمعية العمومية')
-                                ->options(fn () => static::templateOptions('general_assembly_members'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('meeting_minutes_board_template_key')
-                                ->label('تصميم محاضر اجتماع مجلس الإدارة')
-                                ->options(fn () => static::templateOptions('meeting_minutes_board'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('meeting_minutes_general_template_key')
-                                ->label('تصميم محاضر اجتماع الجمعية العمومية')
-                                ->options(fn () => static::templateOptions('meeting_minutes_general'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('meeting_minutes_committee_template_key')
-                                ->label('تصميم محاضر اجتماع اللجان')
-                                ->options(fn () => static::templateOptions('meeting_minutes_committee'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('employees_template_key')
-                                ->label('تصميم صفحة الموظفين')
-                                ->options(fn () => static::templateOptions('employees'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('program_projects_index_template_key')
-                                ->label('تصميم صفحة قائمة المشاريع')
-                                ->options(fn () => static::templateOptions('program_projects_index'))
-                                ->searchable()
-                                ->preload(),
-
-                                            Select::make('inner_pages_header_template_key')
-                    ->label('تصميم هيدر الصفحات الداخلية')
-                    ->options(static::templateOptionsByType('inner_header'))
-                    ->searchable()
-                    ->preload(),
-
-                Select::make('inner_pages_footer_template_key')
-                    ->label('تصميم فوتر الصفحات الداخلية')
-                    ->options(static::templateOptionsByType('inner_footer'))
-                    ->searchable()
-                    ->preload(),
-
-                Select::make('licenses_template_key')
-                    ->label('تصميم صفحة تراخيص الجمعية')
-                    ->options(static::templateOptionsByType('licenses'))
-                    ->searchable()
-                    ->preload(),
-
-                Select::make('program_projects_show_template_key')
-                                ->label('تصميم صفحة تفاصيل المشروع')
-                                ->options(fn () => static::templateOptions('program_projects_show'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('volunteer_opportunities_index_template_key')
-                                ->label('تصميم قائمة فرص التطوع')
-                                ->options(fn () => static::templateOptions('volunteer_opportunities_index'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('volunteer_opportunities_show_template_key')
-                                ->label('تصميم تفاصيل فرصة التطوع')
-                                ->options(fn () => static::templateOptions('volunteer_opportunities_show'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('services_template_key')
-                                ->label('تصميم صفحة الخدمات')
-                                ->options(fn () => static::templateOptions('services'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('bank_accounts_template_key')
-                                ->label('تصميم صفحة الحسابات البنكية')
-                                ->options(fn () => static::templateOptions('bank_accounts'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('beneficiary_services_template_key')
-                                ->label('تصميم صفحة خدمات المستفيدين')
-                                ->options(fn () => static::templateOptions('beneficiary_services'))
-                                ->searchable()
-                                ->preload(),
-
-                            Forms\Components\Select::make('executive_director_template_key')
-                                ->label('تصميم صفحة المدير التنفيذي')
-                                ->options(fn () => static::templateOptions('executive_director'))
-                                ->searchable()
-                                ->preload(),
-                            Forms\Components\Select::make('association_plans_template_key')
-                                ->label('تصميم صفحة خطط الجمعية')
-                                ->options(fn () => static::templateOptions('association_plans'))
-                                ->searchable()
-                                ->preload(),
+                            Forms\Components\Select::make('home_template_key')->label('تصميم الصفحة الرئيسية')->options(fn () => static::templateOptions('home'))->searchable()->preload(),
+                            Forms\Components\Select::make('policies_template_key')->label('تصميم صفحة السياسات')->options(fn () => static::templateOptions('policies'))->searchable()->preload(),
+                            Forms\Components\Select::make('regulations_template_key')->label('تصميم صفحة اللوائح')->options(fn () => static::templateOptions('regulations'))->searchable()->preload(),
+                            Forms\Components\Select::make('disclosure_template_key')->label('تصميم صفحة الإفصاح')->options(fn () => static::templateOptions('disclosure'))->searchable()->preload(),
+                            Forms\Components\Select::make('financial_reports_template_key')->label('تصميم صفحة القوائم المالية')->options(fn () => static::templateOptions('financial_reports'))->searchable()->preload(),
+                            Forms\Components\Select::make('news_index_template_key')->label('تصميم قائمة الأخبار')->options(fn () => static::templateOptions('news_index'))->searchable()->preload(),
+                            Forms\Components\Select::make('news_show_template_key')->label('تصميم تفاصيل الخبر')->options(fn () => static::templateOptions('news_show'))->searchable()->preload(),
+                            Forms\Components\Select::make('committees_template_key')->label('تصميم صفحة اللجان')->options(fn () => static::templateOptions('committees'))->searchable()->preload(),
+                            Forms\Components\Select::make('board_members_template_key')->label('تصميم صفحة مجلس الإدارة')->options(fn () => static::templateOptions('board_members'))->searchable()->preload(),
+                            Forms\Components\Select::make('general_assembly_members_template_key')->label('تصميم صفحة الجمعية العمومية')->options(fn () => static::templateOptions('general_assembly_members'))->searchable()->preload(),
+                            Forms\Components\Select::make('meeting_minutes_board_template_key')->label('تصميم محاضر اجتماع مجلس الإدارة')->options(fn () => static::templateOptions('meeting_minutes_board'))->searchable()->preload(),
+                            Forms\Components\Select::make('meeting_minutes_general_template_key')->label('تصميم محاضر اجتماع الجمعية العمومية')->options(fn () => static::templateOptions('meeting_minutes_general'))->searchable()->preload(),
+                            Forms\Components\Select::make('meeting_minutes_committee_template_key')->label('تصميم محاضر اجتماع اللجان')->options(fn () => static::templateOptions('meeting_minutes_committee'))->searchable()->preload(),
+                            Forms\Components\Select::make('employees_template_key')->label('تصميم صفحة الموظفين')->options(fn () => static::templateOptions('employees'))->searchable()->preload(),
+                            Forms\Components\Select::make('program_projects_index_template_key')->label('تصميم صفحة قائمة المشاريع')->options(fn () => static::templateOptions('program_projects_index'))->searchable()->preload(),
+                            Select::make('inner_pages_header_template_key')->label('تصميم هيدر الصفحات الداخلية')->options(static::templateOptionsByType('inner_header'))->searchable()->preload(),
+                            Select::make('inner_pages_footer_template_key')->label('تصميم فوتر الصفحات الداخلية')->options(static::templateOptionsByType('inner_footer'))->searchable()->preload(),
+                            Select::make('licenses_template_key')->label('تصميم صفحة تراخيص الجمعية')->options(static::templateOptionsByType('licenses'))->searchable()->preload(),
+                            Select::make('program_projects_show_template_key')->label('تصميم صفحة تفاصيل المشروع')->options(fn () => static::templateOptions('program_projects_show'))->searchable()->preload(),
+                            Forms\Components\Select::make('volunteer_opportunities_index_template_key')->label('تصميم قائمة فرص التطوع')->options(fn () => static::templateOptions('volunteer_opportunities_index'))->searchable()->preload(),
+                            Forms\Components\Select::make('volunteer_opportunities_show_template_key')->label('تصميم تفاصيل فرصة التطوع')->options(fn () => static::templateOptions('volunteer_opportunities_show'))->searchable()->preload(),
+                            Forms\Components\Select::make('services_template_key')->label('تصميم صفحة الخدمات')->options(fn () => static::templateOptions('services'))->searchable()->preload(),
+                            Forms\Components\Select::make('bank_accounts_template_key')->label('تصميم صفحة الحسابات البنكية')->options(fn () => static::templateOptions('bank_accounts'))->searchable()->preload(),
+                            Forms\Components\Select::make('beneficiary_services_template_key')->label('تصميم صفحة خدمات المستفيدين')->options(fn () => static::templateOptions('beneficiary_services'))->searchable()->preload(),
+                            Forms\Components\Select::make('executive_director_template_key')->label('تصميم صفحة المدير التنفيذي')->options(fn () => static::templateOptions('executive_director'))->searchable()->preload(),
+                            Forms\Components\Select::make('association_plans_template_key')->label('تصميم صفحة خطط الجمعية')->options(fn () => static::templateOptions('association_plans'))->searchable()->preload(),
                         ])->columns(2),
 
                     Forms\Components\Tabs\Tab::make('الأرشفة و SEO')
@@ -270,16 +180,8 @@ class SiteSettingResource extends Resource
                                     }),
                             ])->columnSpanFull(),
 
-                            Forms\Components\TextInput::make('default_meta_title')
-                                ->label('عنوان SEO الافتراضي')
-                                ->maxLength(255)
-                                ->columnSpanFull(),
-
-                            Forms\Components\Textarea::make('default_meta_description')
-                                ->label('وصف SEO الافتراضي')
-                                ->rows(4)
-                                ->columnSpanFull(),
-
+                            Forms\Components\TextInput::make('default_meta_title')->label('عنوان SEO الافتراضي')->maxLength(255)->columnSpanFull(),
+                            Forms\Components\Textarea::make('default_meta_description')->label('وصف SEO الافتراضي')->rows(4)->columnSpanFull(),
                             Forms\Components\Select::make('robots_indexing')
                                 ->label('إعداد الأرشفة لمحركات البحث')
                                 ->options([
@@ -322,9 +224,7 @@ class SiteSettingResource extends Resource
                                 })
                                 ->columnSpanFull(),
 
-                            MediaPicker::make('favicon_media_id')
-                                ->label('أيقونة الموقع')
-                                ->columnSpanFull(),
+                            MediaPicker::make('favicon_media_id')->label('أيقونة الموقع')->columnSpanFull(),
 
                             Actions::make([
                                 Action::make('suggest_colors_from_logo')
@@ -364,37 +264,6 @@ class SiteSettingResource extends Resource
                 ])
                 ->columnSpanFull(),
         ]);
-    }
-
-
-    protected static function templateOptions(string $pageType): array
-    {
-        $associationId = DB::connection('mysql')
-            ->table('associations')
-            ->where('domain', request()->getHost())
-            ->value('id');
-
-        return PageTemplate::query()
-            ->where('page_type', $pageType)
-            ->where('is_active', true)
-            ->where(function ($query) use ($associationId) {
-                $query->where('scope_type', 'global');
-
-                if ($associationId) {
-                    $query->orWhere(function ($subQuery) use ($associationId) {
-                        $subQuery->where('scope_type', 'restricted')
-                            ->whereExists(function ($existsQuery) use ($associationId) {
-                                $existsQuery->select(DB::raw(1))
-                                    ->from('page_template_associations')
-                                    ->whereColumn('page_template_associations.page_template_id', 'page_templates.id')
-                                    ->where('page_template_associations.association_id', $associationId);
-                            });
-                    });
-                }
-            })
-            ->orderBy('sort_order')
-            ->pluck('name', 'template_key')
-            ->toArray();
     }
 
     public static function table(Table $table): Table
