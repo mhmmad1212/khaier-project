@@ -9,6 +9,7 @@ class PageTypeRegistry
         return [
             'home' => 'الصفحة الرئيسية',
             'policies' => 'السياسات',
+            'feedback' => 'التغذية الراجعة',
             'regulations' => 'اللوائح',
             'financial_reports' => 'القوائم المالية',
             'disclosure' => 'الإفصاح',
@@ -20,22 +21,18 @@ class PageTypeRegistry
             'volunteer_opportunities_index' => 'قائمة فرص التطوع',
             'volunteer_opportunities_show' => 'تفاصيل فرصة التطوع',
             'licenses' => 'صفحة تراخيص الجمعية',
-            'disclosure' => 'الإفصاح',
             'inner_footer' => 'فوتر الصفحات الداخلية',
             'inner_header' => 'هيدر الصفحات الداخلية',
             'services' => 'الخدمات',
             'beneficiary_services' => 'خدمات المستفيدين',
             'bank_accounts' => 'الحسابات البنكية',
             'executive_director' => 'المدير التنفيذي',
-            'beneficiary_services' => 'خدمات المستفيدين',
-            'beneficiary_services' => 'خدمات المستفيدين',
             'employees' => 'الموظفون',
             'board_members' => 'مجلس الإدارة',
             'general_assembly_members' => 'الجمعية العمومية',
             'meeting_minutes_board' => 'محاضر اجتماعات مجلس الإدارة',
             'meeting_minutes_general' => 'محاضر اجتماعات الجمعية العمومية',
             'meeting_minutes_committee' => 'محاضر اجتماعات اللجان',
-            'committees' => 'اللجان',
             'committees' => 'اللجان',
             'page' => 'الصفحات الداخلية',
         ];
@@ -51,6 +48,7 @@ class PageTypeRegistry
         return [
             'home' => 'الصفحة الرئيسية',
             'policies' => 'السياسات',
+            'feedback' => 'التغذية الراجعة',
             'regulations' => 'اللوائح',
             'financial_reports' => 'القوائم المالية',
             'news_index' => 'قائمة الأخبار',
@@ -76,6 +74,7 @@ class PageTypeRegistry
     {
         return [
             'policies' => 'السياسات',
+            'feedback' => 'التغذية الراجعة',
             'regulations' => 'اللوائح',
             'financial_reports' => 'القوائم المالية',
             'disclosure' => 'الإفصاح',

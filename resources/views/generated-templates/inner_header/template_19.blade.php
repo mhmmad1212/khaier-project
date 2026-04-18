@@ -7,17 +7,37 @@
     $siteName = $settings->site_name ?? 'جمعية الخير';
     $assocName = $settings->association_name ?? $siteName;
 
-    $logoPath = $settings->logo ?? null;
-    if (empty($logoPath) && !empty($settings->logo_media_id)) {
-        $media = $connection->table('media_items')->where('id', $settings->logo_media_id)->first();
-        if ($media) {
-            $logoPath = $media->file ?? $media->path ?? null;
+    $finalLogoUrl = null;
+    $logoMedia = null;
+
+    if (!empty($settings->logo_media_id)) {
+        $logoMedia = \App\Models\MediaItem::query()->find($settings->logo_media_id);
+
+        if ($logoMedia) {
+            try {
+                $finalLogoUrl = \App\Support\Media\MediaUrl::for($logoMedia);
+            } catch (\Throwable $e) {
+                $finalLogoUrl = null;
+            }
+
+            if (empty($finalLogoUrl) && !empty($logoMedia->url)) {
+                $finalLogoUrl = $logoMedia->url;
+            }
+
+            if (empty($finalLogoUrl) && !empty($logoMedia->file)) {
+                $finalLogoUrl = str_starts_with($logoMedia->file, 'http')
+                    ? $logoMedia->file
+                    : \App\Support\Media\MediaUrl::forDiskPath($logoMedia->disk ?? 'public', $logoMedia->file);
+            }
         }
     }
 
-    $finalLogoUrl = null;
-    if (!empty($logoPath)) {
-        $finalLogoUrl = str_starts_with($logoPath, 'http') ? $logoPath : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
+    if (empty($finalLogoUrl) && !empty($settings->logo)) {
+        $logoPath = $settings->logo;
+
+        $finalLogoUrl = str_starts_with($logoPath, 'http')
+            ? $logoPath
+            : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
     }
 
     $mainMenu = $connection->table('menus')->where('location', 'header')->first();
@@ -61,6 +81,10 @@
     $primary = $settings?->primary_color ?? '#127962';
     $secondary = $settings?->secondary_color ?? '#0d5948';
 @endphp
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
 
 <style>
     .inner-custom-header,
@@ -423,7 +447,7 @@
                 <div class="inner-actions">
                     <a href="/" class="inner-btn inner-btn--ghost">الرئيسية</a>
                     @if(!empty($settings?->beneficiary_portal_url))
-                        <a href="{{ $settings->beneficiary_portal_url }}" class="inner-btn inner-btn--light">بوابة المستفيدين</a>
+                        <a href="{{ $settings->beneficiary_portal_url }}" class="inner-btn inner-btn--light">بوابة الموظفين</a>
                     @elseif(!empty($settings?->store_url))
                         <a href="{{ $settings->store_url }}" class="inner-btn inner-btn--light">المتجر</a>
                     @endif

@@ -43,6 +43,7 @@ class SiteSetting extends TenantModel
 
         'home_template_key',
         'policies_template_key',
+        'feedback_template_key',
         'regulations_template_key',
         'financial_reports_template_key',
         'news_index_template_key',

@@ -4,6 +4,6 @@
         x-init="setTimeout(() => window.initCkEditorMediaPicker($el), 100)"
         wire:key="ckeditor-{{ md5($getStatePath()) }}"
     >
-        <textarea wire:model.live.debounce.500ms="{{ $getStatePath() }}" style="min-height: 360px;">{!! $getState() !!}</textarea>
+        <textarea wire:model.defer="{{ $getStatePath() }}" style="min-height: 360px;">{!! $getState() !!}</textarea>
     </div>
 </x-dynamic-component>

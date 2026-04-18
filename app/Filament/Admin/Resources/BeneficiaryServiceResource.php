@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\BeneficiaryServiceResource\Pages;
+use App\Forms\Components\CkEditor;
 use App\Forms\Components\LocalIconGrid;
 use App\Models\BeneficiaryService;
 use Filament\Forms;
@@ -16,7 +17,6 @@ class BeneficiaryServiceResource extends Resource
     protected static ?string $navigationGroup = 'خدمات المستفيدين';
     protected static ?int $navigationSort = 1;
     protected static bool $shouldRegisterNavigation = true;
-
 
     protected static ?string $model = BeneficiaryService::class;
 
@@ -39,19 +39,8 @@ class BeneficiaryServiceResource extends Resource
                         ->label('أيقونة الخدمة')
                         ->columnSpanFull(),
 
-                    Forms\Components\RichEditor::make('conditions')
+                    CkEditor::make('conditions')
                         ->label('شروط الخدمة')
-                        ->toolbarButtons([
-                            'bold',
-                            'italic',
-                            'underline',
-                            'bulletList',
-                            'orderedList',
-                            'link',
-                            'blockquote',
-                            'redo',
-                            'undo',
-                        ])
                         ->columnSpanFull()
                         ->required(),
 

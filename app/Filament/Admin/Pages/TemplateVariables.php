@@ -65,6 +65,12 @@ class TemplateVariables extends Page
             ['group' => 'متغيرات السياسة', 'label' => 'رابط ملف السياسة', 'code' => '{{ policy.file_url }}', 'description' => 'رابط ملف السياسة إن وجد'],
             ['group' => 'متغيرات السياسة', 'label' => 'تاريخ نشر السياسة', 'code' => '{{ policy.published_at }}', 'description' => 'تاريخ نشر السياسة الحالية'],
 
+            ['group' => 'متغيرات التغذية الراجعة', 'label' => 'اسم التغذية الراجعة', 'code' => '{{ feedback.title }}', 'description' => 'عنوان التغذية الراجعة الحالية'],
+            ['group' => 'متغيرات التغذية الراجعة', 'label' => 'وصف التغذية الراجعة', 'code' => '{{ feedback.description }}', 'description' => 'وصف التغذية الراجعة الحالية'],
+            ['group' => 'متغيرات التغذية الراجعة', 'label' => 'رابط التغذية الراجعة', 'code' => '{{ feedback.url }}', 'description' => 'رابط صفحة أو عنصر التغذية الراجعة الحالية'],
+            ['group' => 'متغيرات التغذية الراجعة', 'label' => 'رابط ملف التغذية الراجعة', 'code' => '{{ feedback.file_url }}', 'description' => 'رابط ملف التغذية الراجعة إن وجد'],
+            ['group' => 'متغيرات التغذية الراجعة', 'label' => 'تاريخ نشر التغذية الراجعة', 'code' => '{{ feedback.published_at }}', 'description' => 'تاريخ نشر التغذية الراجعة الحالية'],
+
             ['group' => 'متغيرات اللائحة', 'label' => 'اسم اللائحة', 'code' => '{{ regulation.title }}', 'description' => 'عنوان اللائحة الحالية'],
             ['group' => 'متغيرات اللائحة', 'label' => 'وصف اللائحة', 'code' => '{{ regulation.description }}', 'description' => 'وصف اللائحة الحالية'],
             ['group' => 'متغيرات اللائحة', 'label' => 'رابط اللائحة', 'code' => '{{ regulation.url }}', 'description' => 'رابط صفحة أو عنصر اللائحة الحالية'],

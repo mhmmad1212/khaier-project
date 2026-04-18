@@ -15,31 +15,59 @@
 
     /*
     |--------------------------------------------------------------------------
+    | دوال مساعدة للوسائط: دعم R2 + دعم الروابط المباشرة + دعم الصور القديمة
+    |--------------------------------------------------------------------------
+    */
+    if (!function_exists('resolveMediaUrlForPath')) {
+        function resolveMediaUrlForPath($path, $disk = 'public')
+        {
+            if (empty($path)) {
+                return null;
+            }
+
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+
+            return \App\Support\Media\MediaUrl::forDiskPath($disk, $path);
+        }
+    }
+
+    if (!function_exists('resolveMediaUrlFromMediaId')) {
+        function resolveMediaUrlFromMediaId($mediaId, $fallbackPath = null, $fallbackDisk = 'public')
+        {
+            if (!empty($mediaId)) {
+                try {
+                    $media = \App\Models\MediaItem::query()->find($mediaId);
+
+                    if ($media) {
+                        if (!empty($media->url)) {
+                            return $media->url;
+                        }
+
+                        if (!empty($media->file)) {
+                            return \App\Support\Media\MediaUrl::forDiskPath($media->disk ?: $fallbackDisk, $media->file);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    //
+                }
+            }
+
+            return resolveMediaUrlForPath($fallbackPath, $fallbackDisk);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | حل الشعار: دعم R2 + دعم الصور القديمة
     |--------------------------------------------------------------------------
     */
-    $finalLogoUrl = null;
-    $logoMedia = null;
-
-    if (!empty($settings->logo_media_id)) {
-        try {
-            $logoMedia = \App\Models\MediaItem::query()->find($settings->logo_media_id);
-        } catch (\Throwable $e) {
-            $logoMedia = null;
-        }
-    }
-
-    if ($logoMedia && !empty($logoMedia->url)) {
-        $finalLogoUrl = $logoMedia->url;
-    } else {
-        $logoPath = $settings->logo ?? null;
-
-        if (!empty($logoPath)) {
-            $finalLogoUrl = str_starts_with($logoPath, 'http')
-                ? $logoPath
-                : \App\Support\Media\MediaUrl::forDiskPath('public', $logoPath);
-        }
-    }
+    $finalLogoUrl = resolveMediaUrlFromMediaId(
+        $settings->logo_media_id ?? null,
+        $settings->logo ?? null,
+        'public'
+    );
 
     $mainMenu = $connection->table('menus')->where('location', 'header')->first();
     if (!$mainMenu) {
@@ -65,7 +93,16 @@
             ->where('is_active', 1)
             ->orderBy('sort_order', 'asc')
             ->limit(12)
-            ->get();
+            ->get()
+            ->map(function ($project) {
+                $project->final_cover_url = resolveMediaUrlFromMediaId(
+                    $project->cover_image_media_id ?? null,
+                    $project->cover_image ?? null,
+                    'public'
+                );
+
+                return $project;
+            });
     } catch (\Exception $e) {}
 
     $statistics = collect();
@@ -75,7 +112,19 @@
 
     $sliders = collect();
     try {
-        $sliders = $connection->table('sliders')->where('is_active', 1)->orderBy('sort_order', 'asc')->get();
+        $sliders = $connection->table('sliders')
+            ->where('is_active', 1)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->map(function ($slider) {
+                $slider->final_image_url = resolveMediaUrlFromMediaId(
+                    $slider->image_media_id ?? null,
+                    $slider->image ?? null,
+                    'public'
+                );
+
+                return $slider;
+            });
     } catch (\Exception $e) {}
 
     $newsItems = collect();
@@ -85,7 +134,16 @@
             ->where('status', 'published')
             ->orderByDesc('id')
             ->limit(3)
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $item->final_image_url = resolveMediaUrlFromMediaId(
+                    $item->image_media_id ?? null,
+                    $item->image ?? null,
+                    'public'
+                );
+
+                return $item;
+            });
     } catch (\Exception $e) {}
 
     $partners = collect();
@@ -94,7 +152,16 @@
             ->where('is_active', 1)
             ->orderBy('sort_order', 'asc')
             ->orderByDesc('id')
-            ->get();
+            ->get()
+            ->map(function ($partner) {
+                $partner->final_logo_url = resolveMediaUrlFromMediaId(
+                    $partner->logo_media_id ?? null,
+                    $partner->logo ?? null,
+                    'public'
+                );
+
+                return $partner;
+            });
     } catch (\Exception $e) {}
 
     if (!function_exists('resolveMenuUrl')) {
@@ -759,7 +826,11 @@
         @if(isset($sliders) && $sliders->count() > 0)
             @foreach($sliders as $index => $slider)
                 <div class="slide slider-fade absolute inset-0 w-full h-full {{ $index == 0 ? 'slide-active' : 'slide-inactive' }}">
-                    <img src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', $slider->image) }}" class="absolute inset-0 w-full h-full object-cover" alt="Slide">
+                    <img
+                        src="{{ $slider->final_image_url ?: 'https://via.placeholder.com/1920x1080?text=' . urlencode($slider->title ?? 'Slide') }}"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="{{ $slider->title ?? 'Slide' }}"
+                    >
                     <div class="absolute inset-0 bg-emerald-900/60 mix-blend-multiply"></div>
                     
                     <div class="container mx-auto px-4 relative z-10 h-full flex flex-col justify-center items-center text-center">
@@ -870,7 +941,7 @@
                 @php
                     $featuredNews = $newsItems->first();
                     $otherNews = $newsItems->skip(1);
-                    $featuredImage = !empty($featuredNews->image) ? \App\Support\Media\MediaUrl::forDiskPath('public', $featuredNews->image) : 'https://via.placeholder.com/900x600?text=News';
+                    $featuredImage = $featuredNews->final_image_url ?: 'https://via.placeholder.com/900x600?text=News';
                     $featuredUrl = !empty($featuredNews->slug) ? url('/news/' . $featuredNews->slug) : '#';
                     $featuredDate = $featuredNews->published_at ?: $featuredNews->created_at;
                 @endphp
@@ -907,7 +978,7 @@
                 <div class="lg:col-span-5 space-y-6">
                     @foreach($otherNews as $item)
                         @php
-                            $newsImage = !empty($item->image) ? \App\Support\Media\MediaUrl::forDiskPath('public', $item->image) : 'https://via.placeholder.com/400x300?text=News';
+                            $newsImage = $item->final_image_url ?: 'https://via.placeholder.com/400x300?text=News';
                             $newsUrl = !empty($item->slug) ? url('/news/' . $item->slug) : '#';
                             $newsDate = $item->published_at ?: $item->created_at;
                         @endphp
@@ -967,12 +1038,7 @@
                     @foreach($projects as $project)
                         @php
                             $title = $project->title ?? 'مشروع خيري';
-                            $img = $project->cover_image ?? null;
-                            if (empty($img) && !empty($project->cover_image_media_id)) {
-                                $pm = $connection->table('media_items')->where('id', $project->cover_image_media_id)->first();
-                                if ($pm) $img = $pm->file ?? $pm->path ?? null;
-                            }
-                            $imgUrl = $img ? \App\Support\Media\MediaUrl::forDiskPath('public', $img) : 'https://via.placeholder.com/400x250?text=مشروع+خيري';
+                            $imgUrl = $project->final_cover_url ?: 'https://via.placeholder.com/400x250?text=مشروع+خيري';
                         @endphp
 
                         <div class="project-slide">
@@ -1038,7 +1104,7 @@
                 <div class="partners-track">
                     @foreach($partners as $partner)
                         @php
-                            $partnerLogo = !empty($partner->logo) ? \App\Support\Media\MediaUrl::forDiskPath('public', $partner->logo) : null;
+                            $partnerLogo = $partner->final_logo_url;
                             $partnerUrl = $partner->url ?: '#';
                         @endphp
                         <div class="partner-card">
@@ -1068,7 +1134,7 @@
 
                     @foreach($partners as $partner)
                         @php
-                            $partnerLogo = !empty($partner->logo) ? \App\Support\Media\MediaUrl::forDiskPath('public', $partner->logo) : null;
+                            $partnerLogo = $partner->final_logo_url;
                             $partnerUrl = $partner->url ?: '#';
                         @endphp
                         <div class="partner-card">
@@ -1157,7 +1223,7 @@
                 @php
                     $donateNowUrl = $settings->store_url ?? $settings->beneficiary_portal_url ?? '#';
                 @endphp
-                <a href="{{ $donateNowUrl }}" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xl py-4 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex justify-center items-center gap-2 flex justify-center items-center gap-2">
+                <a href="{{ $donateNowUrl }}" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xl py-4 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
                     <i class="fas fa-heart"></i>
                     إتمام التبرع جزاك الله خيراً
                 </a>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AssociationPlan;
 use App\Models\BeneficiaryService;
 use App\Models\ExecutiveDirectorProfile;
+use App\Models\Feedback;
 use App\Models\BankAccount;
 use App\Models\BoardMember;
 use App\Models\Committee;
@@ -74,6 +75,22 @@ class FrontendPageController extends Controller
                 ->where('is_active', true)
                 ->with('fileMedia')
                 ->orderByDesc('published_at')
+                ->orderBy('sort_order')
+                ->get();
+
+            return view($viewPath, compact('association', 'siteSettings', 'template', 'page', 'items'));
+        }
+
+        if ($page->page_type === 'system' && $page->system_key === 'feedback') {
+            $template = $this->resolveTemplateByKey($siteSettings->feedback_template_key ?? null);
+            $viewPath = ($template && ! empty($template->view_path))
+                ? $template->view_path
+                : 'themes.default.feedback.index';
+
+            $items = Feedback::query()
+                ->where('is_active', true)
+                ->with('fileMedia')
+                ->orderByDesc('created_at')
                 ->orderBy('sort_order')
                 ->get();
 

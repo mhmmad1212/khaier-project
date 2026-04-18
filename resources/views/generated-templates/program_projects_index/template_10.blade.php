@@ -2,11 +2,74 @@
 
 @section('content')
 @php
-    $buttonColor = $siteSettings->button_color
-        ?? $siteSettings->primary_color
+    $connection = \Illuminate\Support\Facades\DB::connection('tenant');
+
+    $settings = $connection->table('site_settings')->orderByDesc('id')->first();
+
+    $buttonColor = $settings->button_color
+        ?? $settings->primary_color
         ?? '#2ea36b';
 
-    $projectsList = collect($projects ?? ($items ?? []));
+    if (!function_exists('resolveMediaUrlForPath')) {
+        function resolveMediaUrlForPath($path, $disk = 'public')
+        {
+            if (empty($path)) {
+                return null;
+            }
+
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+
+            return \App\Support\Media\MediaUrl::forDiskPath($disk, $path);
+        }
+    }
+
+    if (!function_exists('resolveMediaUrlFromMediaId')) {
+        function resolveMediaUrlFromMediaId($mediaId, $fallbackPath = null, $fallbackDisk = 'public')
+        {
+            if (!empty($mediaId)) {
+                try {
+                    $media = \App\Models\MediaItem::query()->find($mediaId);
+
+                    if ($media) {
+                        if (!empty($media->url)) {
+                            return $media->url;
+                        }
+
+                        if (!empty($media->file)) {
+                            return \App\Support\Media\MediaUrl::forDiskPath($media->disk ?: $fallbackDisk, $media->file);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    //
+                }
+            }
+
+            return resolveMediaUrlForPath($fallbackPath, $fallbackDisk);
+        }
+    }
+
+    $projectsList = collect();
+
+    try {
+        $projectsList = $connection->table('program_projects')
+            ->where('is_active', 1)
+            ->orderBy('sort_order', 'asc')
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($project) {
+                $project->final_cover_url = resolveMediaUrlFromMediaId(
+                    $project->cover_image_media_id ?? null,
+                    $project->cover_image ?? null,
+                    'public'
+                );
+
+                return $project;
+            });
+    } catch (\Throwable $e) {
+        $projectsList = collect();
+    }
 @endphp
 
 <div style="direction: rtl; text-align: right; max-width: 1240px; margin: 40px auto; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box;">
@@ -31,6 +94,9 @@
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
             transition: transform .25s ease, box-shadow .25s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .project-card:hover {
@@ -68,21 +134,11 @@
             font-weight: 700;
         }
 
-        .project-badge {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: rgba(255, 255, 255, 0.92);
-            color: #111827;
-            font-size: 13px;
-            font-weight: 800;
-            padding: 8px 12px;
-            border-radius: 999px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-        }
-
         .project-body {
             padding: 20px 18px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .project-title {
@@ -92,6 +148,14 @@
             margin: 0 0 12px;
             line-height: 1.7;
             min-height: 68px;
+        }
+
+        .project-description {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 2;
+            margin-bottom: 18px;
+            flex-grow: 1;
         }
 
         .project-meta {
@@ -124,7 +188,10 @@
         }
 
         .project-actions {
-            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
         }
 
         .project-btn {
@@ -147,6 +214,16 @@
             opacity: .9;
         }
 
+        .project-btn-secondary {
+            background: #ffffff;
+            color: {{ $buttonColor }};
+            border: 1px solid {{ $buttonColor }};
+        }
+
+        .project-btn-secondary:hover {
+            background: #f8fafc;
+        }
+
         .projects-empty {
             text-align: center;
             padding: 70px 20px;
@@ -167,11 +244,6 @@
                 font-size: 18px;
                 min-height: auto;
             }
-
-            .project-meta-item {
-                flex-direction: row;
-                align-items: center;
-            }
         }
     </style>
 
@@ -191,21 +263,20 @@
         <div class="projects-grid">
             @foreach($projectsList as $project)
                 @php
-                    $title = $project->title ?? 'بدون عنوان';
-                    $image = $project->cover_image
-                        ?? ($project->coverMedia->url ?? null)
-                        ?? null;
-
-                    $projectAmount = $project->project_amount ?? null;
+                    $title = $project->title ?? 'مشروع خيري';
+                    $description = $project->description ?? 'مشروع خيري يهدف لخدمة المجتمع ودعم الفئات المستحقة.';
+                    $image = $project->final_cover_url ?? null;
                     $startDate = $project->start_date ?? null;
                     $endDate = $project->end_date ?? null;
+                    $donationUrl = $project->donation_url ?? null;
+                    $detailsUrl = url('/projects/' . ($project->id ?? '#'));
                 @endphp
 
                 <div class="project-card">
                     <div class="project-image-wrap">
                         @if(!empty($image))
                             <img
-                                src="{{ \App\Support\Media\MediaUrl::forDiskPath('public', ltrim($image, '/')) }}"
+                                src="{{ $image }}"
                                 alt="{{ $title }}"
                                 class="project-image"
                             >
@@ -214,25 +285,16 @@
                                 لا توجد صورة للمشروع
                             </div>
                         @endif
-
-                        @if(!empty($projectAmount))
-                            <div class="project-badge">
-                                {{ number_format($projectAmount, 2) }} ر.س
-                            </div>
-                        @endif
                     </div>
 
                     <div class="project-body">
                         <h2 class="project-title">{{ $title }}</h2>
 
-                        <div class="project-meta">
-                            @if(!empty($projectAmount))
-                                <div class="project-meta-item">
-                                    <span class="project-meta-label">مبلغ المشروع</span>
-                                    <span class="project-meta-value">{{ number_format($projectAmount, 2) }} ر.س</span>
-                                </div>
-                            @endif
+                        <div class="project-description">
+                            {{ \Illuminate\Support\Str::limit(strip_tags($description), 140) }}
+                        </div>
 
+                        <div class="project-meta">
                             @if(!empty($startDate))
                                 <div class="project-meta-item">
                                     <span class="project-meta-label">تاريخ البداية</span>
@@ -253,9 +315,15 @@
                         </div>
 
                         <div class="project-actions">
-                            <a href="{{ url('/projects/' . $project->id) }}" class="project-btn">
+                            <a href="{{ $detailsUrl }}" class="project-btn">
                                 تفاصيل المشروع
                             </a>
+
+                            @if(!empty($donationUrl))
+                                <a href="{{ $donationUrl }}" class="project-btn project-btn-secondary">
+                                    تبرع الآن
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>

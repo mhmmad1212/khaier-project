@@ -8,6 +8,8 @@
 
     $beneficiaryServices = collect($beneficiaryServices ?? ($items ?? []));
 
+    $openFileUrl = url('/page/tsgyl-mstfyd');
+
     $cardThemes = [
         ['card' => 'card-blue', 'iconBg' => '#eff6ff', 'iconColor' => '#2563eb', 'condBg' => '#f8fafc', 'condBorder' => '#dbeafe', 'condTitle' => '#1e40af'],
         ['card' => 'card-yellow', 'iconBg' => '#fefce8', 'iconColor' => '#ca8a04', 'condBg' => '#fefce8', 'condBorder' => '#fef08a', 'condTitle' => '#854d0e'],
@@ -18,18 +20,21 @@
     ];
 @endphp
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
     .radwan-services-wrapper {
-        font-family: 'Cairo', Tahoma, Arial, sans-serif;
+        font-family: 'Noto Kufi Arabic', Tahoma, Arial, sans-serif;
         direction: rtl;
         box-sizing: border-box;
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
         color: #374151;
-        line-height: 1.6;
+        line-height: 1.7;
     }
 
     .radwan-services-wrapper * {
@@ -39,15 +44,15 @@
     .radwan-header-section {
         position: relative;
         background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
-        border-radius: 24px;
-        padding: 40px 20px;
+        border-radius: 18px;
+        padding: 26px 18px;
         text-align: center;
         color: white;
-        margin-bottom: 40px;
+        margin-bottom: 28px;
         overflow: hidden;
         box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
     }
-    
+
     .radwan-watermarks {
         position: absolute;
         inset: 0;
@@ -81,32 +86,55 @@
     .radwan-header-icon {
         display: inline-block;
         background: rgba(255, 255, 255, 0.2);
-        padding: 15px;
+        padding: 12px;
         border-radius: 50%;
-        font-size: 30px;
-        margin-bottom: 15px;
+        font-size: 24px;
+        margin-bottom: 12px;
         backdrop-filter: blur(5px);
         border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .radwan-main-title {
-        font-size: 32px;
-        font-weight: 900;
-        margin: 0 0 10px 0;
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0 0 8px 0;
         text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .radwan-subtitle {
-        font-size: 16px;
+        font-size: 14px;
         opacity: 0.92;
-        max-width: 700px;
+        max-width: 760px;
         margin: 0 auto;
-        line-height: 1.9;
+        line-height: 2.2;
+    }
+
+    .radwan-inline-open-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #065f46 !important;
+        text-decoration: none;
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 800;
+        border: 1px solid rgba(255,255,255,.35);
+        box-shadow: 0 8px 18px rgba(0,0,0,.12);
+        transition: all .25s ease;
+    }
+
+    .radwan-inline-open-btn:hover {
+        background: #ecfdf5;
+        color: #047857 !important;
+        transform: translateY(-1px);
     }
 
     .radwan-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 25px;
     }
 
@@ -120,6 +148,7 @@
         flex-direction: column;
         transition: all 0.3s ease;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        min-width: 0;
     }
 
     .radwan-card:hover {
@@ -144,6 +173,7 @@
         font-weight: 700;
         margin: 0 0 15px 0;
         color: #111827;
+        line-height: 1.8;
     }
 
     .radwan-conditions {
@@ -153,6 +183,7 @@
         margin-bottom: 20px;
         flex-grow: 1;
         font-size: 14px;
+        overflow-wrap: anywhere;
     }
 
     .radwan-conditions h4 {
@@ -232,6 +263,17 @@
         background: #047857;
     }
 
+    .radwan-btn-secondary {
+        background: #f0fdf4;
+        color: #065f46 !important;
+        border: 1px solid #a7f3d0;
+    }
+
+    .radwan-btn-secondary:hover {
+        background: #dcfce7;
+        color: #064e3b !important;
+    }
+
     .radwan-modal-overlay {
         position: fixed;
         top: 0;
@@ -309,12 +351,20 @@
     }
 
     @media (max-width: 768px) {
+        .radwan-grid {
+            grid-template-columns: 1fr;
+        }
+
         .radwan-main-title {
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .radwan-subtitle {
-            font-size: 14px;
+            font-size: 13px;
+        }
+
+        .radwan-card {
+            padding: 18px;
         }
     }
 </style>
@@ -338,7 +388,16 @@
             </h2>
 
             <p class="radwan-subtitle">
-                {{ $page->excerpt ?? ('مرحباً بك في بوابة المستفيدين لـ ' . $associationName . '. اختر الخدمة المطلوبة واطلع على الشروط، ثم قدم طلبك بكل سهولة وأمان.') }}
+                @if(!empty($page->excerpt))
+                    {{ $page->excerpt }}
+                @else
+                    مرحباً بك في بوابة المستفيدين لـ {{ $associationName }} . اختر الخدمة المطلوبة واطلع على الشروط، ثم قدم طلبك بكل سهولة وأمان علماً بان الخدمة تحتاج فتح ملف بالجمعية اذا لم يكون لديك ملف نأمل فتح ملف من خلال هذا الزر
+                    <br><br>
+                    <a href="{{ $openFileUrl }}" class="radwan-inline-open-btn">
+                        <i class="fas fa-folder-plus"></i>
+                        فتح ملف بالجمعية
+                    </a>
+                @endif
             </p>
         </div>
     </div>
@@ -347,7 +406,6 @@
         @forelse($beneficiaryServices as $index => $beneficiary_service)
             @php
                 $theme = $cardThemes[$index % count($cardThemes)];
-
                 $guideUrl = $beneficiary_service->guide_url ?? null;
                 $applicationUrl = $beneficiary_service->application_url ?? null;
             @endphp
@@ -392,6 +450,11 @@
                             تقديم الطلب
                         </a>
                     @endif
+
+                    <a href="{{ $openFileUrl }}" class="radwan-btn radwan-btn-secondary">
+                        <i class="fas fa-folder-plus"></i>
+                        فتح ملف بالجمعية
+                    </a>
                 </div>
             </div>
         @empty

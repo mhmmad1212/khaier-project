@@ -129,6 +129,7 @@ class SiteSettingResource extends Resource
                         ->schema([
                             Forms\Components\Select::make('home_template_key')->label('تصميم الصفحة الرئيسية')->options(fn () => static::templateOptions('home'))->searchable()->preload(),
                             Forms\Components\Select::make('policies_template_key')->label('تصميم صفحة السياسات')->options(fn () => static::templateOptions('policies'))->searchable()->preload(),
+                            Forms\Components\Select::make('feedback_template_key')->label('تصميم صفحة التغذية الراجعة')->options(fn () => static::templateOptions('feedback'))->searchable()->preload(),
                             Forms\Components\Select::make('regulations_template_key')->label('تصميم صفحة اللوائح')->options(fn () => static::templateOptions('regulations'))->searchable()->preload(),
                             Forms\Components\Select::make('disclosure_template_key')->label('تصميم صفحة الإفصاح')->options(fn () => static::templateOptions('disclosure'))->searchable()->preload(),
                             Forms\Components\Select::make('financial_reports_template_key')->label('تصميم صفحة القوائم المالية')->options(fn () => static::templateOptions('financial_reports'))->searchable()->preload(),
